@@ -207,8 +207,6 @@ class DatabaseSeeder extends Seeder
                 'image' => 'products/' . $sembako['image'] 
             ]);
         }
-
-    
         
     }
 }
