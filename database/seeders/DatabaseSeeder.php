@@ -89,26 +89,16 @@ class DatabaseSeeder extends Seeder
             ['name' => 'LA Bold 16', 'price' => 30000, 'image' => '33._LA_Bold_16_Rp30.0000.png'], 
         ];
 
-        $daftarRokok = array_map(function($item) {
-            // Hapus spasi di nama file gambar
-            $item['image'] = str_replace(' ', '_', $item['image']);
-            return $item;
-        }, $daftarRokok);
 
         $daftarSnack = [
-            ['name' => 'Wafello', 'price' => 9500, 'image' => '1.Wafello_Rp_9.500_per_pack_per_10_pc.png'],
-            ['name' => 'Sonice', 'price' => 19000, 'image' => '2.Sonice_Rp_19.000_per_topless.png'],
+            ['name' => 'Wafello', 'price' => 9500, 'image' => '1._Wafello_Rp_9.500_per_pack_per_10_pc.png'],
+            ['name' => 'Sonice', 'price' => 19000, 'image' => '2._Sonice_Rp_19.000_per_topless.png'],
             ['name' => 'Astor', 'price' => 19000, 'image' => '3._Astor_Rp_19.000_per_box.png'],
             ['name' => 'Roti Regal', 'price' => 23000, 'image' => '4._Roti Regal_Rp_23.000_per_pc.png'],
             ['name' => 'Crispy Crackers', 'price' => 10000, 'image' => '5._Crispy_Crackers_Rp_10.000.png'],
             ['name' => 'Bang Bang Maxx', 'price' => 27000, 'image' => '6._Bang_Bang_Maxx_Rp_27.000.png'],
         ];
 
-        $daftarSnack = array_map(function($item) {
-            // Hapus spasi di nama file gambar
-            $item['image'] = str_replace(' ', '_', $item['image']);
-            return $item;
-        }, $daftarSnack);
 
         $daftarMinuman = [
             ['name' => 'Aqua', 'price' => 5000, 'image' => '1._Aqua_1_5_liter_Rp_5.000_per_botol.png'],
@@ -128,28 +118,26 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Indocafe Coffeemix', 'price' => 15500, 'image' => '17._Indocafe_Coffeemix_15.500_per_rcg.png'],
         ];
 
-        $daftarMinuman = array_map(function($item) {
-            // Hapus spasi di nama file gambar
-            $item['image'] = str_replace(' ', '_', $item['image']);
-            return $item;
-        }, $daftarMinuman);
-
         $daftarSabun = [
-            ['name' => 'DIV', 'price' => 2900, 'image' => '1.DIV_Rp2.900_pc.png'],
-            ['name' => 'Claudia', 'price' => 2100, 'image' => '2.Claudia_Rp2.100_pc.png'],
-            ['name' => 'Shinzui', 'price' => 4500, 'image' => '3.Shinzui_Rp4.500_pc.png'],
-            ['name' => 'Lifebuoy', 'price' => 3200, 'image' => '4.Lifebuoy_Rp3.200_pc.png'],
-            ['name' => 'Nuvo', 'price' => 2900, 'image' => '5.Nuvo_Rp2.900_pc.png'],
-            ['name' => 'So Klin', 'price' => 4500, 'image' => '6.So-Klin_Liquid_Rp4.500.png'],
-            ['name' => 'Rinso', 'price' => 2600, 'image' => '7.Rinso_Rp26.000.png'],
+            ['name' => 'DIV', 'price' => 2900, 'image' => '1._DIV_Rp2.900_pc.png'],
+            ['name' => 'Claudia', 'price' => 2100, 'image' => '2._Claudia_Rp2.100_pc.png'],
+            ['name' => 'Shinzui', 'price' => 4500, 'image' => '3._Shinzui_Rp4.500_pc.png'],
+            ['name' => 'Lifebuoy', 'price' => 3200, 'image' => '4._Lifebuoy_Rp3.200_pc.png'],
+            ['name' => 'Nuvo', 'price' => 2900, 'image' => '5._Nuvo_Rp2.900_pc.png'],
+            ['name' => 'So Klin', 'price' => 4500, 'image' => '6._So-Klin_Liquid_Rp4.500.png'],
+            ['name' => 'Rinso', 'price' => 2600, 'image' => '7._Rinso_Rp26.000.png'],
             ['name' => 'Sunlight', 'price' => 11000, 'image' => '8._Sunlight_Rp11.000.png'],
         ];
 
-        $daftarSabun = array_map(function($item) {
-            // Hapus spasi di nama file gambar
-            $item['image'] = str_replace(' ', '_', $item['image']);
-            return $item;
-        }, $daftarSabun);
+        $daftarSembako = [
+            ['name' => 'Minyak Mas', 'price' => 17500, 'image' => '1._Minyak_mas_1liter_Rp_17.500_per_botol.png'],
+            ['name' => 'Hemart 900 ml', 'price' => 18500, 'image' => '2._Hemart_900_ml_18.500_per_pc.png'],
+            ['name' => 'Hemart 500 ml', 'price' => 11000, 'image' => '3._Hemart_500_ml_Rp_11.000_per_botol.png'],
+            ['name' => 'Beras C4 3 kg', 'price' => 43500, 'image' => '4._Beras_C4_3_kg_Rp_43.500.png'],
+            ['name' => 'Beras Super 5 kg', 'price' => 77500, 'image' => '5._Beras_super_5_kg_Rp77.500.png'],
+            ['name' => 'Gulaku Premium', 'price' => 18000, 'image' => '6._Gulaku_Premium_Rp_18.000.png'],
+        ];
+
 
         foreach ($daftarRokok as $rokok) {
             Product::create([
@@ -205,6 +193,22 @@ class DatabaseSeeder extends Seeder
                 'image' => 'products/' . $sabun['image'] 
             ]);
         }
+
+        foreach ($daftarSembako as $sembako) {
+            Product::create([
+                'name' => $sembako['name'],
+                'slug' => Str::slug($sembako['name']), // Otomatis bikin slug
+                'category_id' => 1, // Masuk Kategori Sembako
+                'brand_id' => 3,    // Masuk Brand Wings
+                'price' => $sembako['price'],
+                'stock' => 50,
+                'description' => 'Lengkapi kebutuhan pokokmu dengan produk sembako berkualitas dari Wings.',
+                // Saya tambahkan 'products/' biar otomatis nyambung ke folder yang tadi
+                'image' => 'products/' . $sembako['image'] 
+            ]);
+        }
+
+    
         
     }
 }
