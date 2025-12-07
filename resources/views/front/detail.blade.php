@@ -1,4 +1,4 @@
-@extends('layouts.front')
+@extends('layouts.main')
 
 @section('content')
     <div class="text-sm text-gray-500 mb-6">

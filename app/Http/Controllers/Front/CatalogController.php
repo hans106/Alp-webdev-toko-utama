@@ -15,38 +15,36 @@ class CatalogController extends Controller
     }
     public function index(Request $request)
     {
-        // 1. Mulai Query Produk
-        // Kita pakai 'with' untuk Eager Loading (Mencegah N+1 Problem)
         $query = Product::with(['category', 'brand']);
 
-        // 2. Logika Search (Kalau ada input 'keyword' di search bar)
+        // 1. Search (Nama)
         if ($request->has('search') && $request->search != null) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        // 3. Logika Filter Kategori (Kalau user klik kategori tertentu)
+        // 2. Filter Kategori
         if ($request->has('category') && $request->category != null) {
-            // Cari produk yang punya kategori dengan slug tertentu
-            $query->whereHas('category', function($q) use ($request) {
+            $query->whereHas('category', function ($q) use ($request) {
                 $q->where('slug', $request->category);
             });
         }
 
-        // 4. Logika Sorting (Termurah / Terbaru)
-        if ($request->sort == 'price_asc') {
-            $query->orderBy('price', 'asc'); // Termurah
-        } elseif ($request->sort == 'price_desc') {
-            $query->orderBy('price', 'desc'); // Termahal
-        } else {
-            $query->latest(); // Default: Terbaru (created_at desc)
+        // 3. Filter Harga Maksimal (BARU)
+        if ($request->has('max_price') && $request->max_price != null) {
+            $query->where('price', '<=', $request->max_price);
         }
 
-        // 5. Eksekusi dengan Pagination (12 produk per halaman)
-        // withQueryString() penting biar pas pindah halaman, filter gak hilang
-        $products = $query->paginate(12)->withQueryString();
+        // 4. Sorting (Opsional, tetap kita simpan biar rapi)
+        if ($request->sort == 'price_asc') {
+            $query->orderBy('price', 'asc');
+        } elseif ($request->sort == 'price_desc') {
+            $query->orderBy('price', 'desc');
+        } else {
+            $query->latest();
+        }
 
-        // Ambil data kategori buat ditampilkan di sidebar filter
-        $categories = Category::all();
+        $products = $query->paginate(12)->withQueryString();
+        $categories = Category::all(); // Jangan lupa import model Category
 
         return view('front.catalog', compact('products', 'categories'));
     }
@@ -56,15 +54,32 @@ class CatalogController extends Controller
         // Cari produk berdasarkan slug
         // Kita load juga 'productImages' (slide foto) dan 'reviews' (komentar)
         $product = Product::with(['category', 'brand', 'productImages', 'reviews'])
-                    ->where('slug', $slug)
-                    ->firstOrFail();
+                ->where('slug', $slug)
+                ->firstOrFail();
 
         // Cari produk terkait (rekomendasi) berdasarkan kategori yang sama
         $relatedProducts = Product::where('category_id', $product->category_id)
-                            ->where('id', '!=', $product->id) // Jangan tampilkan produk yang sedang dibuka
-                            ->take(4)
-                            ->get();
+            ->where('id', '!=', $product->id) // Jangan tampilkan produk yang sedang dibuka
+            ->take(4)
+            ->get();
 
         return view('front.detail', compact('product', 'relatedProducts'));
+    }
+
+    // Delete
+    public function destroy($id)
+    {
+
+        $product = Product::findOrFail($id);
+
+        if (file_exists(public_path($product->image))) {
+            unlink(public_path($product->image));
+        }
+
+        // Hapus data dari database
+        $product->delete();
+
+        // 4. Balik ke halaman list
+        return redirect()->route('admin.products.index')->with('success', 'Produk Berhasil Dihapus!');
     }
 }

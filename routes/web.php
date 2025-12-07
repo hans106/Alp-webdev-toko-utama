@@ -45,4 +45,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Proses Simpan Data ke Database (STORE)
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
 
+    Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
+
+    Route::get('/produk/{slug}', [CatalogController::class, 'show'])->name('front.product');
+
 });

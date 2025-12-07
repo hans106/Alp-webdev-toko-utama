@@ -69,13 +69,21 @@
                                 </span>
                             @endif
                         </td>
+                        
                         <td class="px-6 py-4 text-sm font-medium">
                             <div class="flex gap-2">
                                 <a href="#" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md transition">Edit</a>
-                                <a href="#" class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md transition">Hapus</a>
+                                
+                                <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md transition">
+                                        Hapus
+                                    </button>
+                                </form>
                             </div>
                         </td>
-                    </tr>
+                        </tr>
                     @empty
                     <tr>
                         <td colspan="6" class="px-6 py-10 text-center text-gray-500">

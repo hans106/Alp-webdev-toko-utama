@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,13 +25,13 @@ class Product extends Model
 
     public function productImages()
     {
-        return $this->hasMany(ProductImage::class);
-        // PENTING: Pastikan nama file modelnya ProductImage.php (bukan ProdcutImage)
+        // Ganti ProductImage::class menjadi String lengkap begini:
+        return $this->hasMany('App\Models\ProductImage');
     }
 
     public function reviews()
     {
-        return $this->hasMany(ProductReview::class);
+        return $this->hasMany('App\Models\ProductReview');
     }
 
     public function restocks()
