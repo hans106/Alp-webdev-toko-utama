@@ -6,7 +6,7 @@
 
         <div class="hidden md:flex space-x-8">
             <a href="{{ route('home') }}" class="text-gray-600 hover:text-blue-600 font-medium transition {{ request()->routeIs('home') ? 'text-blue-600' : '' }}">
-                Beranda
+                Home
             </a>
             <a href="{{ route('catalog') }}" class="text-gray-600 hover:text-blue-600 font-medium transition {{ request()->routeIs('catalog') ? 'text-blue-600' : '' }}">
                 Belanja
@@ -25,7 +25,6 @@
             </a>
             
             <div class="h-6 w-px bg-gray-300 mx-2"></div>
-
             <a href="#" class="text-sm font-semibold text-gray-700 hover:text-blue-600">Masuk</a>
         </div>
     </div>
