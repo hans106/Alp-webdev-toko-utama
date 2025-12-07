@@ -9,6 +9,10 @@ use App\Models\Category;
 
 class CatalogController extends Controller
 {
+    public function home()
+    {
+        return view('front.home');
+    }
     public function index(Request $request)
     {
         // 1. Mulai Query Produk

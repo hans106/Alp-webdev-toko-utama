@@ -21,7 +21,7 @@ class ProductController extends Controller
         // 'with' gunanya biar query hemat (Eager Loading)
         $products = Product::with(['category', 'brand'])->latest()->paginate(10);
         
-        return view('admin.products.index', compact('products'));
+        return view('admin.products.manage', compact('products'));
     }
 
     // ==========================================
@@ -56,7 +56,7 @@ class ProductController extends Controller
         $validated['slug'] = Str::slug($request->name);
         
         // 3. Default Status Aktif
-        $validated['is_active'] = 1;
+        // $validated['is_active'] = 1;
 
         // 4. Proses Upload Gambar (Jika ada)
         if ($request->hasFile('image')) {
