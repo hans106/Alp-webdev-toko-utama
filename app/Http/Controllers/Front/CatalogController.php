@@ -66,20 +66,5 @@ class CatalogController extends Controller
         return view('front.detail', compact('product', 'relatedProducts'));
     }
 
-    // Delete
-    public function destroy($id)
-    {
 
-        $product = Product::findOrFail($id);
-
-        if (file_exists(public_path($product->image))) {
-            unlink(public_path($product->image));
-        }
-
-        // Hapus data dari database
-        $product->delete();
-
-        // 4. Balik ke halaman list
-        return redirect()->route('admin.products.index')->with('success', 'Produk Berhasil Dihapus!');
-    }
 }
