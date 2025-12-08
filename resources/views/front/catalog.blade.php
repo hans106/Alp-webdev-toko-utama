@@ -1,70 +1,78 @@
 @extends('layouts.main')
 
 @section('content')
-    <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">Produk</h1>
-        <p class="text-gray-500 mt-2">Temukan kebutuhan harianmu di sini</p>
-    </div>
+    <div class="container mx-auto px-4 md:px-12 py-12">
+        
+        <div class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">Katalog Pilihan</h1>
+            <p class="text-slate-500">Temukan produk terbaik dengan harga tetangga.</p>
+        </div>
 
-    <div class="bg-white p-4 rounded-xl shadow-sm border mb-8">
-        <form action="{{ url()->current() }}" method="GET" class="flex flex-col md:flex-row gap-4 items-center justify-center">
-            
-            <div class="w-full md:w-1/3">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari barang..." 
-                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
-            </div>
+        <div class="bg-white p-6 rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 mb-10">
+            <form action="{{ url()->current() }}" method="GET" class="flex flex-col lg:flex-row gap-4 items-center">
+                
+                <div class="w-full lg:flex-1 relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-4 top-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari beras, rokok, sabun..." 
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 focus:ring-2 focus:ring-primary outline-none transition font-medium text-slate-700">
+                </div>
 
-            <div class="w-full md:w-1/4">
-                <select name="category" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
-                    <option value="">Semua Kategori</option>
-                    @foreach($categories as $cat)
-                        <option value="{{ $cat->slug }}" {{ request('category') == $cat->slug ? 'selected' : '' }}>
-                            {{ $cat->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+                <div class="w-full lg:w-1/4">
+                    <select name="category" onchange="this.form.submit()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none cursor-pointer font-medium text-slate-700 appearance-none">
+                        <option value="">Semua Kategori</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->slug }}" {{ request('category') == $cat->slug ? 'selected' : '' }}>{{ $cat->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
-            <div class="w-full md:w-1/4 relative">
-                <span class="absolute left-3 top-2 text-gray-500 text-sm">Max Rp</span>
-                <input type="number" name="max_price" value="{{ request('max_price') }}" placeholder="0" 
-                    class="w-full border border-gray-300 rounded-lg pl-16 pr-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
-            </div>
+                <button type="submit" class="w-full lg:w-auto bg-gradient-to-r from-primary to-indigo-600 text-white font-bold px-8 py-3 rounded-xl hover:shadow-lg transition transform hover:-translate-y-0.5">
+                    Cari
+                </button>
+            </form>
+        </div>
 
-            <button type="submit" class="w-full md:w-auto bg-blue-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-                Filter
-            </button>
-        </form>
-    </div>
-
-    <div class="w-full">
         @if($products->count() > 0)
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
                 @foreach($products as $item)
-                    <div class="bg-white rounded-xl shadow-sm border hover:shadow-md transition group h-full flex flex-col">
-                        <a href="{{ route('front.product', $item->slug) }}" class="block relative h-48 overflow-hidden rounded-t-xl bg-gray-100 p-4">
-                            <img src="{{ asset($item->image) }}" alt="{{ $item->name }}" class="w-full h-full object-contain group-hover:scale-105 transition duration-300">
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition duration-300 group flex flex-col h-full overflow-hidden">
+                        
+                        <a href="{{ route('front.product', $item->slug) }}" class="block relative h-48 md:h-56 bg-slate-50 overflow-hidden">
+                            <img src="{{ asset($item->image) }}" alt="{{ $item->name }}" class="w-full h-full object-contain p-6 group-hover:scale-110 transition duration-500">
+                            @if($item->stock <= 5)
+                                <span class="absolute top-3 right-3 bg-rose-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">Sisa {{ $item->stock }}</span>
+                            @endif
                         </a>
-                        <div class="p-4 flex flex-col flex-grow">
-                            <span class="text-xs text-gray-500 mb-1 block">{{ $item->category->name }}</span>
-                            <a href="{{ route('front.product', $item->slug) }}" class="font-semibold text-gray-800 hover:text-blue-600 line-clamp-2 mb-2">
+
+                        <div class="p-5 flex flex-col flex-grow">
+                            <div class="mb-2">
+                                <span class="text-[10px] font-bold text-primary uppercase tracking-wider bg-indigo-50 px-2 py-1 rounded-md">{{ $item->category->name }}</span>
+                            </div>
+                            
+                            <a href="{{ route('front.product', $item->slug) }}" class="text-base font-bold text-slate-800 hover:text-primary transition line-clamp-2 mb-2 leading-snug">
                                 {{ $item->name }}
                             </a>
-                            <div class="mt-auto text-blue-600 font-bold text-lg">
-                                Rp {{ number_format($item->price, 0, ',', '.') }}
+                            
+                            <div class="mt-auto pt-3 border-t border-slate-50 flex justify-between items-center">
+                                <div class="text-base md:text-lg font-extrabold text-slate-900">
+                                    Rp {{ number_format($item->price, 0, ',', '.') }}
+                                </div>
+                                <button class="bg-slate-100 text-slate-600 p-2 rounded-lg hover:bg-primary hover:text-white transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                </button>
                             </div>
                         </div>
                     </div>
                 @endforeach
             </div>
 
-            <div class="mt-8">
+            <div class="mt-12">
                 {{ $products->links() }}
             </div>
         @else
-            <div class="text-center py-12 bg-gray-50 rounded-xl border border-dashed">
-                <p class="text-gray-500">Produk tidak ditemukan.</p>
-                <a href="{{ route('catalog') }}" class="text-blue-600 font-medium mt-2 inline-block">Reset Filter</a>
+            <div class="text-center py-20 bg-slate-50 rounded-3xl border border-dashed border-slate-300">
+                <p class="text-slate-500">Produk tidak ditemukan.</p>
+                <a href="{{ route('catalog') }}" class="text-primary font-bold mt-2 inline-block hover:underline">Reset Filter</a>
             </div>
         @endif
     </div>

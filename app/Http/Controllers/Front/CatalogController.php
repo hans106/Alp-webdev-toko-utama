@@ -15,26 +15,31 @@ class CatalogController extends Controller
     }
     public function index(Request $request)
     {
+        // Mulai query dari produk
         $query = Product::with(['category', 'brand']);
 
-        // 1. Search (Nama)
-        if ($request->has('search') && $request->search != null) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
-
-        // 2. Filter Kategori
+        // 1. FILTER KATEGORI (Perbaikan)
         if ($request->has('category') && $request->category != null) {
-            $query->whereHas('category', function ($q) use ($request) {
-                $q->where('slug', $request->category);
+            // Kita cari kategori berdasarkan SLUG yang dikirim dari form
+            $slug = $request->category;
+
+            $query->whereHas('category', function ($q) use ($slug) {
+                $q->where('slug', $slug);
             });
         }
 
-        // 3. Filter Harga Maksimal (BARU)
+        // 2. SEARCH (Pencarian Nama)
+        if ($request->has('search') && $request->search != null) {
+            $search = strtolower($request->search);
+            $query->whereRaw('LOWER(name) LIKE ?', ['%' . $search . '%']);
+        }
+
+        // 3. FILTER HARGA MAX
         if ($request->has('max_price') && $request->max_price != null) {
             $query->where('price', '<=', $request->max_price);
         }
 
-        // 4. Sorting (Opsional, tetap kita simpan biar rapi)
+        // 4. SORTING
         if ($request->sort == 'price_asc') {
             $query->orderBy('price', 'asc');
         } elseif ($request->sort == 'price_desc') {
@@ -44,7 +49,7 @@ class CatalogController extends Controller
         }
 
         $products = $query->paginate(12)->withQueryString();
-        $categories = Category::all(); // Jangan lupa import model Category
+        $categories = Category::all();
 
         return view('front.catalog', compact('products', 'categories'));
     }
@@ -54,8 +59,8 @@ class CatalogController extends Controller
         // Cari produk berdasarkan slug
         // Kita load juga 'productImages' (slide foto) dan 'reviews' (komentar)
         $product = Product::with(['category', 'brand', 'productImages', 'reviews'])
-                ->where('slug', $slug)
-                ->firstOrFail();
+            ->where('slug', $slug)
+            ->firstOrFail();
 
         // Cari produk terkait (rekomendasi) berdasarkan kategori yang sama
         $relatedProducts = Product::where('category_id', $product->category_id)
@@ -65,6 +70,4 @@ class CatalogController extends Controller
 
         return view('front.detail', compact('product', 'relatedProducts'));
     }
-
-
 }

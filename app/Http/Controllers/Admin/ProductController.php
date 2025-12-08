@@ -93,4 +93,61 @@ class ProductController extends Controller
         // 4. Balik ke halaman list
         return redirect()->route('admin.products.index')->with('success', 'Produk Berhasil Dihapus!');
     }
+    // ... (Fungsi store di atas biarkan) ...
+
+    // 5. FITUR EDIT (Tampilkan Form Edit)
+    public function edit($id)
+    {
+        $product = Product::findOrFail($id);
+        $categories = Category::all();
+        $brands = Brand::all();
+
+        return view('admin.products.edit', compact('product', 'categories', 'brands'));
+    }
+
+    // 6. FITUR UPDATE (Simpan Perubahan)
+    public function update(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+
+        // Validasi (Image jadi nullable, karena kalau gak ganti gambar gapapa)
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'category_id' => 'required',
+            'brand_id' => 'required',
+            'price' => 'required|numeric',
+            'stock' => 'required|numeric',
+            'description' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', 
+        ]);
+
+        $data = [
+            'name' => $request->name,
+            'slug' => Str::slug($request->name),
+            'category_id' => $request->category_id,
+            'brand_id' => $request->brand_id,
+            'price' => $request->price,
+            'stock' => $request->stock,
+            'description' => $request->description,
+        ];
+
+        // Cek apakah user upload gambar baru?
+        if ($request->hasFile('image')) {
+            // 1. Hapus gambar lama (KECUALI kalau gambar dari seeder/dummy kadang gak ada filenya, kita cek dulu)
+            if ($product->image && file_exists(public_path($product->image))) {
+                unlink(public_path($product->image));
+            }
+
+            // 2. Upload gambar baru
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('products'), $imageName);
+            
+            // 3. Masukkan ke array data
+            $data['image'] = 'products/' . $imageName;
+        }
+
+        $product->update($data);
+
+        return redirect()->route('admin.products.index')->with('success', 'Produk Berhasil Diupdate!');
+    }
 }

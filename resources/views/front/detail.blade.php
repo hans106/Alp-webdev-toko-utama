@@ -1,74 +1,100 @@
 @extends('layouts.main')
 
 @section('content')
-    <div class="text-sm text-gray-500 mb-6">
-        <a href="/" class="hover:text-blue-600">Beranda</a> 
-        <span class="mx-2">/</span> 
-        <span class="text-gray-800">{{ $product->name }}</span>
-    </div>
+    <div class="max-w-6xl mx-auto px-4 md:px-8 py-10">
 
-    <div class="bg-white rounded-xl shadow-sm border p-6 md:p-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div>
-                <div class="bg-gray-100 rounded-xl overflow-hidden mb-4 p-8 border">
-                    <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="w-full h-auto object-contain max-h-[400px]">
+        <nav class="text-sm font-medium text-slate-500 mb-8 flex items-center gap-2">
+            <a href="{{ route('home') }}" class="hover:text-primary transition">Beranda</a> 
+            <span class="text-slate-300">/</span> 
+            <a href="{{ route('catalog') }}" class="hover:text-primary transition">Katalog</a>
+            <span class="text-slate-300">/</span> 
+            <span class="text-slate-900">{{ $product->name }}</span>
+        </nav>
+
+        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2">
+                
+                <div class="bg-slate-50 p-8 md:p-12 flex flex-col justify-center items-center border-b md:border-b-0 md:border-r border-slate-100 relative">
+                    <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="w-full h-auto object-contain max-h-[400px] drop-shadow-lg transform hover:scale-105 transition duration-500">
+                    
+                    @if($product->productImages->count() > 0)
+                        <div class="mt-8 flex gap-3 overflow-x-auto w-full justify-center">
+                            @foreach($product->productImages as $img)
+                                <div class="w-16 h-16 border-2 border-white rounded-xl overflow-hidden shadow-sm cursor-pointer hover:border-primary transition">
+                                    <img src="{{ asset($img->image) }}" class="w-full h-full object-cover"> 
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
-                <div class="grid grid-cols-4 gap-2">
-                    @foreach($product->productImages as $img)
-                        <div class="border rounded-lg p-2 cursor-pointer hover:border-blue-500">
-                            <img src="{{ asset($img->image_path) }}" class="w-full h-16 object-contain"> 
+
+                <div class="p-8 md:p-12 flex flex-col">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="bg-indigo-50 text-primary text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider border border-indigo-100">
+                            {{ $product->category->name }}
+                        </span>
+                        <span class="text-slate-400 text-sm font-medium">Brand: {{ $product->brand->name ?? 'Umum' }}</span>
+                    </div>
+
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 leading-tight">
+                        {{ $product->name }}
+                    </h1>
+
+                    <div class="text-4xl font-extrabold text-primary mb-8 tracking-tight">
+                        Rp {{ number_format($product->price, 0, ',', '.') }}
+                    </div>
+
+                    <div class="prose prose-slate text-slate-600 mb-8 flex-grow leading-relaxed">
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">Tentang Produk</h3>
+                        <p>{{ $product->description }}</p>
+                    </div>
+
+                    <div class="mt-auto pt-8 border-t border-slate-100">
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-sm font-bold text-slate-700">Stok Tersisa</span>
+                            @if($product->stock > 5)
+                                <span class="text-emerald-600 font-bold bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100">
+                                    {{ $product->stock }} pcs
+                                </span>
+                            @else
+                                <span class="text-rose-600 font-bold bg-rose-50 px-3 py-1 rounded-lg border border-rose-100 animate-pulse">
+                                    {{ $product->stock }} pcs (Segera Habis!)
+                                </span>
+                            @endif
+                        </div>
+
+                        <button class="w-full bg-gradient-to-r from-primary to-indigo-700 text-white font-bold py-4 px-6 rounded-xl hover:shadow-lg hover:shadow-indigo-500/30 transition transform hover:-translate-y-0.5 flex justify-center items-center gap-3 text-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            Masukkan Keranjang
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if(isset($relatedProducts) && $relatedProducts->count() > 0)
+            <div class="mt-16">
+                <h2 class="text-2xl font-bold mb-8 text-slate-800">Produk Sejenis</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    @foreach($relatedProducts as $related)
+                        <div class="bg-white rounded-xl border border-slate-100 p-4 hover:shadow-md transition group h-full flex flex-col">
+                            <a href="{{ route('front.product', $related->slug) }}" class="block relative h-40 bg-slate-50 rounded-lg mb-3 overflow-hidden">
+                                <img src="{{ asset($related->image) }}" class="w-full h-full object-contain p-4 group-hover:scale-110 transition duration-300">
+                            </a>
+                            <div class="flex flex-col flex-grow">
+                                <h4 class="font-bold text-slate-800 line-clamp-2 text-sm mb-2 group-hover:text-primary transition">
+                                    {{ $related->name }}
+                                </h4>
+                                <div class="mt-auto text-primary font-bold">
+                                    Rp {{ number_format($related->price, 0, ',', '.') }}
+                                </div>
+                            </div>
                         </div>
                     @endforeach
                 </div>
             </div>
-
-            <div>
-                <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded">{{ $product->category->name }}</span>
-                <h1 class="text-3xl font-bold text-gray-900 mt-2 mb-2">{{ $product->name }}</h1>
-                <p class="text-gray-500 mb-6">Brand: {{ $product->brand->name ?? 'Umum' }}</p>
-
-                <div class="text-3xl font-bold text-blue-600 mb-6">
-                    Rp {{ number_format($product->price, 0, ',', '.') }}
-                </div>
-
-                <div class="prose text-gray-600 mb-8 border-t border-b py-4">
-                    <p>{{ $product->description }}</p>
-                </div>
-
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="text-sm font-semibold">Stok Tersisa: 
-                        <span class="{{ $product->stock > 5 ? 'text-green-600' : 'text-red-600' }}">{{ $product->stock }}</span>
-                    </div>
-                </div>
-
-                <div class="flex gap-4">
-                    <button class="flex-1 bg-blue-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-700 transition">
-                        + Keranjang
-                    </button>
-                    <a href="https://wa.me/62812345678?text=Halo%20saya%20mau%20beli%20{{ $product->name }}" target="_blank" class="flex-1 bg-green-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-green-600 text-center transition">
-                        Beli via WA
-                    </a>
-                </div>
-            </div>
-        </div>
+        @endif
     </div>
-
-    @if($relatedProducts->count() > 0)
-        <div class="mt-12">
-            <h2 class="text-xl font-bold mb-6">Produk Sejenis</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                @foreach($relatedProducts as $related)
-                    <div class="bg-white rounded-xl shadow-sm border p-4 hover:shadow-md transition">
-                        <a href="{{ route('front.product', $related->slug) }}">
-                            <img src="{{ asset($related->image) }}" class="w-full h-32 object-contain mb-3">
-                            <h4 class="font-semibold text-gray-800 line-clamp-2 text-sm">{{ $related->name }}</h4>
-                            <div class="text-blue-600 font-bold mt-2 text-sm">
-                                Rp {{ number_format($related->price, 0, ',', '.') }}
-                            </div>
-                        </a>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    @endif
 @endsection

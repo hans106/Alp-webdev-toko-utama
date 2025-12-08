@@ -22,6 +22,15 @@ use App\Http\Controllers\Admin\ProductController;
 // Halaman Utama (Home) -> Tampilan sambutan toko
 Route::get('/', [CatalogController::class, 'home'])->name('home');
 
+use App\Http\Controllers\AuthController;
+
+// --- AUTHENTICATION ---
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
 // Halaman Katalog -> List semua rokok, sembako, dll
 Route::get('/katalog', [CatalogController::class, 'index'])->name('catalog');
 
@@ -35,18 +44,10 @@ Route::get('/produk/{slug}', [CatalogController::class, 'show'])->name('front.pr
 
 // Kita grup pakai prefix 'admin' biar URL-nya rapi (contoh: /admin/products)
 Route::prefix('admin')->name('admin.')->group(function () {
-    
-    // Halaman Dashboard List Produk (READ Admin)
-    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-
-    // Halaman Form Tambah Produk (CREATE)
-    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
-
-    // Proses Simpan Data ke Database (STORE)
-    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
-
-    Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
-
-    Route::get('/produk/{slug}', [CatalogController::class, 'show'])->name('front.product');
-
+    Route::get('/products', [App\Http\Controllers\Admin\ProductController::class, 'index'])->name('products.index');
+    Route::get('/products/create', [App\Http\Controllers\Admin\ProductController::class, 'create'])->name('products.create');
+    Route::post('/products', [App\Http\Controllers\Admin\ProductController::class, 'store'])->name('products.store');
+    Route::get('/products/{id}/edit', [App\Http\Controllers\Admin\ProductController::class, 'edit'])->name('products.edit');
+    Route::put('/products/{id}', [App\Http\Controllers\Admin\ProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{id}', [App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('products.destroy');
 });
