@@ -45,7 +45,7 @@
                     </div>
 
                     <div class="prose prose-slate text-slate-600 mb-8 flex-grow leading-relaxed">
-                        <h3 class="text-lg font-bold text-slate-800 mb-2">Tentang Produk</h3>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">Description:</h3>
                         <p>{{ $product->description }}</p>
                     </div>
 
@@ -67,7 +67,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
-                            Masukkan Keranjang
+                            Add to Cart
                         </button>
                     </div>
                 </div>
@@ -83,7 +83,7 @@
                             <a href="{{ route('front.product', $related->slug) }}" class="block relative h-40 bg-slate-50 rounded-lg mb-3 overflow-hidden">
                                 <img src="{{ asset($related->image) }}" class="w-full h-full object-contain p-4 group-hover:scale-110 transition duration-300">
                             </a>
-                            <div class="flex flex-col flex-grow">
+                            <div class="flex flex-col flex-1">
                                 <h4 class="font-bold text-slate-800 line-clamp-2 text-sm mb-2 group-hover:text-primary transition">
                                     {{ $related->name }}
                                 </h4>

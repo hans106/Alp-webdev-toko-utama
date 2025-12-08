@@ -73,7 +73,7 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Camel Blue 16', 'price' => 23000, 'image' => '17._Camel_Blue16_Rp_23.000.png'],
             ['name' => 'Camel Ice Red 16', 'price' => 25500, 'image' => '18._Camel_Ice_Red_16_Rp_25.500.png'],
             ['name' => 'Camel Kretek 12', 'price' => 25500, 'image' => '19._Camel_Kretek_12_Rp_14.000.png'],
-            ['name' => 'Camel Kretek 16', 'price' => 25500, 'image' => '20._Camel_Kretek_16_Rp_25.500.png'],
+            ['name' => 'LA Ice Purple 16', 'price' => 33500, 'image' => '20._LA_IcePurple_16_Rp_33.500.png'],
             ['name' => 'Tenor Hijau 12', 'price' => 9500, 'image' => '21._Tenor_Hijau_12_Rp_9.500.png'],
             ['name' => 'Tenor Teh Manis 12', 'price' => 9500, 'image' => '22._Tenor_teh_manis_12_Rp_9.500.png'],
             ['name' => 'Viper Red 16', 'price' => 21000, 'image' => '23._Viper_Red_16_Rp_21.000.png'],
@@ -86,7 +86,7 @@ class DatabaseSeeder extends Seeder
             ['name' => 'LA Light 16', 'price' => 33500, 'image' => '30._LA_Light_16_Rp_33.500.png'],
             ['name' => 'LA Bold 12', 'price' => 22500, 'image' => '31._LA_Bold_12_Rp_22.500.png'],
             ['name' => 'LA Bold 20', 'price' => 38000, 'image' => '32._LA_Bold_20_Rp_38.000.png'],
-            ['name' => 'LA Bold 16', 'price' => 30000, 'image' => '33._LA_Bold_16_Rp30.0000.png'], 
+            ['name' => 'LA Bold 16', 'price' => 30000, 'image' => '33._LA_Bold_16_Rp30.000.png'], 
         ];
 
 
@@ -104,7 +104,7 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Aqua', 'price' => 5000, 'image' => '1._Aqua_1_5_liter_Rp_5.000_per_botol.png'],
             ['name' => 'Le-Minerale', 'price' => 5000, 'image' => '2._Le-Minerale_1_5_liter_Rp_5.000_per_botol.png'],
             ['name' => 'Coca Cola', 'price' => 5000, 'image' => '3._Coca_cola_seru_Rp_5.000_per_botol.png'],
-            ['name' => 'Larutan Cap Kaki Tiga Kaleng', 'price' => 6000, 'image' => '4._Larutan_Cap_Kaki_Tiga_Kaleng_Rp_6.000'],
+            ['name' => 'Larutan Cap Kaki Tiga Kaleng', 'price' => 6000, 'image' => '4._Larutan_Cap_Kaki_Tiga_Kaleng_Rp_6.000.png'],
             ['name' => 'Pocari 300 ml', 'price' => 6500, 'image' => '6._Pocari_300_ml_harga_6.500_per_botol.png'],
             ['name' => 'Teh Pacuk Harum', 'price' => 3000, 'image' => '7._Teh_Pacuk_Harum_Rp_3.000.png'],
             ['name' => 'Nestle Carnation', 'price' => 14500, 'image' => '9._Nestle_Carnation_Rp14.500.png'],

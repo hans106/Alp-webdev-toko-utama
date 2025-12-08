@@ -5,7 +5,7 @@
             <div class="mb-4 md:mb-0 text-center md:text-left">
                 <span class="text-xl font-bold text-blue-600">Toko<span class="text-gray-900">Utama</span></span>
                 <p class="text-sm text-gray-500 mt-1">
-                    &copy; {{ date('Y') }} Dikelola oleh Keluarga Besar. <br>
+                    &copy; {{ date('Y') }} Dikelola oleh Keluarga Besar Toko Utama.
                     Melayani sepenuh hati sejak 2024.
                 </p>
             </div>
