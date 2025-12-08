@@ -10,6 +10,9 @@ use App\Models\Brand; // <--- JANGAN LUPA IMPORT INI
 
 class CatalogController extends Controller
 {
+    public function home(){
+        return view('front.home');
+    }
     public function index(Request $request)
     {
         // Mulai query
@@ -44,16 +47,19 @@ class CatalogController extends Controller
         // 5. SORTING (Opsional)
         // Kalau abang mau sorting berdasarkan nama atau harga juga bisa
         $query->latest();
-
         // Eksekusi Query
         $products = $query->paginate(12)->withQueryString();
+
+        $groupedProducts = Brand::with(['products' => function($q) {
+            $q->latest()->take(4); // Ambil maks 4 produk per brand biar rapi
+        }])->whereHas('products')->get();
 
         // Ambil Data Pendukung buat Dropdown
         $categories = Category::all();
         $brands = Brand::all(); // <--- INI YANG TADI KURANG (Penyebab Error)
 
         // Kirim ke View (Jangan lupa masukkan 'brands' ke compact)
-        return view('front.catalog', compact('products', 'categories', 'brands'));
+        return view('front.catalog', compact('products', 'categories', 'brands', 'groupedProducts'));
     }
 
     public function show($slug)
