@@ -6,52 +6,54 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Brand; // <--- JANGAN LUPA IMPORT INI
 
 class CatalogController extends Controller
 {
-    public function home()
-    {
-        return view('front.home');
-    }
     public function index(Request $request)
     {
-        // Mulai query dari produk
+        // Mulai query
         $query = Product::with(['category', 'brand']);
 
-        // 1. FILTER KATEGORI (Perbaikan)
-        if ($request->has('category') && $request->category != null) {
-            // Kita cari kategori berdasarkan SLUG yang dikirim dari form
-            $slug = $request->category;
-
-            $query->whereHas('category', function ($q) use ($slug) {
-                $q->where('slug', $slug);
-            });
-        }
-
-        // 2. SEARCH (Pencarian Nama)
+        // 1. SEARCH (Pencarian Nama)
         if ($request->has('search') && $request->search != null) {
             $search = strtolower($request->search);
             $query->whereRaw('LOWER(name) LIKE ?', ['%' . $search . '%']);
         }
 
-        // 3. FILTER HARGA MAX
-        if ($request->has('max_price') && $request->max_price != null) {
-            $query->where('price', '<=', $request->max_price);
+        // 2. FILTER KATEGORI
+        if ($request->has('category') && $request->category != null) {
+            $query->whereHas('category', function ($q) use ($request) {
+                $q->where('slug', $request->category);
+            });
         }
 
-        // 4. SORTING
-        if ($request->sort == 'price_asc') {
-            $query->orderBy('price', 'asc');
-        } elseif ($request->sort == 'price_desc') {
-            $query->orderBy('price', 'desc');
-        } else {
-            $query->latest();
+        // 3. FILTER BRAND (BARU!) ✅
+        if ($request->has('brand') && $request->brand != null) {
+            $query->whereHas('brand', function ($q) use ($request) {
+                $q->where('slug', $request->brand);
+            });
         }
 
+        // 4. FILTER HARGA MAX (BARU!) ✅
+        if ($request->filled('max_price')) {
+            $maxPrice = $request->max_price;
+            $query->where('price', '<=', $maxPrice);
+        }
+
+        // 5. SORTING (Opsional)
+        // Kalau abang mau sorting berdasarkan nama atau harga juga bisa
+        $query->latest();
+
+        // Eksekusi Query
         $products = $query->paginate(12)->withQueryString();
-        $categories = Category::all();
 
-        return view('front.catalog', compact('products', 'categories'));
+        // Ambil Data Pendukung buat Dropdown
+        $categories = Category::all();
+        $brands = Brand::all(); // <--- INI YANG TADI KURANG (Penyebab Error)
+
+        // Kirim ke View (Jangan lupa masukkan 'brands' ke compact)
+        return view('front.catalog', compact('products', 'categories', 'brands'));
     }
 
     public function show($slug)
