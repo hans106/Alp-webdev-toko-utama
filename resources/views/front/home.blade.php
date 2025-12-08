@@ -4,7 +4,7 @@
     <section class="relative h-[600px] flex items-center justify-center overflow-hidden mb-16">
 
         <div class="absolute inset-0">
-            <img src="https://images.unsplash.com/photo-1604719312566-b7cb966348e7?q=80&w=2574&auto=format&fit=crop"
+            <img src="{{ asset('lokasi/Utama_bagian_depan.jpg') }}"
                 alt="Background Toko" class="w-full h-full object-cover">
 
             <div class="absolute inset-0 bg-slate-900/60"></div>
@@ -26,7 +26,7 @@
             class="flex flex-col md:flex-row items-center gap-12 bg-white rounded-3xl p-8 md:p-12 shadow-xl shadow-slate-200/50 border border-slate-100">
 
             <div class="w-full md:w-1/2 h-64 md:h-96 rounded-2xl overflow-hidden relative group">
-                <img src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?q=80&w=2670&auto=format&fit=crop"
+                <img src="{{ asset('lokasi/Utama_bagian_dalam.jpg') }}"
                     class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Sejarah Toko">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
                     <span class="text-white font-bold text-lg">Sejak 1959</span>
