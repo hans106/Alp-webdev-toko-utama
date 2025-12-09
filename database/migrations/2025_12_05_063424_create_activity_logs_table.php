@@ -13,11 +13,9 @@ return new class extends Migration
     {
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-
-            $table->string('action'); // Contoh: "Hapus Barang"
+            $table->string('user_name'); // Nama pelakunya (biar tau itu Papah/Mamah/Abang)
+            $table->string('action');    // Ngapain? (Hapus Barang / Ubah Harga)
             $table->text('description')->nullable(); // Detailnya
-
             $table->timestamps();
         });
     }

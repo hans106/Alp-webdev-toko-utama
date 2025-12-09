@@ -3,10 +3,9 @@
         
         <a href="{{ route('home') }}" class="flex items-center gap-3 group">
             <img src="{{ asset('logo/Logo_Utama.jpeg') }}" alt="Logo" 
-                class="h-10 w-auto object-contain rounded-lg group-hover:scale-105 transition duration-300 shadow-sm">
-            
+                 class="h-10 w-auto object-contain rounded-lg group-hover:scale-105 transition duration-300 shadow-sm">
             <span class="text-2xl font-extrabold text-primary tracking-tight">
-                Toko<span class="text-slate-900">Utama</span>
+                Toko<span class="text-slate-900">Utama</span><span class="text-secondary">.</span>
             </span>
         </a>
 
@@ -28,11 +27,27 @@
         </div>
 
         <div class="flex items-center gap-6">
-            <a href="#" class="relative text-slate-500 hover:text-primary transition group">
+            
+            {{-- LOGIKA HITUNG KERANJANG --}}
+            @php
+                $cartCount = 0;
+                if(Auth::check()){
+                    // Hitung jumlah qty dari tabel carts milik user yang login
+                    $cartCount = \App\Models\Cart::where('user_id', Auth::id())->sum('qty');
+                }
+            @endphp
+
+            <a href="{{ route('cart.index') }}" class="relative text-slate-500 hover:text-primary transition group">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:scale-110 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
-                <span class="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">0</span>
+                
+                {{-- Badge Angka Merah (Hanya muncul kalau ada isinya) --}}
+                @if($cartCount > 0)
+                    <span class="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm animate-bounce">
+                        {{ $cartCount }}
+                    </span>
+                @endif
             </a>
 
             @auth

@@ -13,11 +13,9 @@ return new class extends Migration
     {
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
-            // Punya Siapa?
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            // Barang Apa?
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->integer('qty')->default(1);
+            $table->integer('qty')->default(1); // Samakan dengan ERD abang 'qty'
             $table->timestamps();
         });
     }
