@@ -45,8 +45,7 @@
 
                 <div class="w-full lg:w-1/4 relative">
                     <span class="absolute left-4 top-3.5 text-slate-500 font-bold text-sm">Rp</span>
-                    <input type="number" name="max_price" value="{{ request('max_price') }}"
-                        placeholder="Maximum Price"
+                    <input type="number" name="max_price" value="{{ request('max_price') }}" placeholder="Maximum Price"
                         class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary outline-none transition font-medium text-slate-700 placeholder-slate-400"
                         min="0">
                 </div>
@@ -90,12 +89,18 @@
                                 <div class="text-base md:text-lg font-extrabold text-slate-900">
                                     Rp {{ number_format($item->price, 0, ',', '.') }}
                                 </div>
-                                <button
-                                    class="bg-slate-100 text-slate-600 px-5 py-2 rounded-lg hover:bg-primary hover:text-white transition"> Add
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </button>
+                                <form action="{{ route('cart.store', $item->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit"
+                                        class="bg-slate-100 text-slate-600 p-2 rounded-lg hover:bg-primary hover:text-white transition shadow-sm"
+                                        title="Masukkan Keranjang">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
