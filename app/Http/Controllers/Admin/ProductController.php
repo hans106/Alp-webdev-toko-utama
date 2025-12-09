@@ -80,21 +80,16 @@ class ProductController extends Controller
         // Delete
     public function destroy($id)
     {
-
         $product = Product::findOrFail($id);
-
         if (file_exists(public_path($product->image))) {
             unlink(public_path($product->image));
         }
-
         // Hapus data dari database
         $product->delete();
-
         // 4. Balik ke halaman list
         return redirect()->route('admin.products.index')->with('success', 'Produk Berhasil Dihapus!');
     }
     // ... (Fungsi store di atas biarkan) ...
-
     // 5. FITUR EDIT (Tampilkan Form Edit)
     public function edit($id)
     {
@@ -110,15 +105,20 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
 
-        // Validasi (Image jadi nullable, karena kalau gak ganti gambar gapapa)
         $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required',
             'brand_id' => 'required',
-            'price' => 'required|numeric',
-            'stock' => 'required|numeric',
+            'price' => 'required|numeric|min:100', // Minimal harga 100 perak misalnya
+            'stock' => 'required|integer|min:0',    // Stok minimal 0, gak boleh -5
+            
             'description' => 'required',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', 
+        ], [
+            // Custom Error Message (Biar Admin Paham)
+            'price.min' => 'Harga tidak boleh kurang dari 100 perak, Bang!',
+            'stock.min' => 'Stok barang tidak boleh minus!',
+            'image.max' => 'Ukuran gambar maksimal 2MB ya.',
         ]);
 
         $data = [

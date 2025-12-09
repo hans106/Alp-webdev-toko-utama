@@ -3,7 +3,7 @@
         
         <a href="{{ route('home') }}" class="flex items-center gap-3 group">
             <img src="{{ asset('logo/Logo_Utama.jpeg') }}" alt="Logo" 
-                 class="h-10 w-auto object-contain rounded-lg group-hover:scale-105 transition duration-300 shadow-sm">
+                class="h-10 w-auto object-contain rounded-lg group-hover:scale-105 transition duration-300 shadow-sm">
             
             <span class="text-2xl font-extrabold text-primary tracking-tight">
                 Toko<span class="text-slate-900">Utama</span>
@@ -17,7 +17,6 @@
             <a href="{{ route('catalog') }}" class="text-slate-500 hover:text-primary font-semibold transition {{ request()->routeIs('catalog') ? 'text-primary' : '' }}">
                 Belanja
             </a>
-            
             @auth
                 @if(Auth::user()->role === 'admin')
                 <a href="{{ route('admin.products.index') }}" class="text-rose-500 hover:text-rose-700 font-bold transition flex items-center gap-2">
