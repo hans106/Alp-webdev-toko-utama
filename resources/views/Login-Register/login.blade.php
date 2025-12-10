@@ -1,4 +1,4 @@
-@extends('layouts.main')
+@extends('layouts.auth')
 
 @section('content')
     <div class="flex justify-center items-center min-h-[60vh]">

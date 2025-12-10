@@ -36,13 +36,9 @@
 </head>
 <body class="bg-gray-50 text-slate-800 antialiased">
 
-    @include('components.navbar')
-
     <main class="flex-grow">
         @yield('content')
     </main>
-
-    @include('components.footer')
 
 </body>
 </html>
