@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Cart; 
 
 class AuthController extends Controller
 {
@@ -65,8 +66,14 @@ class AuthController extends Controller
     }
 
     // 5. Logout
+    // 5. Logout
     public function logout(Request $request)
     {
+
+        if (Auth::check()) {
+            Cart::where('user_id', Auth::id())->delete();
+        }
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

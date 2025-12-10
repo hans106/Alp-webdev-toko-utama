@@ -53,22 +53,22 @@
                     <div class="p-6 space-y-3">
                         <p class="text-slate-600 mb-2">Silakan pilih admin yang ingin dihubungi:</p>
                         
-                        <a href="https://wa.me/6281234567890?text=Halo%20Papah%20Admin" target="_blank" 
+                        <a href="https://wa.me/6285702328000?text=Ivan%20Purnomo%20Liem%20Owner" target="_blank" 
                            class="flex items-center gap-4 p-4 border border-slate-200 rounded-xl hover:bg-green-50 hover:border-green-300 transition group">
                             <div class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold text-lg">P</div>
-                            <div><h4 class="font-bold text-slate-800">Admin Papah</h4><p class="text-xs text-slate-500">Owner</p></div>
+                            <div><h4 class="font-bold text-slate-800">Ivan Purnomo Liem</h4><p class="text-xs text-slate-500">Owner</p></div>
                         </a>
 
-                        <a href="https://wa.me/6281234567891?text=Halo%20Mamah%20Admin" target="_blank" 
+                        <a href="https://wa.me/6283865802000?text=Kristiani%20PudjiAstuti%20Keuangan%20Management" target="_blank" 
                            class="flex items-center gap-4 p-4 border border-slate-200 rounded-xl hover:bg-green-50 hover:border-green-300 transition group">
                             <div class="w-10 h-10 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center font-bold text-lg">M</div>
-                            <div><h4 class="font-bold text-slate-800">Admin Mamah</h4><p class="text-xs text-slate-500">Keuangan</p></div>
+                            <div><h4 class="font-bold text-slate-800">Kristiani PudjiAstuti</h4><p class="text-xs text-slate-500">Keuangan</p></div>
                         </a>
 
-                        <a href="https://wa.me/6281234567892?text=Halo%20Admin%20Abang" target="_blank" 
+                        <a href="https://wa.me/6283146018000?text=Hans%20Vere%20Liem%20Support" target="_blank" 
                            class="flex items-center gap-4 p-4 border border-slate-200 rounded-xl hover:bg-green-50 hover:border-green-300 transition group">
                             <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-lg">A</div>
-                            <div><h4 class="font-bold text-slate-800">Admin Abang</h4><p class="text-xs text-slate-500">Support</p></div>
+                            <div><h4 class="font-bold text-slate-800">Hans Vere Liem</h4><p class="text-xs text-slate-500">Support</p></div>
                         </a>
                     </div>
                 </div>
