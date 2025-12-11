@@ -1,7 +1,7 @@
 @extends('layouts.auth')
 
 @section('content')
-<div class="flex justify-center items-center min-h-[60vh]">
+<div class="flex justify-center items-center min-h-[100vh]">
     <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border">
         <h2 class="text-2xl font-bold text-center mb-6">Daftar Akun Baru</h2>
 

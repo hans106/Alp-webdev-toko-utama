@@ -4,8 +4,7 @@
     <section class="relative h-[600px] flex items-center justify-center overflow-hidden mb-16">
 
         <div class="absolute inset-0">
-            <img src="{{ asset('lokasi/Utama_bagian_depan.jpg') }}"
-                alt="Background Toko" class="w-full h-full object-cover">
+            <img src="{{ asset('lokasi/Utama_bagian_depan.jpg') }}" alt="Background Toko" class="w-full h-full object-cover">
 
             <div class="absolute inset-0 bg-neutral-900/60"></div>
         </div>
@@ -15,11 +14,17 @@
                 Toko Utama
             </h1>
 
-            {{-- Tombol Hero (Merah -> Emas) --}}
             <a href="{{ route('catalog') }}"
-                class="inline-block bg-gradient-to-r from-rose-700 to-amber-500 text-white font-bold py-4 px-12 rounded-full hover:shadow-lg hover:shadow-rose-500/40 transition transform hover:-translate-y-1 text-lg">
+                class="inline-block text-white font-semibold py-4 px-12 rounded-xl
+          bg-[#1A1A1A]
+          border border-[#A889FF]
+          shadow-[0_0_10px_rgba(150,120,255,0.35)]
+          hover:shadow-[0_0_16px_rgba(150,120,255,0.55)]
+          transition-all duration-300">
                 Buy the Products Now
             </a>
+
+
         </div>
     </section>
 
@@ -38,7 +43,8 @@
             <div class="w-full md:w-1/2">
                 {{-- Badge About Us (Maroon) --}}
                 <span
-                    class="text-rose-700 font-bold tracking-wider uppercase text-sm bg-rose-100 px-3 py-1 rounded-full">About Us</span>
+                    class="text-rose-700 font-bold tracking-wider uppercase text-sm bg-rose-100 px-3 py-1 rounded-full">About
+                    Us</span>
 
                 <h2 class="text-3xl font-bold text-slate-900 mt-4 mb-6">History of Utama Shop</h2>
 
@@ -87,7 +93,8 @@
                 </div>
 
                 <div class="relative z-10">
-                    <div class="w-14 h-14 bg-rose-100 text-rose-700 rounded-xl flex items-center justify-center text-3xl mb-6">
+                    <div
+                        class="w-14 h-14 bg-rose-100 text-rose-700 rounded-xl flex items-center justify-center text-3xl mb-6">
                         🚀
                     </div>
 
@@ -187,7 +194,8 @@
                     {{-- Header --}}
                     <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-slate-100">
                         <div class="flex items-start justify-between">
-                            <h3 class="text-2xl font-bold leading-6 text-slate-900" id="modal-title">Sejarah Toko Utama</h3>
+                            <h3 class="text-2xl font-bold leading-6 text-slate-900" id="modal-title">Sejarah Toko Utama
+                            </h3>
                             <button onclick="closeModal()" class="text-slate-400 hover:text-rose-500 transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">

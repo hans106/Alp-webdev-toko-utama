@@ -12,6 +12,16 @@
 
     <h1 class="text-3xl font-bold mb-8 text-slate-800">Checkout Pengiriman</h1>
 
+    @if ($errors->any())
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative mb-6">
+            <strong class="font-bold">Waduh! Ada yang kurang nih:</strong>
+            <ul class="mt-2 list-disc list-inside text-sm">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <div class="flex flex-col lg:flex-row gap-8">
         <div class="w-full lg:w-2/3">
             <form action="{{ route('checkout.process') }}" method="POST" class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
@@ -26,18 +36,19 @@
 
                 <div class="mb-6">
                     <label class="block font-bold text-slate-700 mb-2 text-sm">Nomor WhatsApp / HP Aktif <span class="text-red-500">*</span></label>
-                    <input type="number" name="phone" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition" placeholder="Contoh: 081234567890" required>
-                    <p class="text-xs text-slate-400 mt-1">*Penting agar kurir bisa menghubungi Anda.</p>
+                    <input type="number" name="phone" value="{{ old('phone') }}" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition" placeholder="Contoh: 081234567890" required>
+                    <p class="text-xs text-slate-400 mt-1">*Wajib angka, minimal 10 digit.</p>
                 </div>
 
                 <div class="mb-6">
                     <label class="block font-bold text-slate-700 mb-2 text-sm">Alamat Lengkap Pengiriman <span class="text-red-500">*</span></label>
-                    <textarea name="address" rows="3" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition" placeholder="Jalan, Nomor Rumah, RT/RW, Kelurahan, Patokan..." required></textarea>
+                    <textarea name="address" rows="3" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition" placeholder="Jalan, Nomor Rumah, RT/RW, Kelurahan, Patokan..." required>{{ old('address') }}</textarea>
+                    <p class="text-xs text-slate-400 mt-1">*Tulis alamat lengkap minimal 10 huruf.</p>
                 </div>
 
                 <div class="mb-8">
                     <label class="block font-bold text-slate-700 mb-2 text-sm">Catatan (Opsional)</label>
-                    <input type="text" name="notes" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition" placeholder="Contoh: Pagar warna hitam">
+                    <input type="text" name="notes" value="{{ old('notes') }}" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition" placeholder="Contoh: Pagar warna hitam">
                 </div>
 
                 <button type="submit" class="w-full bg-gradient-to-r from-primary to-indigo-600 text-white font-bold py-4 rounded-xl hover:shadow-lg transition transform hover:-translate-y-0.5 text-lg">

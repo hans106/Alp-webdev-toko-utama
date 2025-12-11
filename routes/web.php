@@ -56,6 +56,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/cart/add/{id}', [App\Http\Controllers\Front\CartController::class, 'store'])->name('cart.store');
     Route::put('/cart/update/{id}', [App\Http\Controllers\Front\CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/delete/{id}', [App\Http\Controllers\Front\CartController::class, 'destroy'])->name('cart.destroy');
+    
+    Route::get('/orders', [App\Http\Controllers\Front\OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{id}', [App\Http\Controllers\Front\OrderController::class, 'show'])->name('orders.show');
 
     // --- ROUTE CHECKOUT (Harus Login) ---
 Route::get('/checkout', [App\Http\Controllers\Front\CheckoutController::class, 'index'])->name('checkout.index');
