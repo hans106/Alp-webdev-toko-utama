@@ -15,7 +15,6 @@ class AuthController extends Controller
     {
         return view('Login-Register.login');
     }
-
     // 2. Proses Login
     public function login(Request $request)
     {
@@ -66,14 +65,12 @@ class AuthController extends Controller
     }
 
     // 5. Logout
-    // 5. Logout
     public function logout(Request $request)
     {
-
         if (Auth::check()) {
             Cart::where('user_id', Auth::id())->delete();
         }
-
+        
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
