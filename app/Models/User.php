@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone', // TAMBAHAN: Biar bisa simpan no hp
+        'role',  // TAMBAHAN: Biar bisa set admin/customer
     ];
 
     /**
@@ -32,10 +34,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-    public function carts()
-    {
-        return $this->hasMany(Cart::class);
-    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -47,5 +46,24 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // --- RELASI ---
+
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    // TAMBAHAN PENTING: User punya banyak Order (Pesanan)
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    // User punya banyak barang Wishlist
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
     }
 }

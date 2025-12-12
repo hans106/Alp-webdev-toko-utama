@@ -12,24 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->id();
-            
-            // Relasi ke tabel categories & brands
-            // Kalau kategori dihapus, produknya ikut terhapus (cascade) biar database bersih
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
-            $table->foreignId('brand_id')->nullable()->constrained()->nullOnDelete();
-            
-            $table->string('name'); // Nama Barang: Indomie Goreng
-            $table->string('slug')->unique(); // URL: indomie-goreng
-            $table->integer('price'); // Harga Jual: 3500
-            $table->integer('stock')->default(0); // Stok awal: 0
-            $table->text('description')->nullable(); // Penjelasan barang
-            $table->string('image')->nullable(); // Foto barang utama
-            
-            // Status barang (aktif/tidak)
-            $table->boolean('is_active')->default(true); 
-            
-            $table->timestamps();
+           $table->id();
+        // Relasi
+        $table->foreignId('category_id')->constrained()->onDelete('cascade');
+        $table->foreignId('brand_id')->constrained()->onDelete('cascade');
+        
+        $table->string('name');
+        $table->string('slug')->unique();
+        $table->integer('price'); // Pakai integer biar gampang
+        $table->integer('stock')->default(0);
+        $table->text('description')->nullable();
+        
+        // FOTO UTAMA
+        $table->string('image_main')->nullable(); // Pengganti image_path
+        
+        $table->boolean('is_active')->default(true); // Buat on/off produk
+        $table->timestamps();
         });
     }
 

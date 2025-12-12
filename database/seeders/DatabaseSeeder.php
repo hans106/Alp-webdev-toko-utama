@@ -149,7 +149,7 @@ class DatabaseSeeder extends Seeder
                 'stock' => 50,
                 'description' => 'Peringatan: Rokok mengandung zat adiktif yang berbahaya bagi kesehatan.',
                 // Saya tambahkan 'products/' biar otomatis nyambung ke folder yang tadi
-                'image' => 'products/RokokUtama/' . $rokok['image'] 
+                'image_main' => 'products/RokokUtama/' . $rokok['image'] 
             ]);
         }
         foreach ($daftarSnack as $snack) {
@@ -162,7 +162,7 @@ class DatabaseSeeder extends Seeder
                 'stock' => 50,
                 'description' => 'Nikmati lezatnya jajanan dari Mayora yang menggugah selera.',
                 // Saya tambahkan 'products/' biar otomatis nyambung ke folder yang tadi
-                'image' => 'products/SnackUtama/' . $snack['image'] 
+                'image_main' => 'products/SnackUtama/' . $snack['image'] 
             ]);
         }
 
@@ -176,7 +176,7 @@ class DatabaseSeeder extends Seeder
                 'stock' => 50,
                 'description' => 'Segarkan harimu dengan minuman berkualitas dari Indofood.',
                 // Saya tambahkan 'products/' biar otomatis nyambung ke folder yang tadi
-                'image' => 'products/DrinkUtama/' . $minuman['image'] 
+                'image_main' => 'products/DrinkUtama/' . $minuman['image'] 
             ]);
         }
 
@@ -190,7 +190,7 @@ class DatabaseSeeder extends Seeder
                 'stock' => 50,
                 'description' => 'Rasakan kesegaran dan kebersihan maksimal dengan sabun pilihan dari Unilever.',
                 // Saya tambahkan 'products/' biar otomatis nyambung ke folder yang tadi
-                'image' => 'products/SabunUtama/' . $sabun['image'] 
+                'image_main' => 'products/SabunUtama/' . $sabun['image'] 
             ]);
         }
 
@@ -204,7 +204,7 @@ class DatabaseSeeder extends Seeder
                 'stock' => 50,
                 'description' => 'Lengkapi kebutuhan pokokmu dengan produk sembako berkualitas dari Wings.',
                 // Saya tambahkan 'products/' biar otomatis nyambung ke folder yang tadi
-                'image' => 'products/Sembako/' . $sembako['image'] 
+                'image_main' => 'products/Sembako/' . $sembako['image'] 
             ]);
         }
         

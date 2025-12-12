@@ -92,7 +92,7 @@
                         {{-- Image --}}
                         <a href="{{ route('front.product', $item->slug) }}"
                             class="block relative h-48 md:h-56 bg-[#F8F5F3] overflow-hidden">
-                            <img src="{{ asset($item->image) }}" alt="{{ $item->name }}"
+                            <img src="{{ asset($item->image_main) }}" alt="{{ $item->name }}"
                                 class="w-full h-full object-contain p-6 group-hover:scale-110 transition duration-500">
 
                             @if ($item->stock <= 5)

@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('teams', function (Blueprint $table) {
+        Schema::create('employees', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // Nama: Papah
-            $table->string('position'); // Jabatan: Owner
-            $table->string('phone'); // No HP: 0812xxxx (buat tombol WA)
-            $table->string('photo')->nullable(); // Foto profil
+            $table->string('name');
+            $table->string('position'); // Jabatan
+            $table->string('phone')->nullable();
+            $table->string('image_photo')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('teams');
+        Schema::dropIfExists('employees');
     }
 };
