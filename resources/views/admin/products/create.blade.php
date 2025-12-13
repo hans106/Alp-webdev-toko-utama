@@ -65,7 +65,7 @@
             <div class="mb-8">
                 <label class="block text-gray-700 font-bold mb-2">Foto Produk <span class="text-red-500">*</span></label>
                 <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:bg-gray-50 transition cursor-pointer relative">
-                    <input type="file" name="image" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required>
+                    <input type="file" name="image_main" id="image_main" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required>
                     <div class="text-gray-500">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto mb-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />

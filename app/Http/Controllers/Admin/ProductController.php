@@ -3,45 +3,34 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;  
+use App\Models\Product;
 use App\Models\Category;
 use App\Models\Brand;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str; // Buat bikin slug (Indomie Goreng -> indomie-goreng)
-use Illuminate\Support\Facades\Storage; // Buat hapus gambar lama (nanti)
+use Illuminate\Support\Str; 
+use Illuminate\Support\Facades\Storage; // Wajib ada buat hapus/simpan gambar
 
 class ProductController extends Controller
 {
-    // ==========================================
-    // 1. FITUR READ (Lihat Daftar Barang)
-    // ==========================================
+
+    // 1. DAFTAR PRODUK (READ)
     public function index()
     {
-        // Ambil data produk terbaru
-        // 'with' gunanya biar query hemat (Eager Loading)
         $products = Product::with(['category', 'brand'])->latest()->paginate(10);
-        
         return view('admin.products.manage', compact('products'));
     }
-
-    // ==========================================
-    // 2. FITUR CREATE (Tampilkan Form)
-    // ==========================================
+    // 2. FORM TAMBAH (CREATE)
     public function create()
     {
-        // Kita butuh data Kategori & Brand buat pilihan di form
         $categories = Category::all();
         $brands = Brand::all();
-        
         return view('admin.products.create', compact('categories', 'brands'));
     }
 
-    // ==========================================
-    // 3. FITUR STORE (Proses Simpan ke DB)
-    // ==========================================
+    // 3. PROSES SIMPAN (STORE)
     public function store(Request $request)
     {
-        // 1. Validasi Inputan
+        // 1. Validasi
         $validated = $request->validate([
             'name'        => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -49,48 +38,28 @@ class ProductController extends Controller
             'price'       => 'required|numeric|min:0',
             'stock'       => 'required|integer|min:0',
             'description' => 'required|string',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Max 2MB
+            // Wajib image_main (bukan image biasa)
+            'image_main'  => 'required|image|mimes:png,jpg,jpeg|max:2048', 
         ]);
 
-        // 2. Bikin Slug Otomatis
+        // 2. Buat Slug
         $validated['slug'] = Str::slug($request->name);
-        
-        // 3. Default Status Aktif
-        // $validated['is_active'] = 1;
 
-        // 4. Proses Upload Gambar (Jika ada)
-        if ($request->hasFile('image')) {
-            // Ambil filenya
-            $file = $request->file('image');
-            // Bikin nama unik: 1700000_indomie.jpg
-            $filename = time() . '_' . $file->getClientOriginalName();
-            // Pindahkan ke folder public/products
-            $file->move(public_path('products'), $filename);
-            
-            // Simpan path-nya ke array data buat masuk database
-            $validated['image'] = 'products/' . $filename;
+        // 3. Upload Gambar
+        if ($request->hasFile('image_main')) {
+            // Simpan ke folder: storage/app/public/products
+            // Nanti diakses lewat: public/storage/products
+            $path = $request->file('image_main')->store('products', 'public');
+            $validated['image_main'] = $path;
         }
 
-        // 5. Simpan ke Database
+        // 4. Simpan ke Database
         Product::create($validated);
 
-        // 6. Balik ke Halaman List + Pesan Sukses
         return redirect()->route('admin.products.index')->with('success', 'Produk Berhasil Ditambahkan!');
     }
-        // Delete
-    public function destroy($id)
-    {
-        $product = Product::findOrFail($id);
-        if (file_exists(public_path($product->image))) {
-            unlink(public_path($product->image));
-        }
-        // Hapus data dari database
-        $product->delete();
-        // 4. Balik ke halaman list
-        return redirect()->route('admin.products.index')->with('success', 'Produk Berhasil Dihapus!');
-    }
-    // ... (Fungsi store di atas biarkan) ...
-    // 5. FITUR EDIT (Tampilkan Form Edit)
+
+    // 4. FORM EDIT
     public function edit($id)
     {
         $product = Product::findOrFail($id);
@@ -100,54 +69,60 @@ class ProductController extends Controller
         return view('admin.products.edit', compact('product', 'categories', 'brands'));
     }
 
-    // 6. FITUR UPDATE (Simpan Perubahan)
+
+    // 5. PROSES UPDATE
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
 
-        $request->validate([
-            'name' => 'required|string|max:255',
+        // 1. Validasi
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
             'category_id' => 'required',
-            'brand_id' => 'required',
-            'price' => 'required|numeric|min:100', // Minimal harga 100 perak misalnya
-            'stock' => 'required|integer|min:0',    // Stok minimal 0, gak boleh -5
-            
+            'brand_id'    => 'required',
+            'price'       => 'required|numeric|min:100',
+            'stock'       => 'required|integer|min:0',
             'description' => 'required',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', 
-        ], [
-            // Custom Error Message (Biar Admin Paham)
-            'price.min' => 'Harga tidak boleh kurang dari 100 perak, Bang!',
-            'stock.min' => 'Stok barang tidak boleh minus!',
-            'image.max' => 'Ukuran gambar maksimal 2MB ya.',
+            // Pakai Nullable (karena user gak wajib ganti foto pas ngedit)
+            'image_main'  => 'nullable|image|mimes:jpeg,png,jpg|max:2048', 
         ]);
 
-        $data = [
-            'name' => $request->name,
-            'slug' => Str::slug($request->name),
-            'category_id' => $request->category_id,
-            'brand_id' => $request->brand_id,
-            'price' => $request->price,
-            'stock' => $request->stock,
-            'description' => $request->description,
-        ];
+        $validated['slug'] = Str::slug($request->name);
 
-        // Cek apakah user upload gambar baru?
-        if ($request->hasFile('image')) {
-            // 1. Hapus gambar lama (KECUALI kalau gambar dari seeder/dummy kadang gak ada filenya, kita cek dulu)
-            if ($product->image && file_exists(public_path($product->image))) {
-                unlink(public_path($product->image));
+        // 2. Cek Ganti Gambar
+        if ($request->hasFile('image_main')) {
+            
+            // Hapus gambar lama biar server gak penuh
+            if ($product->image_main) {
+                Storage::disk('public')->delete($product->image_main);
             }
 
-            // 2. Upload gambar baru
-            $imageName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('products'), $imageName);
-            
-            // 3. Masukkan ke array data
-            $data['image'] = 'products/' . $imageName;
+            // Upload gambar baru
+            $path = $request->file('image_main')->store('products', 'public');
+            $validated['image_main'] = $path;
         }
 
-        $product->update($data);
+        // 3. Update Data
+        $product->update($validated);
 
         return redirect()->route('admin.products.index')->with('success', 'Produk Berhasil Diupdate!');
+    }
+
+    // ==========================================
+    // 6. HAPUS (DESTROY)
+    // ==========================================
+    public function destroy($id)
+    {
+        $product = Product::findOrFail($id);
+
+        // Hapus file fisik gambar
+        if ($product->image_main) {
+            Storage::disk('public')->delete($product->image_main);
+        }
+
+        // Hapus data di database
+        $product->delete();
+
+        return redirect()->route('admin.products.index')->with('success', 'Produk Berhasil Dihapus!');
     }
 }

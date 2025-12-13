@@ -17,6 +17,7 @@
         </a>
     </div>
 
+    {{-- Alert Sukses --}}
     @if(session('success'))
         <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm" role="alert">
             <p class="font-bold">Berhasil!</p>
@@ -42,7 +43,12 @@
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="h-12 w-12 rounded-lg border overflow-hidden bg-gray-100">
-                                <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="h-full w-full object-cover">
+                                {{-- PERBAIKAN UTAMA: Pakai asset('storage/...') dan image_main --}}
+                                @if($product->image_main)
+                                    <img src="{{ asset('storage/' . $product->image_main) }}" alt="{{ $product->name }}" class="h-full w-full object-cover">
+                                @else
+                                    <span class="flex items-center justify-center h-full text-xs text-gray-400">No Img</span>
+                                @endif
                             </div>
                         </td>
                         <td class="px-6 py-4">
@@ -72,8 +78,10 @@
                         
                         <td class="px-6 py-4 text-sm font-medium">
                             <div class="flex gap-2">
-                                <a href="#" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md transition">Edit</a>
+                                {{-- Tombol EDIT --}}
+                                <a href="{{ route('admin.products.edit', $product->id) }}" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md transition">Edit</a>
                                 
+                                {{-- Tombol DELETE --}}
                                 <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
                                     @csrf
                                     @method('DELETE')
@@ -83,11 +91,16 @@
                                 </form>
                             </div>
                         </td>
-                        </tr>
+                    </tr>
                     @empty
                     <tr>
                         <td colspan="6" class="px-6 py-10 text-center text-gray-500">
-                            Belum ada produk. Silakan tambah produk baru.
+                            <div class="flex flex-col items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                </svg>
+                                <p>Belum ada produk. Silakan tambah produk baru.</p>
+                            </div>
                         </td>
                     </tr>
                     @endforelse
