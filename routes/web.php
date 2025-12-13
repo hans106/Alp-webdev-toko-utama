@@ -5,15 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Front\CatalogController;
 // Panggil Controller Admin (Punya Abang buat Create Data)
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Front\PageController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Di sini tempat mendaftarkan semua alamat URL website Toko Utama.
-|
-*/
 
 // ==========================================
 // 1. AREA DEPAN (GUEST / PEMBELI)
@@ -21,6 +14,7 @@ use App\Http\Controllers\Admin\ProductController;
 
 // Halaman Utama (Home) -> Tampilan sambutan toko
 Route::get('/', [CatalogController::class, 'home'])->name('home');
+Route::get('/tentang-kami', [PageController::class, 'about'])->name('about');
 
 use App\Http\Controllers\AuthController;
 
@@ -40,7 +34,7 @@ Route::get('/produk/{slug}', [CatalogController::class, 'show'])->name('front.pr
 // 2. AREA BELAKANG (ADMIN / KELUARGA)
 // ==========================================
 
-// Kita grup pakai prefix 'admin' biar URL-nya rapi (contoh: /admin/products)
+
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/products', [App\Http\Controllers\Admin\ProductController::class, 'index'])->name('products.index');
     Route::get('/products/create', [App\Http\Controllers\Admin\ProductController::class, 'create'])->name('products.create');
@@ -49,6 +43,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/products/{id}', [App\Http\Controllers\Admin\ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{id}', [App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('products.destroy');
 });
+
+
 
 // --- ROUTE KERANJANG (Harus Login) ---
 Route::middleware(['auth'])->group(function () {
