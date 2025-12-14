@@ -8,7 +8,8 @@ use App\Models\Brand;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str; // <--- WAJIB TAMBAH INI BUAT SLUG
+use Illuminate\Support\Str; 
+use App\Models\Employee;
 
 class DatabaseSeeder extends Seeder
 {
@@ -207,6 +208,26 @@ class DatabaseSeeder extends Seeder
                 'image_main' => 'products/Sembako/' . $sembako['image'] 
             ]);
         }
-        
+
+        Employee::create([
+            'name' => 'Ivan Purnomo',
+            'position' => 'Owner (Pemilik)',
+            'phone' => '6281234567890',
+            'image_photo' => 'Father.jpg', 
+        ]);
+
+        Employee::create([
+            'name' => 'Kristiani Pudji Astuti',
+            'position' => 'Co-Owner & Finance',
+            'phone' => '6281234567891',
+            'image_photo' => 'Mother.jpg',
+        ]);
+
+        Employee::create([
+            'name' => 'Lim Salim',
+            'position' => 'Operational Manager',
+            'phone' => '6281234567892',
+            'image_photo' => 'LimSalim.jpg',
+        ]);
     }
 }
