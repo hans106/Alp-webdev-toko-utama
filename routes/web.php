@@ -1,11 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-// Panggil Controller Front (Punya Teman & Abang buat Guest)
+
+// --- IMPORT CONTROLLER ---
 use App\Http\Controllers\Front\CatalogController;
-// Panggil Controller Admin (Punya Abang buat Create Data)
-use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Front\PageController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Front\CartController;
+use App\Http\Controllers\Front\OrderController;
+use App\Http\Controllers\Front\CheckoutController;
 
 
 // ==========================================
@@ -16,7 +20,6 @@ use App\Http\Controllers\Front\PageController;
 Route::get('/', [CatalogController::class, 'home'])->name('home');
 Route::get('/tentang-kami', [PageController::class, 'about'])->name('about');
 
-use App\Http\Controllers\AuthController;
 
 // --- AUTHENTICATION ---
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -35,13 +38,21 @@ Route::get('/produk/{slug}', [CatalogController::class, 'show'])->name('front.pr
 // ==========================================
 
 
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/products', [App\Http\Controllers\Admin\ProductController::class, 'index'])->name('products.index');
-    Route::get('/products/create', [App\Http\Controllers\Admin\ProductController::class, 'create'])->name('products.create');
-    Route::post('/products', [App\Http\Controllers\Admin\ProductController::class, 'store'])->name('products.store');
-    Route::get('/products/{id}/edit', [App\Http\Controllers\Admin\ProductController::class, 'edit'])->name('products.edit');
-    Route::put('/products/{id}', [App\Http\Controllers\Admin\ProductController::class, 'update'])->name('products.update');
-    Route::delete('/products/{id}', [App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('products.destroy');
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+    
+    // Dashboard Admin dengan Search & Filter
+    Route::get('/', [ProductController::class, 'dashboard'])->name('dashboard');
+    
+    // Manage Products dengan prefix route name 'admin.products.*'
+    Route::prefix('products')->name('products.')->group(function () {
+        Route::get('/', [ProductController::class, 'index'])->name('index');
+        Route::get('/create', [ProductController::class, 'create'])->name('create');
+        Route::post('/', [ProductController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [ProductController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [ProductController::class, 'update'])->name('update');
+        Route::delete('/{id}', [ProductController::class, 'destroy'])->name('destroy');
+    });
+
 });
 
 
@@ -57,6 +68,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/orders/{id}', [App\Http\Controllers\Front\OrderController::class, 'show'])->name('orders.show');
 
     // --- ROUTE CHECKOUT (Harus Login) ---
-Route::get('/checkout', [App\Http\Controllers\Front\CheckoutController::class, 'index'])->name('checkout.index');
+    Route::get('/checkout', [App\Http\Controllers\Front\CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [App\Http\Controllers\Front\CheckoutController::class, 'process'])->name('checkout.process');
 });
