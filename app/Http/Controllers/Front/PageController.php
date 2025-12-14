@@ -12,8 +12,9 @@ class PageController extends Controller
     public function about()
     {
         // Ambil data karyawan (yang dipecat otomatis gak ikut karena SoftDeletes)
-        $employees = Employee::all();
+        $employees = Employee::latest()->get();
 
+        // 2. Kirim data $employees ke view 'front.about'
         return view('front.about', compact('employees'));
     }
 }

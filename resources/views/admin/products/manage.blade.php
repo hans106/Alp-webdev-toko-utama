@@ -43,9 +43,9 @@
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="h-12 w-12 rounded-lg border overflow-hidden bg-gray-100">
-                                {{-- PERBAIKAN UTAMA: Pakai asset('storage/...') dan image_main --}}
+                                {{-- PERBAIKAN: Pakai asset() langsung seperti di halaman lain --}}
                                 @if($product->image_main)
-                                    <img src="{{ asset('storage/' . $product->image_main) }}" alt="{{ $product->name }}" class="h-full w-full object-cover">
+                                    <img src="{{ asset($product->image_main) }}" alt="{{ $product->name }}" class="h-full w-full object-cover">
                                 @else
                                     <span class="flex items-center justify-center h-full text-xs text-gray-400">No Img</span>
                                 @endif

@@ -5,9 +5,9 @@
     {{-- BAGIAN 1: HEADER JUDUL --}}
     <section class="bg-rose-50 py-16 mb-12">
         <div class="container mx-auto px-6 text-center">
-            <span class="text-rose-600 font-bold tracking-wider uppercase text-sm">Tentang Kami</span>
+            <span class="text-rose-600 font-bold tracking-wider uppercase text-sm">About Us</span>
             <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mt-2 mb-4">
-                Perjalanan Toko Utama
+                History of Toko Utama
             </h1>
             <div class="w-24 h-1 bg-rose-600 mx-auto rounded-full"></div>
         </div>
@@ -23,8 +23,8 @@
                     {{-- Pakai foto bagian dalam toko sebagai ilustrasi sejarah --}}
                     <img src="{{ asset('lokasi/Utama_bagian_dalam.jpg') }}" alt="Foto Sejarah Toko" class="w-full h-auto object-cover">
                     <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
-                        <p class="font-bold text-lg">Kenangan Masa Lalu</p>
-                        <p class="text-sm text-slate-300">Awal mula berdirinya toko keluarga.</p>
+                        <p class="font-bold text-lg">1959</p>
+                        <p class="text-sm text-slate-300">CX22+C36, Dompon, Karanganyar, Karanganyar Regency, Central Java 57711.</p>
                     </div>
                 </div>
             </div>
