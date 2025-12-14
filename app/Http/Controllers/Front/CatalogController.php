@@ -66,7 +66,7 @@ class CatalogController extends Controller
     {
         // Cari produk berdasarkan slug
         // Kita load juga 'productImages' (slide foto) dan 'reviews' (komentar)
-        $product = Product::with(['category', 'brand', 'productImages', 'reviews'])
+        $product = Product::with(['category', 'brand'])
             ->where('slug', $slug)
             ->firstOrFail();
 

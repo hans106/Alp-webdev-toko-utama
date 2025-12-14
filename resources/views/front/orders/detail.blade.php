@@ -29,7 +29,7 @@
                     @foreach($order->orderItems as $item)
                     <div class="flex gap-4 items-start">
                         <div class="w-16 h-16 bg-white border border-slate-200 rounded-lg p-1 flex-shrink-0">
-                            <img src="{{ asset($item->product->image) }}" class="w-full h-full object-contain">
+                            <img src="{{ asset($item->product->image_main) }}" class="w-full h-full object-contain">
                         </div>
                         
                         <div class="flex-grow">

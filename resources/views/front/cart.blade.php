@@ -49,7 +49,7 @@
                                 class="flex items-center gap-4 p-6 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition">
                                 <div
                                     class="w-20 h-20 bg-white border border-slate-200 rounded-lg overflow-hidden flex-shrink-0 p-1">
-                                    <img src="{{ asset($cart->product->image) }}" class="w-full h-full object-contain">
+                                    <img src="{{ asset($cart->product->image_main) }}" class="w-full h-full object-contain">
                                 </div>
 
                                 <div class="flex-grow">

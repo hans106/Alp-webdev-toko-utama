@@ -10,6 +10,10 @@ class OrderItem extends Model
     use HasFactory;
 
     protected $guarded = ['id'];
+
+    // 👇 TAMBAHKAN BARIS INI (PENYELAMAT ERRORNYA) 👇
+    public $timestamps = false; 
+
     public function order()
     {
         return $this->belongsTo(Order::class);
