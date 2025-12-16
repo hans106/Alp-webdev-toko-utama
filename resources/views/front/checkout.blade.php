@@ -65,7 +65,7 @@
                     @foreach($carts as $cart)
                     <div class="flex gap-3 items-start border-b border-slate-50 pb-3 last:border-0">
                         <div class="w-12 h-12 bg-slate-50 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200">
-                            <img src="{{ asset($cart->product->image) }}" class="w-full h-full object-contain">
+                            <img src="{{ asset($cart->product->image_main) }}" class="w-full h-full object-contain">
                         </div>
                         <div class="flex-grow text-sm">
                             <p class="font-bold text-slate-700 line-clamp-1">{{ $cart->product->name }}</p>
