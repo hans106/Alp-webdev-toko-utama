@@ -131,7 +131,7 @@
 
                         {{-- Kolom Stok --}}
                         <td class="px-6 py-4">
-                            @if($product->stock <= 5)
+                            @if($product->stock <= 20)
                                 <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 animate-pulse">
                                     {{ $product->stock }} (Menipis)
                                 </span>
