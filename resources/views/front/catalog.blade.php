@@ -11,8 +11,7 @@
             <p class="text-[#6b4a4a]">Temukan produk terbaik dengan harga tetangga.</p>
         </div>
 
-        <div class="!bg-white p-6 rounded-2xl shadow-lg shadow-[#A4102520] 
-    border border-[#E8D6D0] mb-10">
+        <div class="!bg-white p-6 rounded-2xl shadow-lg shadow-[#A4102520] border border-[#E8D6D0] mb-10">
             <form action="{{ url()->current() }}" method="GET" class="flex flex-col lg:flex-row gap-4 items-center">
 
                 {{-- Search Bar --}}
@@ -71,9 +70,9 @@
 
                 {{-- Search Button --}}
                 <button type="submit"
-                    class="w-full lg:w-auto bg-gradient-to-r from-[#A41025] to-[#F4A236]
-            text-white font-bold px-8 py-3 rounded-xl hover:shadow-lg
-            transition transform hover:-translate-y-0.5">
+                    class="w-full lg:w-auto bg-[#A41025] hover:bg-[#820c1d]
+                    text-white font-bold px-8 py-3 rounded-xl hover:shadow-lg
+                    transition transform hover:-translate-y-0.5">
                     Search
                 </button>
             </form>
