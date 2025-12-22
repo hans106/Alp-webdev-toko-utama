@@ -14,7 +14,7 @@ class AdminOrderController extends Controller
         $orders = Order::with('user')->latest()->paginate(10);
         
         // PERBAIKAN: Pakai 'admin.orders.index' (sesuai nama folder orders pakai 's')
-        return view('admin.orders.index', compact('orders'));
+        return view('admin.orders.rekap', compact('orders'));
     }
     public function ship($id) 
     {
