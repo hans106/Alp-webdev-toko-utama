@@ -7,7 +7,7 @@
                 <img src="{{ asset('logo/Logo_Utama.jpeg') }}" alt="Logo"
                     class="h-10 w-auto object-contain rounded-lg group-hover:scale-105 transition duration-300 shadow-sm">
                 <span class="text-xl md:text-2xl font-extrabold text-amber-400 leading-none">
-                    Toko<span class="text-white">Utama</span><span class="text-amber-500">.</span>
+                    Toko<span class="text-white">Utama</span>
                 </span>
             </a>
 

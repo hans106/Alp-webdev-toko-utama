@@ -29,7 +29,6 @@ return new class extends Migration
             $table->timestamp('paid_at')->nullable(); // Kapan lunasnya
             $table->string('snap_token')->nullable(); // WAJIB BUAT MIDTRANS (Saran saya tetap adakan ini)
             // ---------------------
-
             $table->timestamps();
         });
     }

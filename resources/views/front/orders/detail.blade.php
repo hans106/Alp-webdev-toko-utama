@@ -89,4 +89,33 @@
         </div>
     </div>
 </div>
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+
+<script type="text/javascript">
+  var payButton = document.getElementById('pay-button');
+  
+  // Cek apakah tombol bayar ada (biar gak error kalau status sudah lunas)
+  if(payButton) {
+      payButton.addEventListener('click', function () {
+        // Memicu PopUp Snap
+        window.snap.pay('{{ $order->snap_token }}', {
+          onSuccess: function(result){
+            alert("Pembayaran Berhasil!");
+            window.location.reload(); 
+          },
+          onPending: function(result){
+            alert("Menunggu Pembayaran!"); 
+            window.location.reload();
+          },
+          onError: function(result){
+            alert("Pembayaran Gagal!"); 
+            console.log(result);
+          },
+          onClose: function(){
+            alert('Anda menutup pop-up tanpa menyelesaikan pembayaran');
+          }
+        });
+      });
+  }
+</script>
 @endsection

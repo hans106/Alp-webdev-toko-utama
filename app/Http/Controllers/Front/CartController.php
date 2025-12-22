@@ -42,14 +42,13 @@ class CartController extends Controller
                             ->first();
 
         if ($existingCart) {
-            // PERBAIKAN: qty
             $existingCart->qty += 1;
             $existingCart->save();
         } else {
             Cart::create([
                 'user_id' => Auth::id(),
                 'product_id' => $id,
-                'qty' => 1 // PERBAIKAN: qty
+                'qty' => 1 
             ]);
         }
 

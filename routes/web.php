@@ -11,6 +11,8 @@ use App\Http\Controllers\Front\CartController;
 use App\Http\Controllers\Front\OrderController;
 use App\Http\Controllers\Front\CheckoutController;
 
+use App\Http\Controllers\Admin\AdminOrderController;
+
 
 // ==========================================
 // 1. AREA DEPAN (GUEST / PEMBELI)
@@ -39,10 +41,10 @@ Route::get('/produk/{slug}', [CatalogController::class, 'show'])->name('front.pr
 
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
-    
+
     // Dashboard Admin dengan Search & Filter
     Route::get('/', [ProductController::class, 'dashboard'])->name('dashboard');
-    
+
     // Manage Products dengan prefix route name 'admin.products.*'
     Route::prefix('products')->name('products.')->group(function () {
         Route::get('/', [ProductController::class, 'index'])->name('index');
@@ -53,6 +55,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::delete('/{id}', [ProductController::class, 'destroy'])->name('destroy');
     });
 
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders/{id}/ship', [AdminOrderController::class, 'ship'])->name('orders.ship');
 });
 
 
@@ -64,6 +68,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/cart/update/{id}', [App\Http\Controllers\Front\CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/delete/{id}', [App\Http\Controllers\Front\CartController::class, 'destroy'])->name('cart.destroy');
     
+    // History Order
     Route::get('/orders', [App\Http\Controllers\Front\OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{id}', [App\Http\Controllers\Front\OrderController::class, 'show'])->name('orders.show');
 

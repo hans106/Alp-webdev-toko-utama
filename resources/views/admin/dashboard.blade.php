@@ -60,16 +60,6 @@
                     </select>
                 </div>
 
-                {{-- Max Price --}}
-                <div class="w-full lg:w-1/4 relative">
-                    <span class="absolute left-4 top-3.5 text-[#7c5b58] font-bold text-sm">Rp</span>
-                    <input type="number" name="max_price" value="{{ request('max_price') }}" placeholder="Maximum Price"
-                        class="w-full !bg-white border border-[#E8D6D0] rounded-xl 
-                pl-10 pr-4 py-3 focus:ring-2 focus:ring-[#A41025] 
-                outline-none !text-gray-900 placeholder-[#B79B98]"
-                        min="0">
-                </div>
-
                 {{-- Search Button --}}
                 <button type="submit"
                     class="w-full lg:w-auto bg-gradient-to-r from-[#A41025] to-[#F4A236]

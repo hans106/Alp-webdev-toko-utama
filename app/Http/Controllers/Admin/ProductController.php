@@ -53,7 +53,7 @@ class ProductController extends Controller
         $categories = Category::all();
         $brands = Brand::all();
 
-        return view('admin.index', compact('products', 'categories', 'brands'));
+        return view('admin.dashboard', compact('products', 'categories', 'brands'));
     }
 
     // ==========================================
