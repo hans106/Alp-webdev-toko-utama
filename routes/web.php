@@ -18,6 +18,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\RestockController;
 
 
 // ==========================================
@@ -96,6 +97,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::get('/{supplier}/edit', [SupplierController::class, 'edit'])->name('edit');
         Route::put('/{supplier}', [SupplierController::class, 'update'])->name('update');
         Route::delete('/{supplier}', [SupplierController::class, 'destroy'])->name('destroy');
+    });
+
+    // --- DIVISI 2C: RESTOCK MANAGEMENT ---
+    // Accessible by superadmin and inventory staff
+    Route::prefix('restocks')->name('restocks.')->middleware('role:superadmin,inventory')->group(function () {
+        Route::get('/', [RestockController::class, 'index'])->name('index');
+        Route::get('/create', [RestockController::class, 'create'])->name('create');
+        Route::post('/', [RestockController::class, 'store'])->name('store');
+        Route::get('/{restock}', [RestockController::class, 'show'])->name('show');
+        Route::get('/{restock}/edit', [RestockController::class, 'edit'])->name('edit');
+        Route::put('/{restock}', [RestockController::class, 'update'])->name('update');
+        Route::delete('/{restock}', [RestockController::class, 'destroy'])->name('destroy');
     });
 
     // --- DIVISI 3: KASIR (Order Management) ---
