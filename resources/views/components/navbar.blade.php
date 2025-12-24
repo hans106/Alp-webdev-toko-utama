@@ -18,7 +18,7 @@
                     Beranda
                 </a>
 
-                @if(!Auth::check() || Auth::user()->role !== 'admin')
+                @if(!Auth::check() || Auth::user()->role === 'customer')
                     <a href="{{ route('catalog') }}"
                         class="text-amber-200 hover:text-amber-400 font-medium transition {{ request()->routeIs('catalog') ? 'text-amber-400 font-semibold' : '' }}">
                         Belanja
@@ -109,7 +109,7 @@
                 Beranda
             </a>
             
-            @if(!Auth::check() || Auth::user()->role !== 'admin')
+            @if(!Auth::check() || Auth::user()->role === 'customer')
                 {{-- Link Belanja --}}
                 <a href="{{ route('catalog') }}" class="flex items-center gap-2 px-4 py-2 bg-[#1A0C0C] border border-[#3b1d1d] rounded-full text-amber-200 hover:text-white hover:border-amber-400 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>

@@ -116,4 +116,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index')->middleware('role:superadmin,cashier');
     Route::post('/orders/{id}/ship', [AdminOrderController::class, 'ship'])->name('orders.ship')->middleware('role:superadmin,cashier');
 
+    // --- DIVISI 4: PENGGUNA (User Management) ---
+    // Accessible by superadmin only
+    Route::get('/users', function () {
+        $users = \App\Models\User::orderBy('id', 'desc')->paginate(15);
+        return view('admin.users.index', compact('users'));
+    })->name('users.index')->middleware('role:superadmin');
+
 });
