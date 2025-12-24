@@ -18,21 +18,51 @@ class DatabaseSeeder extends Seeder
         // ==========================================
         // 1. USER & ADMIN
         // ==========================================
-        User::create([
-            'name' => 'Admin',
+        User::firstOrCreate([
             'email' => 'admin@tokoUtama.com',
+        ], [
+            'name' => 'Admin',
             'password' => Hash::make('admin123'),
             'role' => 'admin',
         ]);
-        User::create([
-            'name' => 'Hansvere',
+
+        User::firstOrCreate([
             'email' => 'hansvere@tokoUtama.com',
+        ], [
+            'name' => 'Hansvere',
             'password' => Hash::make('hansvere123'),
             'role' => 'admin',
         ]);
-        User::create([
-            'name' => 'Budi Pembeli',
+
+        // Demo specialized roles
+        User::firstOrCreate([
+            'email' => 'superadmin@tokoUtama.com',
+        ], [
+            'name' => 'Super Admin',
+            'password' => Hash::make('superadmin123'),
+            'role' => 'superadmin',
+        ]);
+
+        User::firstOrCreate([
+            'email' => 'inventory@tokoUtama.com',
+        ], [
+            'name' => 'Inventory Staff',
+            'password' => Hash::make('inventory123'),
+            'role' => 'inventory',
+        ]);
+
+        User::firstOrCreate([
+            'email' => 'kasir@tokoUtama.com',
+        ], [
+            'name' => 'Kasir Demo',
+            'password' => Hash::make('kasir123'),
+            'role' => 'cashier',
+        ]);
+
+        User::firstOrCreate([
             'email' => 'budi@gmail.com',
+        ], [
+            'name' => 'Budi Pembeli',
             'password' => Hash::make('password'),
             'role' => 'customer',
         ]);
@@ -40,47 +70,47 @@ class DatabaseSeeder extends Seeder
         // ==========================================
         // 2. KATEGORI
         // ==========================================
-        $catSembako = Category::create(['name' => 'Sembako', 'slug' => 'sembako']);
-        $catMinuman = Category::create(['name' => 'Minuman', 'slug' => 'minuman']);
-        $catJajanan = Category::create(['name' => 'Jajanan', 'slug' => 'jajanan']);
-        $catSabun   = Category::create(['name' => 'Sabun & Cuci', 'slug' => 'sabun']);
-        $catRokok   = Category::create(['name' => 'Rokok', 'slug' => 'rokok']);
+        $catSembako = Category::firstOrCreate(['slug' => 'sembako'], ['name' => 'Sembako']);
+        $catMinuman = Category::firstOrCreate(['slug' => 'minuman'], ['name' => 'Minuman']);
+        $catJajanan = Category::firstOrCreate(['slug' => 'jajanan'], ['name' => 'Jajanan']);
+        $catSabun   = Category::firstOrCreate(['slug' => 'sabun'], ['name' => 'Sabun & Cuci']);
+        $catRokok   = Category::firstOrCreate(['slug' => 'rokok'], ['name' => 'Rokok']);
 
         // ==========================================
         // 3. BRAND (SESUAI DUNIA NYATA)
         // ==========================================
         
         // --- Perusahaan Besar (FMCG) ---
-        Brand::create(['name' => 'Indofood', 'slug' => 'indofood']);
-        Brand::create(['name' => 'Unilever', 'slug' => 'unilever']);
-        Brand::create(['name' => 'Wings Group', 'slug' => 'wings']); // Wings Food & Care
-        Brand::create(['name' => 'Mayora', 'slug' => 'mayora']);
-        Brand::create(['name' => 'So Good Food', 'slug' => 'so-good']); // Untuk Sonice
-        Brand::create(['name' => 'Danone', 'slug' => 'danone']); // Untuk Aqua
-        Brand::create(['name' => 'Coca-Cola', 'slug' => 'coca-cola']);
-        Brand::create(['name' => 'Kino', 'slug' => 'kino']); // Larutan
-        Brand::create(['name' => 'Otsuka', 'slug' => 'otsuka']); // Pocari
-        Brand::create(['name' => 'Nestle', 'slug' => 'nestle']); // Carnation
-        Brand::create(['name' => 'Frisian Flag', 'slug' => 'frisian-flag']);
-        Brand::create(['name' => 'Ultrajaya', 'slug' => 'ultrajaya']);
-        Brand::create(['name' => 'Sosro', 'slug' => 'sosro']);
-        Brand::create(['name' => 'Tong Tji', 'slug' => 'tong-tji']);
-        Brand::create(['name' => 'Sido Muncul', 'slug' => 'sido-muncul']);
-        Brand::create(['name' => 'Kapal Api Global', 'slug' => 'kapal-api']); // Kapal api & Goodday
-        Brand::create(['name' => 'Sari Incofood', 'slug' => 'sari-incofood']); // Indocafe
-        Brand::create(['name' => 'Bina Karya Prima', 'slug' => 'bkp']); // Shinzui, Hemart
-        Brand::create(['name' => 'Marie Regal', 'slug' => 'marie-regal']);
-        Brand::create(['name' => 'Nissin', 'slug' => 'nissin']); // Crispy Crackers
-        Brand::create(['name' => 'Sinar Mas', 'slug' => 'sinar-mas']); // Minyak Mas
-        Brand::create(['name' => 'Sugar Group', 'slug' => 'sugar-group']); // Gulaku
-        Brand::create(['name' => 'Umum', 'slug' => 'umum']); // Beras, dll
+        Brand::firstOrCreate(['slug' => 'indofood'], ['name' => 'Indofood']);
+        Brand::firstOrCreate(['slug' => 'unilever'], ['name' => 'Unilever']);
+        Brand::firstOrCreate(['slug' => 'wings'], ['name' => 'Wings Group']);
+        Brand::firstOrCreate(['slug' => 'mayora'], ['name' => 'Mayora']);
+        Brand::firstOrCreate(['slug' => 'so-good'], ['name' => 'So Good Food']);
+        Brand::firstOrCreate(['slug' => 'danone'], ['name' => 'Danone']);
+        Brand::firstOrCreate(['slug' => 'coca-cola'], ['name' => 'Coca-Cola']);
+        Brand::firstOrCreate(['slug' => 'kino'], ['name' => 'Kino']);
+        Brand::firstOrCreate(['slug' => 'otsuka'], ['name' => 'Otsuka']);
+        Brand::firstOrCreate(['slug' => 'nestle'], ['name' => 'Nestle']);
+        Brand::firstOrCreate(['slug' => 'frisian-flag'], ['name' => 'Frisian Flag']);
+        Brand::firstOrCreate(['slug' => 'ultrajaya'], ['name' => 'Ultrajaya']);
+        Brand::firstOrCreate(['slug' => 'sosro'], ['name' => 'Sosro']);
+        Brand::firstOrCreate(['slug' => 'tong-tji'], ['name' => 'Tong Tji']);
+        Brand::firstOrCreate(['slug' => 'sido-muncul'], ['name' => 'Sido Muncul']);
+        Brand::firstOrCreate(['slug' => 'kapal-api'], ['name' => 'Kapal Api Global']);
+        Brand::firstOrCreate(['slug' => 'sari-incofood'], ['name' => 'Sari Incofood']);
+        Brand::firstOrCreate(['slug' => 'bkp'], ['name' => 'Bina Karya Prima']);
+        Brand::firstOrCreate(['slug' => 'marie-regal'], ['name' => 'Marie Regal']);
+        Brand::firstOrCreate(['slug' => 'nissin'], ['name' => 'Nissin']);
+        Brand::firstOrCreate(['slug' => 'sinar-mas'], ['name' => 'Sinar Mas']);
+        Brand::firstOrCreate(['slug' => 'sugar-group'], ['name' => 'Sugar Group']);
+        Brand::firstOrCreate(['slug' => 'umum'], ['name' => 'Umum']);
 
         // --- Pabrik Rokok ---
-        Brand::create(['name' => 'Bentoel Group (BAT)', 'slug' => 'bentoel']); // Dunhill, Lucky Strike
-        Brand::create(['name' => 'JTI (Camel)', 'slug' => 'jti']); // Camel
-        Brand::create(['name' => 'Djarum', 'slug' => 'djarum']); // LA, 76
-        Brand::create(['name' => 'Gudang Garam', 'slug' => 'gudang-garam']);
-        Brand::create(['name' => 'HM Sampoerna', 'slug' => 'sampoerna']);
+        Brand::firstOrCreate(['slug' => 'bentoel'], ['name' => 'Bentoel Group (BAT)']);
+        Brand::firstOrCreate(['slug' => 'jti'], ['name' => 'JTI (Camel)']);
+        Brand::firstOrCreate(['slug' => 'djarum'], ['name' => 'Djarum']);
+        Brand::firstOrCreate(['slug' => 'gudang-garam'], ['name' => 'Gudang Garam']);
+        Brand::firstOrCreate(['slug' => 'sampoerna'], ['name' => 'HM Sampoerna']);
 
         // ==========================================
         // 4. PRODUK (MAPPING AKURAT)
@@ -129,11 +159,12 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($daftarRokok as $rokok) {
-            Product::create([
-                'name' => $rokok['name'],
+            Product::firstOrCreate([
                 'slug' => Str::slug($rokok['name']),
+            ], [
+                'name' => $rokok['name'],
                 'category_id' => $catRokok->id,
-                'brand_id' => Brand::where('slug', $rokok['brand'])->first()->id, // Otomatis cari ID Brand
+                'brand_id' => Brand::where('slug', $rokok['brand'])->first()->id,
                 'price' => $rokok['price'],
                 'stock' => 50,
                 'description' => 'Peringatan: Rokok mengandung zat adiktif yang berbahaya bagi kesehatan.',
@@ -152,9 +183,10 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($daftarSnack as $snack) {
-            Product::create([
-                'name' => $snack['name'],
+            Product::firstOrCreate([
                 'slug' => Str::slug($snack['name']),
+            ], [
+                'name' => $snack['name'],
                 'category_id' => $catJajanan->id,
                 'brand_id' => Brand::where('slug', $snack['brand'])->first()->id,
                 'price' => $snack['price'],
@@ -184,9 +216,10 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($daftarMinuman as $minuman) {
-            Product::create([
-                'name' => $minuman['name'],
+            Product::firstOrCreate([
                 'slug' => Str::slug($minuman['name']),
+            ], [
+                'name' => $minuman['name'],
                 'category_id' => $catMinuman->id,
                 'brand_id' => Brand::where('slug', $minuman['brand'])->first()->id,
                 'price' => $minuman['price'],
@@ -209,9 +242,10 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($daftarSabun as $sabun) {
-            Product::create([
-                'name' => $sabun['name'],
+            Product::firstOrCreate([
                 'slug' => Str::slug($sabun['name']),
+            ], [
+                'name' => $sabun['name'],
                 'category_id' => $catSabun->id,
                 'brand_id' => Brand::where('slug', $sabun['brand'])->first()->id,
                 'price' => $sabun['price'],
@@ -232,9 +266,10 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($daftarSembako as $sembako) {
-            Product::create([
-                'name' => $sembako['name'],
+            Product::firstOrCreate([
                 'slug' => Str::slug($sembako['name']),
+            ], [
+                'name' => $sembako['name'],
                 'category_id' => $catSembako->id,
                 'brand_id' => Brand::where('slug', $sembako['brand'])->first()->id,
                 'price' => $sembako['price'],
