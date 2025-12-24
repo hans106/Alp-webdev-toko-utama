@@ -14,6 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Register custom middleware
         $middleware->alias([
             'admin' => \App\Http\Middleware\Admin::class,
+            // role middleware accepts parameters, e.g. 'role:superadmin,inventory'
+            'role' => \App\Http\Middleware\CheckRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

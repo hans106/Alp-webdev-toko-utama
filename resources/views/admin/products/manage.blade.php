@@ -66,18 +66,10 @@
                     <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded-xl font-bold hover:bg-gray-900 transition flex-1">
                         Cari
                     </button>
-                    <a href="{{ route('admin.products.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl font-bold hover:bg-gray-200 transition flex items-center justify-center border border-gray-300">
-                        Reset
-                    </a>
                 </div>
             </div>
-            
-            {{-- Filter Tambahan: Harga Max (Opsional) --}}
-            <div class="mt-4 flex items-center gap-3">
-                <span class="text-sm font-bold text-gray-500">Max Harga:</span>
-                <input type="number" name="price_max" value="{{ request('price_max') }}" placeholder="Rp 0"
-                    class="w-40 py-1 px-3 border rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
-            </div>
+        </form>
+    </div>
         </form>
     </div>
 
