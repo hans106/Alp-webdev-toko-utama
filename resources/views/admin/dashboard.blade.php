@@ -8,6 +8,33 @@
     <div class="mb-8">
         <p class="text-gray-600 mb-6">Kelola dan pantau semua produk toko Anda</p>
 
+        {{-- SUMMARY CARDS --}}
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-sm p-4 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500">Produk (di halaman)</p>
+                    <p class="text-xl font-bold text-gray-800">{{ $products->total ?? $products->count() }}</p>
+                </div>
+                <div class="text-3xl text-[#A41025]">📦</div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-4 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500">Kategori</p>
+                    <p class="text-xl font-bold text-gray-800">{{ $categories->count() }}</p>
+                </div>
+                <div class="text-3xl text-[#F4A236]">🏷️</div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-4 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500">Brand</p>
+                    <p class="text-xl font-bold text-gray-800">{{ $brands->count() }}</p>
+                </div>
+                <div class="text-3xl text-green-500">🏷️</div>
+            </div>
+        </div>
+
         {{-- Search & Filter Box --}}
         <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200 mb-10">
             <form action="{{ route('admin.dashboard') }}" method="GET" class="flex flex-col lg:flex-row gap-4 items-center">

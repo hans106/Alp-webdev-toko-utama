@@ -9,13 +9,13 @@
 </head>
 
 <body class="bg-gray-100">
-    <div class="flex h-screen">
+    <div class="flex min-h-screen">
         {{-- SIDEBAR --}}
         <div class="w-64 bg-[#1A0C0C] text-white shadow-lg flex flex-col">
             {{-- Logo Section --}}
-            <div class="px-6 py-8 border-b border-[#A41025]">
-                <h1 class="text-2xl font-bold text-[#F4A236]">Toko Utama</h1>
-                <p class="text-xs text-gray-400 mt-1">Admin Control Panel</p>
+            <div class="px-6 py-6 border-b border-[#A41025]">
+                <h1 class="text-xl font-bold text-[#F4A236]">Toko Utama</h1>
+                <p class="text-xs text-gray-300 mt-1">Admin Control Panel</p>
             </div>
 
             {{-- User Info --}}
@@ -127,7 +127,7 @@
         </div>
 
         {{-- MAIN CONTENT --}}
-        <div class="flex-1 overflow-auto">
+        <div class="flex-1 overflow-auto flex flex-col">
             {{-- Top Bar --}}
             <div class="bg-white shadow-sm border-b border-gray-200 px-8 py-4 flex justify-between items-center">
                 <h2 class="text-2xl font-bold text-[#1A0C0C]">@yield('page-title', 'Dashboard')</h2>
@@ -137,7 +137,7 @@
             </div>
 
             {{-- Content --}}
-            <div class="p-8">
+            <div class="p-8 flex-1">
                 @if ($errors->any())
                     <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
                         <ul class="list-disc list-inside">
@@ -156,6 +156,14 @@
 
                 @yield('content')
             </div>
+
+            {{-- FOOTER --}}
+            <footer class="bg-white border-t border-gray-200 p-4 text-sm text-gray-600">
+                <div class="container mx-auto px-4 flex justify-between items-center">
+                    <div>© {{ date('Y') }} Toko Utama. All rights reserved.</div>
+                    <div class="text-right text-xs text-gray-500">Designed with care · Clean admin UI</div>
+                </div>
+            </footer>
         </div>
     </div>
 </body>

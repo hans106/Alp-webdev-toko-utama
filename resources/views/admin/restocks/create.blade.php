@@ -6,15 +6,9 @@
 
 @section('content')
     <div class="max-w-2xl">
-    
-    {{-- HEADER --}}
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Tambah Restock Baru</h1>
-        <p class="text-gray-500 text-sm">Dashboard Admin / Restock / Tambah</p>
-    </div>
 
     {{-- FORM TAMBAH RESTOCK --}}
-    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 max-w-2xl">
+    <div class="bg-white p-8 rounded-xl shadow-md border border-gray-200">
         <form action="{{ route('admin.restocks.store') }}" method="POST">
             @csrf
 
