@@ -330,5 +330,11 @@ class DatabaseSeeder extends Seeder
             'phone' => '-',
             'image_photo' => 'Pak_Mbung.jpeg',
         ]);
+
+        // Seed suppliers & restocks
+        $this->call([
+            \Database\Seeders\SupplierSeeder::class,
+            \Database\Seeders\RestockSeeder::class,
+        ]);
     }
 }
