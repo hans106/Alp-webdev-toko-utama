@@ -1,7 +1,10 @@
-@extends('layouts.main')
+@extends('layouts.admin')
+
+@section('page-title')
+    Manajemen Restock
+@endsection
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
     
     {{-- HEADER & TOMBOL TAMBAH --}}
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
@@ -152,5 +155,4 @@
     <div class="mt-6">
         {{ $restocks->links() }}
     </div>
-</div>
 @endsection

@@ -1,41 +1,37 @@
-@extends('layouts.main')
+@extends('layouts.admin')
+
+@section('page-title')
+    Dashboard Admin
+@endsection
 
 @section('content')
-    <div class="container mx-auto px-4 md:px-12 py-12">
-
-        {{-- Title --}}
-        <div class="text-center mb-10">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-[#1A0C0C] tracking-tight mb-2">
-                Area Admin
-            </h1>
-            <p class="text-[#6b4a4a]">Kelola dan pantau semua produk toko Anda</p>
-        </div>
+    <div class="mb-8">
+        <p class="text-gray-600 mb-6">Kelola dan pantau semua produk toko Anda</p>
 
         {{-- Search & Filter Box --}}
-        <div class="!bg-white p-6 rounded-2xl shadow-lg shadow-[#A4102520] 
-    border border-[#E8D6D0] mb-10">
+        <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200 mb-10">
             <form action="{{ route('admin.dashboard') }}" method="GET" class="flex flex-col lg:flex-row gap-4 items-center">
 
                 {{-- Search Bar --}}
                 <div class="w-full lg:w-1/3 relative">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-4 top-3.5 !text-[#B79B98]"
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-4 top-3.5 text-gray-400"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
 
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari produk..."
-                        class="w-full !bg-white border border-[#E8D6D0] rounded-xl
+                        class="w-full bg-white border border-gray-200 rounded-xl
                 pl-12 pr-4 py-3 focus:ring-2 focus:ring-[#A41025] 
-                !text-gray-900 placeholder-[#B79B98] outline-none font-medium">
+                text-gray-900 placeholder-gray-400 outline-none font-medium">
                 </div>
 
                 {{-- Category --}}
                 <div class="w-full lg:w-1/4">
                     <select name="category" onchange="this.form.submit()"
-                        class="w-full !bg-white border border-[#E8D6D0] rounded-xl px-4 py-3
+                        class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3
                 focus:ring-2 focus:ring-[#A41025] outline-none cursor-pointer
-                !text-gray-900 appearance-none font-medium">
+                text-gray-900 appearance-none font-medium">
                         <option value="">All Category</option>
                         @foreach ($categories as $cat)
                             <option value="{{ $cat->slug }}" {{ request('category') == $cat->slug ? 'selected' : '' }}>
@@ -48,9 +44,9 @@
                 {{-- Brand --}}
                 <div class="w-full lg:w-1/4">
                     <select name="brand" onchange="this.form.submit()"
-                        class="w-full !bg-white border border-[#E8D6D0] rounded-xl px-4 py-3
+                        class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3
                 focus:ring-2 focus:ring-[#A41025] outline-none cursor-pointer
-                !text-gray-900 appearance-none font-medium">
+                text-gray-900 appearance-none font-medium">
                         <option value="">All Brand</option>
                         @foreach ($brands as $brand)
                             <option value="{{ $brand->slug }}" {{ request('brand') == $brand->slug ? 'selected' : '' }}>
@@ -85,56 +81,56 @@
 
         {{-- Products Table --}}
         @if ($products->count() > 0)
-            <div class="overflow-x-auto">
-                <table class="w-full border-collapse">
+            <div class="overflow-x-auto bg-white rounded-lg shadow-md">
+                <table class="w-full">
                     <thead>
                         <tr class="bg-[#1A0C0C] text-white">
-                            <th class="border border-[#E8D6D0] px-4 py-3 text-left font-semibold">Produk</th>
-                            <th class="border border-[#E8D6D0] px-4 py-3 text-left font-semibold">Kategori</th>
-                            <th class="border border-[#E8D6D0] px-4 py-3 text-left font-semibold">Brand</th>
-                            <th class="border border-[#E8D6D0] px-4 py-3 text-right font-semibold">Harga</th>
-                            <th class="border border-[#E8D6D0] px-4 py-3 text-center font-semibold">Stok</th>
-                            <th class="border border-[#E8D6D0] px-4 py-3 text-center font-semibold">Aksi</th>
+                            <th class="px-4 py-3 text-left font-semibold">Produk</th>
+                            <th class="px-4 py-3 text-left font-semibold">Kategori</th>
+                            <th class="px-4 py-3 text-left font-semibold">Brand</th>
+                            <th class="px-4 py-3 text-right font-semibold">Harga</th>
+                            <th class="px-4 py-3 text-center font-semibold">Stok</th>
+                            <th class="px-4 py-3 text-center font-semibold">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($products as $item)
-                            <tr class="bg-white hover:bg-[#F8F5F3] transition border-b border-[#E8D6D0]">
+                            <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
                                 {{-- Produk --}}
-                                <td class="border border-[#E8D6D0] px-4 py-3">
+                                <td class="px-4 py-3">
                                     <div class="flex items-center gap-3">
                                         <img src="{{ asset($item->image_main) }}" alt="{{ $item->name }}"
-                                            class="w-12 h-12 object-contain rounded-lg bg-[#F8F5F3]">
+                                            class="w-12 h-12 object-contain rounded-lg bg-gray-100">
                                         <div>
                                             <p class="font-bold text-[#1A0C0C]">{{ $item->name }}</p>
-                                            <p class="text-xs text-[#7c5b58]">{{ Str::limit($item->description, 40) }}</p>
+                                            <p class="text-xs text-gray-600">{{ Str::limit($item->description, 40) }}</p>
                                         </div>
                                     </div>
                                 </td>
 
                                 {{-- Kategori --}}
-                                <td class="border border-[#E8D6D0] px-4 py-3">
+                                <td class="px-4 py-3">
                                     <span
                                         class="text-[10px] font-bold text-[#A41025] uppercase tracking-wider
-                                    bg-[#F8E7E8] px-2 py-1 rounded-md inline-block">
+                                    bg-red-100 px-2 py-1 rounded-md inline-block">
                                         {{ $item->category->name }}
                                     </span>
                                 </td>
 
                                 {{-- Brand --}}
-                                <td class="border border-[#E8D6D0] px-4 py-3 text-[#1A0C0C] font-medium">
+                                <td class="px-4 py-3 text-[#1A0C0C] font-medium">
                                     {{ $item->brand->name }}
                                 </td>
 
                                 {{-- Harga --}}
-                                <td class="border border-[#E8D6D0] px-4 py-3 text-right">
+                                <td class="px-4 py-3 text-right">
                                     <span class="font-bold text-[#1A0C0C]">
                                         Rp {{ number_format($item->price, 0, ',', '.') }}
                                     </span>
                                 </td>
 
                                 {{-- Stok --}}
-                                <td class="border border-[#E8D6D0] px-4 py-3 text-center">
+                                <td class="px-4 py-3 text-center">
                                     <span
                                         class="font-semibold px-3 py-1 rounded-full text-white
                                     {{ $item->stock <= 5 ? 'bg-red-500' : 'bg-green-500' }}">
@@ -143,7 +139,7 @@
                                 </td>
 
                                 {{-- Aksi --}}
-                                <td class="border border-[#E8D6D0] px-4 py-3">
+                                <td class="px-4 py-3">
                                     <div class="flex justify-center gap-2">
                                         <a href="{{ route('admin.products.edit', $item->id) }}"
                                             class="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition"
@@ -182,12 +178,11 @@
                 {{ $products->links() }}
             </div>
         @else
-            <div class="text-center py-20 bg-[#F8F5F3] rounded-3xl border border-dashed border-[#E8D6D0]">
-                <p class="text-[#7c5b58]">Produk tidak ditemukan.</p>
+            <div class="text-center py-20 bg-gray-100 rounded-lg border border-dashed border-gray-300">
+                <p class="text-gray-600">Produk tidak ditemukan.</p>
                 <a href="{{ route('admin.dashboard') }}"
                     class="text-[#A41025] font-bold mt-2 inline-block hover:underline">Reset Filter</a>
             </div>
         @endif
-
     </div>
 @endsection

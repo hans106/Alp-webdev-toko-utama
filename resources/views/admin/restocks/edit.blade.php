@@ -1,7 +1,11 @@
-@extends('layouts.main')
+@extends('layouts.admin')
+
+@section('page-title')
+    Edit Restock
+@endsection
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl">
     
     {{-- HEADER --}}
     <div class="mb-6">
@@ -102,5 +106,4 @@
             </div>
         </form>
     </div>
-</div>
 @endsection

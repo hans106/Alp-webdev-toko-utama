@@ -26,9 +26,11 @@ class AuthController extends Controller
         if (Auth::attempt($request->only('email', 'password'))) {
             $request->session()->regenerate();
 
-            // Cek Role: Kalau Admin ke Dashboard, Kalau User ke Home
-            if (Auth::user()->role === 'admin') {
-                return redirect()->intended('/admin/products');
+            // Cek Role: Admin users (superadmin, admin, inventory, cashier) go to /admin
+            // Regular customers go to home
+            $user = Auth::user();
+            if (in_array($user->role, ['superadmin', 'admin', 'inventory', 'cashier'])) {
+                return redirect()->intended('/admin');
             }
             
             return redirect()->intended('/');
