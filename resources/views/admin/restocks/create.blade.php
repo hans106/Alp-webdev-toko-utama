@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    <div class="max-w-2xl">
+    <div class="max-w-2xl mx-auto my-auto">
 
     {{-- FORM TAMBAH RESTOCK --}}
     <div class="bg-white p-8 rounded-xl shadow-md border border-gray-200">

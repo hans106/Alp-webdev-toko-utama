@@ -5,13 +5,7 @@
 @endsection
 
 @section('content')
-    <div class="max-w-2xl">
-    
-    {{-- HEADER --}}
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Edit Restock</h1>
-        <p class="text-gray-500 text-sm">Dashboard Admin / Restock / Edit</p>
-    </div>
+    <div class="max-w-2xl mx-auto my-auto">
 
     {{-- FORM EDIT RESTOCK --}}
     <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 max-w-2xl">

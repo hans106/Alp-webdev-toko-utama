@@ -15,50 +15,38 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+// ==========================================
+        // 1. USER & ROLES (YANG FINAL)
         // ==========================================
-        // 1. USER & ADMIN
-        // ==========================================
-        User::firstOrCreate([
-            'email' => 'admin@tokoUtama.com',
-        ], [
-            'name' => 'Admin',
-            'password' => Hash::make('admin123'),
-            'role' => 'admin',
-        ]);
-
-        User::firstOrCreate([
-            'email' => 'hansvere@tokoUtama.com',
-        ], [
-            'name' => 'Hansvere',
-            'password' => Hash::make('hansvere123'),
-            'role' => 'admin',
-        ]);
-
-        // Demo specialized roles
+        
+        // 👑 SUPER ADMIN (BOS BESAR - Bisa Akses Semua)
         User::firstOrCreate([
             'email' => 'superadmin@tokoUtama.com',
         ], [
-            'name' => 'Super Admin',
+            'name' => 'Owner (Super Admin)', // Boleh ganti nama jadi 'Hansvere' kalau mau
             'password' => Hash::make('superadmin123'),
             'role' => 'superadmin',
         ]);
 
+        // 📦 INVENTORY (Staff Gudang)
         User::firstOrCreate([
             'email' => 'inventory@tokoUtama.com',
         ], [
-            'name' => 'Inventory Staff',
+            'name' => 'Staff Gudang',
             'password' => Hash::make('inventory123'),
             'role' => 'inventory',
         ]);
 
+        // 💰 CASHIER (Kasir)
         User::firstOrCreate([
             'email' => 'kasir@tokoUtama.com',
         ], [
-            'name' => 'Kasir Demo',
+            'name' => 'Staff Kasir',
             'password' => Hash::make('kasir123'),
             'role' => 'cashier',
         ]);
 
+        // 👤 CUSTOMER (Pembeli)
         User::firstOrCreate([
             'email' => 'budi@gmail.com',
         ], [

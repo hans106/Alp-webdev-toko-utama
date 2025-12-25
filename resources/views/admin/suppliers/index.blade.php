@@ -41,8 +41,7 @@
 
     {{-- TABEL SUPPLIER --}}
     <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nama Supplier</th>
-    <div class="overflow-x-auto">
+                      
         <table class="w-full">
             <thead class="bg-[#1A0C0C] text-white">
                 <tr>

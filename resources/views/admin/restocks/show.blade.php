@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    <div class="max-w-3xl">
+    <div class="max-w-2xl mx-auto">
     
     {{-- HEADER --}}
     <div class="flex justify-between items-center mb-6">

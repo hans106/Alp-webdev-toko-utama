@@ -17,8 +17,8 @@ class Admin
     public function handle(Request $request, Closure $next): Response
     {
         // Cek apakah user sudah login dan memiliki role admin
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
-            // Jika bukan admin, redirect ke home
+        if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'superadmin'])) {
+            // Jika bukan admin atau superadmin, redirect ke home
             return redirect('/')->with('error', 'Akses ditolak! Hanya admin yang bisa mengakses area ini.');
         }
 
