@@ -11,37 +11,26 @@
                 </span>
             </a>
 
-            {{-- 2. DESKTOP MENU (Hidden di Mobile) --}}
+            {{-- 2. DESKTOP MENU --}}
             <div class="hidden md:flex space-x-10 items-center">
                 <a href="{{ route('home') }}"
                     class="text-amber-200 hover:text-amber-400 font-medium transition {{ request()->routeIs('home') ? 'text-amber-400 font-semibold' : '' }}">
                     Beranda
                 </a>
 
+                {{-- Menu Belanja (Muncul untuk Guest atau Customer) --}}
                 @if(!Auth::check() || Auth::user()->role === 'customer')
                     <a href="{{ route('catalog') }}"
                         class="text-amber-200 hover:text-amber-400 font-medium transition {{ request()->routeIs('catalog') ? 'text-amber-400 font-semibold' : '' }}">
                         Belanja
                     </a>
                 @endif
-
-                @auth
-                    @if (Auth::user()->role === 'admin')
-                        <a href="{{ route('admin.dashboard') }}"
-                            class="text-rose-300 hover:text-rose-100 font-bold transition flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
-                            </svg>
-                            Area Admin
-                        </a>
-                    @endif
-                @endauth
             </div>
 
             {{-- 3. DESKTOP RIGHT MENU (Cart & Auth) --}}
             <div class="hidden md:flex items-center gap-6">
-                @if(!Auth::check() || Auth::user()->role !== 'admin')
+                {{-- Icon Keranjang --}}
+                @if(!Auth::check() || Auth::user()->role !== 'superadmin') {{-- Asumsi: Superadmin gak butuh keranjang --}}
                     @php
                         $cartCount = Auth::check() ? \App\Models\Cart::where('user_id', Auth::id())->sum('qty') : 0;
                     @endphp
@@ -58,17 +47,23 @@
                 @endif
 
                 @auth
+                    {{-- Dropdown User --}}
                     <div class="relative group">
                         <button class="font-semibold text-amber-200 hover:text-amber-400 flex items-center gap-2 transition">
                             <span>{{ Auth::user()->name }}</span>
-                            @if(Auth::user()->role === 'admin')
-                                <span class="bg-rose-600 text-white text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider">Admin</span>
-                            @endif
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
+                        {{-- Isi Dropdown --}}
                         <div class="absolute right-0 mt-4 w-48 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 border border-slate-100 transform translate-y-2 group-hover:translate-y-0">
+                            {{-- Kalau butuh link dashboard Superadmin, taruh di sini opsional --}}
+                            @if(in_array(Auth::user()->role, ['superadmin', 'inventory', 'cashier']))
+                                <a href="{{ route('admin.dashboard') }}" class="block px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 font-medium">
+                                    Dashboard Staff
+                                </a>
+                            @endif
+
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
                                 <button type="submit" class="w-full text-left px-5 py-2.5 text-sm text-rose-600 hover:bg-rose-50 font-medium transition">
@@ -78,6 +73,7 @@
                         </div>
                     </div>
                 @else
+                    {{-- Tombol Login/Register --}}
                     <div class="flex items-center gap-4">
                         <a href="{{ route('login') }}" class="text-sm font-semibold text-amber-200 hover:text-amber-400 transition">Masuk</a>
                         <a href="{{ route('register') }}" class="px-4 py-2 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-maroon-900 font-semibold transition shadow-md hover:shadow-lg">Daftar</a>
@@ -97,10 +93,8 @@
     </div>
 
     {{-- 5. MOBILE MENU (HORIZONTAL SCROLL) --}}
-    {{-- Ini bagian 'Horizontal' yang Abang minta --}}
     <div id="mobile-menu" class="hidden md:hidden bg-[#241212] border-t border-[#3b1d1d] transition-all duration-300 ease-in-out">
         
-        {{-- Container Flex Row + Overflow-X-Auto biar bisa digeser ke samping --}}
         <div class="flex items-center gap-4 px-6 py-4 overflow-x-auto whitespace-nowrap hide-scrollbar">
             
             {{-- Link Beranda --}}
@@ -117,7 +111,7 @@
                 </a>
             @endif
 
-            @if(!Auth::check() || (Auth::check() && Auth::user()->role !== 'admin'))
+            @if(!Auth::check() || (Auth::check() && Auth::user()->role !== 'superadmin'))
                 {{-- Link Keranjang --}}
                 @php $cartCountMobile = Auth::check() ? \App\Models\Cart::where('user_id', Auth::id())->sum('qty') : 0; @endphp
                 <a href="{{ route('cart.index') }}" class="flex items-center gap-2 px-4 py-2 bg-[#1A0C0C] border border-[#3b1d1d] rounded-full text-amber-200 hover:text-white hover:border-amber-400 transition relative">
@@ -129,14 +123,6 @@
             @endif
 
             @auth
-                @if (Auth::user()->role === 'admin')
-                    {{-- Link Admin --}}
-                    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 px-4 py-2 bg-rose-900/20 border border-rose-800/50 rounded-full text-rose-300 hover:text-rose-100 hover:border-rose-500 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
-                        Area Admin
-                    </a>
-                @endif
-                
                 {{-- Tombol Logout --}}
                 <form action="{{ route('logout') }}" method="POST" class="inline-block">
                     @csrf
@@ -159,15 +145,10 @@
     </div>
 </nav>
 
-{{-- CSS Tambahan untuk menyembunyikan scrollbar tapi tetap bisa di-scroll --}}
+{{-- CSS & Script --}}
 <style>
-    .hide-scrollbar::-webkit-scrollbar {
-        display: none;
-    }
-    .hide-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
 
 <script>

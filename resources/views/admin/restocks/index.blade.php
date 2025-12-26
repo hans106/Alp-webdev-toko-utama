@@ -32,18 +32,18 @@
     {{-- FORM PENCARIAN & FILTER --}}
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8">
         <form action="{{ route('admin.restocks.index') }}" method="GET">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
                 
                 {{-- Search Bar --}}
                 <div class="relative">
                     <input type="text" name="search" value="{{ request('search') }}" 
-                        placeholder="Cari nama produk/supplier..."
+                        placeholder="Nama Produk atau Supplier"
                         class="w-full pl-4 pr-4 py-2 border rounded-xl focus:ring-blue-500 focus:border-blue-500 transition">
                 </div>
 
                 {{-- Filter Supplier --}}
-                <select name="supplier_id" class="w-full py-2 px-4 border rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white transition">
-                    <option value="">Semua Supplier</option>
+                <select name="supplier_id" class="w-full py-2 px-2 border rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white transition">
+                    <option value="">Suplier</option>
                     @foreach($suppliers as $supplier)
                         <option value="{{ $supplier->id }}" {{ request('supplier_id') == $supplier->id ? 'selected' : '' }}>
                             {{ $supplier->name }}

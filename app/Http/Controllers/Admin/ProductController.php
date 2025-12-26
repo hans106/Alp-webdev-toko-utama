@@ -6,50 +6,40 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Brand;
+use App\Models\ActivityLog; // <--- WAJIB IMPORT INI (MODEL LOG)
 use Illuminate\Http\Request;
 use Illuminate\Support\Str; 
 use Illuminate\Support\Facades\Storage; 
+use Illuminate\Support\Facades\Auth; // <--- WAJIB IMPORT INI (AUTH)
 
 class ProductController extends Controller
 {
     // ==========================================
-    // 0. DASHBOARD ADMIN (Dashboard dengan Search & Filter)
+    // 0. DASHBOARD ADMIN
     // ==========================================
     public function dashboard(Request $request)
     {
-        // Mulai Query Builder
         $query = Product::with(['category', 'brand']);
 
-        // --- LOGIC FILTER PENCARIAN ---
-
-        // 1. Filter Nama (Search)
+        // --- FILTER ---
         if ($request->has('search') && $request->search != '') {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
-
-        // 2. Filter Kategori (menggunakan slug dari frontend)
         if ($request->has('category') && $request->category != '') {
             $query->whereHas('category', function ($q) use ($request) {
                 $q->where('slug', $request->category);
             });
         }
-
-        // 3. Filter Brand (menggunakan slug dari frontend)
         if ($request->has('brand') && $request->brand != '') {
             $query->whereHas('brand', function ($q) use ($request) {
                 $q->where('slug', $request->brand);
             });
         }
-
-        // 4. Filter Harga Maksimal
         if ($request->has('max_price') && $request->max_price != '') {
             $query->where('price', '<=', $request->max_price);
         }
 
-        // Ambil data (Pagination 15 per halaman & Simpan history filter saat pindah halaman)
         $products = $query->latest()->paginate(15)->withQueryString();
-
-        // Ambil data Kategori & Brand untuk Dropdown di Dashboard
         $categories = Category::all();
         $brands = Brand::all();
 
@@ -57,48 +47,35 @@ class ProductController extends Controller
     }
 
     // ==========================================
-    // 1. DAFTAR PRODUK + FILTER (READ)
+    // 1. DAFTAR PRODUK (MANAGE)
     // ==========================================
     public function index(Request $request)
     {
-        // Mulai Query Builder
         $query = Product::with(['category', 'brand']);
 
-        // --- LOGIC FILTER PENCARIAN ---
-
-        // 1. Filter Nama (Search)
+        // --- FILTER ---
         if ($request->has('search') && $request->search != '') {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
-
-        // 2. Filter Kategori
         if ($request->has('category_id') && $request->category_id != '') {
             $query->where('category_id', $request->category_id);
         }
-
-        // 3. Filter Brand
         if ($request->has('brand_id') && $request->brand_id != '') {
             $query->where('brand_id', $request->brand_id);
         }
-
-        // 4. Filter Harga Maksimal
         if ($request->has('price_max') && $request->price_max != '') {
             $query->where('price', '<=', $request->price_max);
         }
 
-        // Ambil data (Pagination 10 per halaman & Simpan history filter saat pindah halaman)
         $products = $query->latest()->paginate(10)->withQueryString();
-
-        // Ambil data Kategori & Brand untuk Dropdown di Halaman Manage
         $categories = Category::all();
         $brands = Brand::all();
 
-        // 👇 PERUBAHAN DISINI BANG: Kita panggil view 'manage'
         return view('admin.products.manage', compact('products', 'categories', 'brands'));
     }
 
     // ==========================================
-    // 2. FORM TAMBAH (CREATE)
+    // 2. FORM TAMBAH
     // ==========================================
     public function create()
     {
@@ -108,7 +85,7 @@ class ProductController extends Controller
     }
 
     // ==========================================
-    // 3. PROSES SIMPAN (STORE)
+    // 3. STORE (SIMPAN + CATAT LOG)
     // ==========================================
     public function store(Request $request)
     {
@@ -129,7 +106,15 @@ class ProductController extends Controller
             $validated['image_main'] = $path;
         }
 
-        Product::create($validated);
+        $product = Product::create($validated);
+
+        // --- 📹 REKAM CCTV (CREATE) ---
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'CREATE PRODUCT',
+            'description' => 'Menambahkan produk baru: ' . $product->name
+        ]);
+        // -----------------------------
 
         return redirect()->route('admin.products.index')->with('success', 'Produk Berhasil Ditambahkan!');
     }
@@ -147,11 +132,16 @@ class ProductController extends Controller
     }
 
     // ==========================================
-    // 5. PROSES UPDATE
+    // 5. UPDATE (UPDATE + CATAT LOG)
     // ==========================================
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
+
+        // Simpan data lama buat bukti sejarah
+        $oldName = $product->name;
+        $oldPrice = $product->price;
+        $oldStock = $product->stock;
 
         $validated = $request->validate([
             'name'        => 'required|string|max:255',
@@ -175,21 +165,48 @@ class ProductController extends Controller
 
         $product->update($validated);
 
+        // --- 📹 REKAM CCTV (UPDATE) ---
+        // Kita catat kalau ada perubahan harga atau stok yang sensitif
+        $logMessage = 'Mengupdate produk ' . $oldName . '.';
+        
+        if ($oldPrice != $request->price) {
+            $logMessage .= ' Harga: ' . number_format($oldPrice) . ' -> ' . number_format($request->price) . '.';
+        }
+        if ($oldStock != $request->stock) {
+            $logMessage .= ' Stok: ' . $oldStock . ' -> ' . $request->stock . '.';
+        }
+
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'UPDATE PRODUCT',
+            'description' => $logMessage
+        ]);
+        // -----------------------------
+
         return redirect()->route('admin.products.index')->with('success', 'Produk Berhasil Diupdate!');
     }
 
     // ==========================================
-    // 6. HAPUS (DESTROY)
+    // 6. DESTROY (HAPUS + CATAT LOG)
     // ==========================================
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
+        $namaProduk = $product->name; // Simpan nama sebelum dihapus
 
         if ($product->image_main) {
             Storage::disk('public')->delete($product->image_main);
         }
 
         $product->delete();
+
+        // --- 📹 REKAM CCTV (DELETE) ---
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'DELETE PRODUCT',
+            'description' => 'Menghapus produk permanen: ' . $namaProduk
+        ]);
+        // -----------------------------
 
         return redirect()->route('admin.products.index')->with('success', 'Produk Berhasil Dihapus!');
     }

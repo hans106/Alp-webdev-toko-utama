@@ -7,10 +7,8 @@
 // ==========================================
 use Illuminate\Support\Facades\Route;
 
-// --- TAMBAHKAN BARIS INI ---
 use App\Http\Controllers\AuthController; 
-// ---------------------------
-
+use App\Http\Controllers\Admin\ActivityLogController;
 // 1. Controller Area Depan (Pembeli)
 use App\Http\Controllers\Front\CatalogController;
 use App\Http\Controllers\Front\PageController;
@@ -86,6 +84,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::put('/{id}', [ProductController::class, 'update'])->name('update');
         Route::delete('/{id}', [ProductController::class, 'destroy'])->name('destroy');
     });
+
+    Route::get('/activity-logs', [ActivityLogController::class, 'index'])
+     ->name('activity_logs.index');
 
     // Supplier
     Route::prefix('suppliers')->name('suppliers.')->middleware('role:superadmin,inventory')->group(function () {
