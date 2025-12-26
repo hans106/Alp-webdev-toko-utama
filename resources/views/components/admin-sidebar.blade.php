@@ -3,7 +3,9 @@
     {{-- 1. LOGO LEBIH COMPACT (p-4 bukan p-6, size w-8 h-8) --}}
     <div class="p-4 flex items-center gap-3 border-b border-gray-800 h-16 flex-shrink-0">
         <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center font-bold text-white text-lg shadow-lg">
-            TU
+            <img src="{{ asset('logo/logo_utama.jpeg') }}" 
+                 alt="Logo" 
+                 class="w-full h-full object-cover">
         </div>
         <div>
             <h1 class="font-bold text-base tracking-wide">Toko Utama</h1>

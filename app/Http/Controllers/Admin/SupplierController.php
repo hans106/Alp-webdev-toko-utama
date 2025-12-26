@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog; // ✅ Import Model Log
+use Illuminate\Support\Facades\Auth; // ✅ Import Auth
 
 class SupplierController extends Controller
 {
@@ -36,7 +38,7 @@ class SupplierController extends Controller
     }
 
     // ==========================================
-    // 3. SIMPAN SUPPLIER BARU (STORE)
+    // 3. SIMPAN SUPPLIER BARU (STORE + LOG)
     // ==========================================
     public function store(Request $request)
     {
@@ -46,7 +48,16 @@ class SupplierController extends Controller
             'address' => 'nullable|string|max:500',
         ]);
 
-        Supplier::create($validated);
+        // Tampung ke variabel $supplier biar bisa diambil namanya buat log
+        $supplier = Supplier::create($validated);
+
+        // --- 📹 REKAM CCTV (CREATE) ---
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'CREATE SUPPLIER',
+            'description' => 'Menambahkan Supplier baru: ' . $supplier->name
+        ]);
+        // -----------------------------
 
         return redirect()
             ->route('admin.suppliers.index')
@@ -70,10 +81,14 @@ class SupplierController extends Controller
     }
 
     // ==========================================
-    // 6. UPDATE SUPPLIER (UPDATE)
+    // 6. UPDATE SUPPLIER (UPDATE + LOG)
     // ==========================================
     public function update(Request $request, Supplier $supplier)
     {
+        // SIMPAN DATA LAMA (BUAT BUKTI SEBELUM BERUBAH)
+        $oldName = $supplier->name;
+        $oldPhone = $supplier->phone;
+
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:suppliers,name,' . $supplier->id,
             'phone' => 'nullable|string|max:20',
@@ -82,17 +97,47 @@ class SupplierController extends Controller
 
         $supplier->update($validated);
 
+        // --- 📹 REKAM CCTV (UPDATE) ---
+        // Logika mencatat apa saja yang berubah
+        $changes = [];
+        if ($oldName != $request->name) {
+            $changes[] = "Nama: '$oldName' -> '$request->name'";
+        }
+        if ($oldPhone != $request->phone) {
+            $changes[] = "HP: '$oldPhone' -> '$request->phone'";
+        }
+
+        // Hanya catat log KALO ada yang berubah
+        if (count($changes) > 0) {
+            ActivityLog::create([
+                'user_id' => Auth::id(),
+                'action' => 'UPDATE SUPPLIER',
+                'description' => 'Update Supplier. ' . implode(', ', $changes)
+            ]);
+        }
+        // -----------------------------
+
         return redirect()
-            ->route('admin.suppliers.show', $supplier)
+            ->route('admin.suppliers.index') // Saya sarankan balik ke index saja biar rapi
             ->with('success', 'Supplier berhasil diperbarui.');
     }
 
     // ==========================================
-    // 7. HAPUS SUPPLIER (DESTROY)
+    // 7. HAPUS SUPPLIER (DESTROY + LOG)
     // ==========================================
     public function destroy(Supplier $supplier)
     {
+        $namaSupplier = $supplier->name; // Simpan nama sebelum dihapus
+
         $supplier->delete();
+
+        // --- 📹 REKAM CCTV (DELETE) ---
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'DELETE SUPPLIER',
+            'description' => 'Menghapus data Supplier: ' . $namaSupplier
+        ]);
+        // -----------------------------
 
         return redirect()
             ->route('admin.suppliers.index')

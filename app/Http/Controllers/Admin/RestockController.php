@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Restock;
 use App\Models\Supplier;
 use App\Models\Product;
+use App\Models\ActivityLog; // ✅ Import Log
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth; // ✅ WAJIB IMPORT AUTH
 
 class RestockController extends Controller
 {
@@ -28,12 +30,10 @@ class RestockController extends Controller
             });
         }
 
-        // Filter berdasarkan supplier
         if ($request->has('supplier_id') && $request->supplier_id != '') {
             $query->where('supplier_id', $request->supplier_id);
         }
 
-        // Filter berdasarkan produk
         if ($request->has('product_id') && $request->product_id != '') {
             $query->where('product_id', $request->product_id);
         }
@@ -46,7 +46,7 @@ class RestockController extends Controller
     }
 
     // ==========================================
-    // 2. TAMPILKAN FORM TAMBAH (CREATE)
+    // 2. FORM TAMBAH (CREATE)
     // ==========================================
     public function create()
     {
@@ -57,41 +57,57 @@ class RestockController extends Controller
     }
 
     // ==========================================
-    // 3. SIMPAN RESTOCK BARU (STORE)
+    // 3. SIMPAN RESTOCK (STORE + LOG)
     // ==========================================
     public function store(Request $request)
     {
         $validated = $request->validate([
             'supplier_id' => 'required|exists:suppliers,id',
-            'product_id' => 'required|exists:products,id',
-            'qty' => 'required|integer|min:1',
-            'buy_price' => 'required|numeric|min:0',
-            'date' => 'required|date',
+            'product_id'  => 'required|exists:products,id',
+            'qty'         => 'required|integer|min:1',
+            'buy_price'   => 'required|numeric|min:0',
+            'date'        => 'required|date',
         ]);
 
-        // Atomic transaction: create restock + increment product stock
+        // Atomic transaction: create restock + increment product stock + LOG
         DB::transaction(function () use ($validated) {
-            Restock::create($validated);
-            Product::find($validated['product_id'])->increment('stock', $validated['qty']);
+            // 1. Simpan Data Restock
+            $restock = Restock::create($validated);
+            
+            // 2. Ambil data produk & supplier buat dicatat namanya di log
+            $product = Product::findOrFail($validated['product_id']);
+            $supplier = Supplier::findOrFail($validated['supplier_id']);
+            
+            // 3. Tambah Stok Produk
+            $oldStock = $product->stock;
+            $product->increment('stock', $validated['qty']);
+            $newStock = $product->stock; // Stok setelah ditambah
+
+            // --- 📹 REKAM CCTV (STORE) ---
+            ActivityLog::create([
+                'user_id' => Auth::id(),
+                'action'  => 'RESTOCK BARANG',
+                'description' => "Beli {$product->name} (Qty: {$validated['qty']}) dari {$supplier->name}. Total Stok: {$oldStock} -> {$newStock}."
+            ]);
+            // -----------------------------
         });
 
         return redirect()
             ->route('admin.restocks.index')
-            ->with('success', 'Restock berhasil dicatat. Stok produk otomatis bertambah.');
+            ->with('success', 'Restock berhasil dicatat & Stok bertambah.');
     }
 
     // ==========================================
-    // 4. TAMPILKAN DETAIL RESTOCK (SHOW)
+    // 4. DETAIL RESTOCK (SHOW)
     // ==========================================
     public function show(Restock $restock)
     {
         $restock->load(['supplier', 'product']);
-
         return view('admin.restocks.show', compact('restock'));
     }
 
     // ==========================================
-    // 5. TAMPILKAN FORM EDIT (EDIT)
+    // 5. FORM EDIT (EDIT)
     // ==========================================
     public function edit(Restock $restock)
     {
@@ -102,54 +118,85 @@ class RestockController extends Controller
     }
 
     // ==========================================
-    // 6. UPDATE RESTOCK (UPDATE)
+    // 6. UPDATE RESTOCK (UPDATE + LOG)
     // ==========================================
     public function update(Request $request, Restock $restock)
     {
         $validated = $request->validate([
             'supplier_id' => 'required|exists:suppliers,id',
-            'product_id' => 'required|exists:products,id',
-            'qty' => 'required|integer|min:1',
-            'buy_price' => 'required|numeric|min:0',
-            'date' => 'required|date',
+            'product_id'  => 'required|exists:products,id',
+            'qty'         => 'required|integer|min:1',
+            'buy_price'   => 'required|numeric|min:0',
+            'date'        => 'required|date',
         ]);
 
-        // Atomic transaction: adjust stock based on qty change + update restock
         DB::transaction(function () use ($restock, $validated) {
             $oldQty = $restock->qty;
             $newQty = $validated['qty'];
             $qtyDiff = $newQty - $oldQty;
 
-            // Update restock record
+            // Update Restock
             $restock->update($validated);
 
-            // Adjust stock: if qty increased, add diff; if decreased, subtract diff
+            // Adjust Stock
             if ($qtyDiff != 0) {
                 $restock->product->increment('stock', $qtyDiff);
             }
+
+            // --- 📹 REKAM CCTV (UPDATE) ---
+            $productName = $restock->product->name ?? 'Unknown Product';
+            $logMsg = "Edit Data Restock {$productName}.";
+            
+            if ($qtyDiff != 0) {
+                $logMsg .= " Koreksi Qty: {$oldQty} -> {$newQty} (Selisih: {$qtyDiff}).";
+            } else {
+                $logMsg .= " Perubahan data administrasi (harga/tanggal).";
+            }
+
+            ActivityLog::create([
+                'user_id' => Auth::id(),
+                'action'  => 'UPDATE RESTOCK',
+                'description' => $logMsg
+            ]);
+            // -----------------------------
         });
 
         return redirect()
             ->route('admin.restocks.show', $restock)
-            ->with('success', 'Restock berhasil diperbarui. Stok produk disesuaikan otomatis.');
+            ->with('success', 'Restock berhasil diperbarui.');
     }
 
     // ==========================================
-    // 7. HAPUS RESTOCK (DESTROY)
+    // 7. HAPUS RESTOCK (DESTROY + LOG)
     // ==========================================
     public function destroy(Restock $restock)
     {
-        $product = $restock->product;
+        // Ambil data dulu sebelum dihapus buat log
+        $product = $restock->product; 
+        $productName = $product->name ?? 'Item Terhapus';
         $qty = $restock->qty;
 
-        // Atomic transaction: delete restock + decrement product stock
-        DB::transaction(function () use ($restock, $product, $qty) {
+        DB::transaction(function () use ($restock, $product, $productName, $qty) {
+            
+            // Hapus data restock
             $restock->delete();
-            $product->decrement('stock', $qty);
+            
+            // Kurangi stok produk (Kembalikan stok)
+            if($product) {
+                $product->decrement('stock', $qty);
+            }
+
+            // --- 📹 REKAM CCTV (DELETE) ---
+            ActivityLog::create([
+                'user_id' => Auth::id(),
+                'action'  => 'BATAL/HAPUS RESTOCK',
+                'description' => "Membatalkan Restock {$productName}. Stok otomatis dikurangi {$qty} pcs."
+            ]);
+            // -----------------------------
         });
 
         return redirect()
             ->route('admin.restocks.index')
-            ->with('success', 'Restock berhasil dihapus. Stok produk otomatis berkurang.');
+            ->with('success', 'Restock dihapus & Stok dikurangi kembali.');
     }
 }

@@ -1,9 +1,12 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog; // ✅ WAJIB IMPORT LOG
+use Illuminate\Support\Facades\Auth; // ✅ WAJIB IMPORT AUTH
 
 class UserController extends Controller
 {
@@ -22,7 +25,7 @@ class UserController extends Controller
         return view('admin.users.index', compact('users'));
     }
 
-    // 2. FITUR HAPUS USER (Sesuai Request Abang)
+    // 2. FITUR HAPUS USER (DENGAN CCTV)
     public function destroy($id)
     {
         $user = User::findOrFail($id);
@@ -32,7 +35,20 @@ class UserController extends Controller
             return back()->with('error', 'GAGAL: Akun Superadmin, Gudang, atau Kasir dilindungi sistem.');
         }
 
+        // Simpan data dulu buat laporan CCTV
+        $deletedName = $user->name;
+        $deletedRole = $user->role;
+
+        // Hapus User
         $user->delete();
+
+        // --- 📹 REKAM CCTV (DELETE USER) ---
+        ActivityLog::create([
+            'user_id' => Auth::id(), // Siapa yang menghapus?
+            'action' => 'DELETE USER',
+            'description' => "Menghapus User: '$deletedName' (Role: $deletedRole)."
+        ]);
+        // ---------------------------------
 
         return back()->with('success', 'User berhasil dihapus.');
     }
