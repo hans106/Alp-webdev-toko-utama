@@ -230,7 +230,7 @@
             @if($leaders->count() > 0 && $staff->count() > 0)
                 <div class="w-full flex items-center justify-center mb-12 opacity-50">
                     <div class="h-px bg-slate-300 w-32"></div>
-                    <span class="mx-4 text-slate-400 text-sm uppercase tracking-widest">Employee</span>
+                    <span class="mx-4 text-slate-900 text-sm uppercase tracking-widest">Employee</span>
                     <div class="h-px bg-slate-300 w-32"></div>
                 </div>
             @endif

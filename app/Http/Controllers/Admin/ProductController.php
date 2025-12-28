@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Brand;
-use App\Models\ActivityLog; // <--- WAJIB IMPORT INI (MODEL LOG)
-use Illuminate\Http\Request;
+use App\Models\ActivityLog;
+use App\Models\Supplier;
+use App\Models\Order;       // <--- Tambah ini (biar bisa hitung pesanan masuk)
 use Illuminate\Support\Str; 
 use Illuminate\Support\Facades\Storage; 
 use Illuminate\Support\Facades\Auth; // <--- WAJIB IMPORT INI (AUTH)
@@ -15,13 +17,13 @@ use Illuminate\Support\Facades\Auth; // <--- WAJIB IMPORT INI (AUTH)
 class ProductController extends Controller
 {
     // ==========================================
-    // 0. DASHBOARD ADMIN
+    // 0. DASHBOARD ADMIN (SUDAH DIPERBAIKI)
     // ==========================================
     public function dashboard(Request $request)
     {
+        // --- BAGIAN 1: LOGIKA FILTER PRODUK (BAWAAN ABANG) ---
         $query = Product::with(['category', 'brand']);
 
-        // --- FILTER ---
         if ($request->has('search') && $request->search != '') {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
@@ -43,7 +45,26 @@ class ProductController extends Controller
         $categories = Category::all();
         $brands = Brand::all();
 
-        return view('admin.dashboard', compact('products', 'categories', 'brands'));
+        // --- BAGIAN 2: LOGIKA STATISTIK (TAMBAHAN BARU) ---
+        $totalProduct  = Product::count();
+        $stokMenipis   = Product::where('stock', '<', 5)->count();
+        $totalSupplier = Supplier::count();
+        // Hitung order hari ini
+        $pesananMasuk  = Order::whereDate('created_at', now())->count(); 
+
+        // --- BAGIAN 3: AMBIL DATA AUDIT TRAIL (INI KUNCINYA!) ---
+        // Ambil 10 aktivitas terakhir dari SIAPAPUN (Admin/Customer)
+        $logs = ActivityLog::with('user')
+                    ->latest()
+                    ->take(10)
+                    ->get();
+
+        // --- BAGIAN 4: KIRIM SEMUA KE VIEW ---
+        return view('admin.dashboard', compact(
+            'products', 'categories', 'brands', // Data Produk
+            'totalProduct', 'stokMenipis', 'totalSupplier', 'pesananMasuk', // Data Kotak Statistik
+            'logs' // <--- INI WAJIB ADA BIAR AUDIT TRAIL MUNCUL
+        ));
     }
 
     // ==========================================

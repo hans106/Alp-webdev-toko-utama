@@ -32,30 +32,30 @@ class EmployeeSeeder extends Seeder
         ]);
 
         Employee::create([
-            'name' => 'Mas Ndok',
+            'name' => 'Tukiman',
             'position' => 'Employee',
             'phone' => '081329518800',
             'image_photo' => 'Mas_Ndok.jpeg',
         ]);
 
         Employee::create([
-            'name' => 'Mas Sugik',
+            'name' => 'Agus Pratolo',
             'position' => 'Employee',
             'phone' => '085728644633',
             'image_photo' => 'Mas_Sugik.jpeg',
         ]);
 
         Employee::create([
-            'name' => 'Mas Min',
+            'name' => 'Ngatmin',
             'position' => 'Employee',
-            'phone' => '-',
+            'phone' => '082313104656',
             'image_photo' => 'Mas_Min.jpeg',
         ]);
         
         Employee::create([
-            'name' => 'Pak Mbung',
+            'name' => 'Suradi Orick',
             'position' => 'Employee',
-            'phone' => '-',
+            'phone' => '081229757570',
             'image_photo' => 'Pak_Mbung.jpeg',
         ]);
     }

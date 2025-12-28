@@ -39,7 +39,6 @@ class AdminOrderController extends Controller
             
             return redirect()->back()->with('success', 'Pesanan Berhasil Dikirim! 🚚');
         }
-
         return redirect()->back()->with('error', 'Pesanan Belum Lunas atau Sudah Dikirim!');
     }
 }
