@@ -100,8 +100,8 @@ class CheckoutController extends Controller
             // ==========================================
             ActivityLog::create([
                 'user_id' => $user->id,
-                'action'  => 'ORDER MASUK',
-                'description' => "User " . $user->name . " membuat pesanan #" . $newOrder->invoice_code . " senilai Rp " . number_format($newOrder->total_price)
+                'action'  => 'CREATE ORDER',
+                'description' => "Checkout Order #" . $newOrder->invoice_code . " (Rp " . number_format($newOrder->total_price) . ")"
             ]);
             // ==========================================
 
