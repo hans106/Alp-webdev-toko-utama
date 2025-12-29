@@ -79,13 +79,33 @@
             @if($events->count() > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($events as $event)
+                        @php
+                            $imageUrl = null;
+                            $candidates = [
+                                public_path('storage/events/' . $event->image),
+                                public_path('storage/Event/' . $event->image),
+                                public_path('events/' . $event->image),
+                                public_path('Event/' . $event->image),
+                            ];
+                            foreach ($candidates as $c) {
+                                if ($event->image && file_exists($c)) {
+                                    $rel = str_replace(public_path() . DIRECTORY_SEPARATOR, '', $c);
+                                    $imageUrl = asset(str_replace('\\', '/', $rel));
+                                    break;
+                                }
+                            }
+                            if (! $imageUrl) {
+                                $imageUrl = 'https://ui-avatars.com/api/?name=' . urlencode($event->title) . '&background=111827&color=fff&size=1024';
+                            }
+                        @endphp
+
                         <div class="group relative overflow-hidden rounded-2xl shadow-lg cursor-pointer h-72"
-                             onclick="openModal('{{ asset($event->image) }}', '{{ $event->title }}', '{{ $event->location }}', '{{ \Carbon\Carbon::parse($event->event_date)->isoFormat('D MMMM Y') }}', '{{ $event->description }}')">
+                             onclick="openModal('{{ $imageUrl }}', '{{ $event->title }}', '{{ $event->location }}', '{{ \Carbon\Carbon::parse($event->event_date)->isoFormat('D MMMM Y') }}', '{{ $event->description }}')">
                             
                             {{-- Gambar --}}
-                            <img src="{{ asset($event->image) }}" 
-                                 alt="{{ $event->title }}" 
-                                 class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
+                               <img src="{{ $imageUrl }}" 
+                                   alt="{{ $event->title }}" 
+                                   class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
                             
                             {{-- Overlay --}}
                             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">

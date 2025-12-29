@@ -1,14 +1,14 @@
 <?php
 
-
+use Illuminate\Support\Facades\Route;
 
 // ==========================================
 // DAFTAR IMPORT CONTROLLER
 // ==========================================
-use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\AuthController; 
 use App\Http\Controllers\Admin\ActivityLogController;
+use App\Http\Controllers\Admin\EmployeeController; // Pastikan ini ada
+
 // 1. Controller Area Depan (Pembeli)
 use App\Http\Controllers\Front\CatalogController;
 use App\Http\Controllers\Front\PageController;
@@ -21,7 +21,8 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\RestockController;
-use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\UserController; // Pastikan ini ada
+use App\Http\Controllers\Admin\EventController;
 
 
 // ==========================================
@@ -67,15 +68,30 @@ Route::middleware(['auth'])->group(function () {
 // 3. AREA ADMIN PANEL
 // ==========================================
 
+
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
 
-    // --- DIVISI 1: DASHBOARD (Super Admin Only) ---
-    // REVISI: Hapus ',admin' karena role admin biasa sudah tidak ada.
-    Route::get('/', [ProductController::class, 'dashboard'])
-        ->name('dashboard')
-        ->middleware('role:superadmin'); 
+    // --------------------------------------------------------
+    // GROUP 1: KHUSUS SUPER ADMIN (Full Access)
+    // --------------------------------------------------------
+    Route::middleware(['role:superadmin'])->group(function () {
+        
+        // 1. Dashboard Utama
+        Route::get('/', [ProductController::class, 'dashboard'])->name('dashboard');
+        // 2. Manajemen User (INI YANG ABANG CARI)
+        // Pakai resource biar lengkap (Index, Create, Edit, Delete)
+        Route::resource('users', UserController::class);
+        // 3. Manajemen Pegawai (Employee - Profil Web)
+        Route::resource('employees', EmployeeController::class)->except(['create', 'edit', 'show']);
+        // 4. Manajemen Event
+        Route::resource('events', EventController::class)->except(['create', 'edit', 'show']);
+        // 5. Activity Log (CCTV System)
+        Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity_logs.index');
+    });
 
-    // --- DIVISI 2: GUDANG (Inventory & Super Admin) ---
+    // --------------------------------------------------------
+    // GROUP 2: DIVISI GUDANG (Inventory + Super Admin)
+    // --------------------------------------------------------
     Route::prefix('products')->name('products.')->middleware('role:superadmin,inventory')->group(function () {
         Route::get('/', [ProductController::class, 'index'])->name('index');
         Route::get('/create', [ProductController::class, 'create'])->name('create');
@@ -84,9 +100,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::put('/{id}', [ProductController::class, 'update'])->name('update');
         Route::delete('/{id}', [ProductController::class, 'destroy'])->name('destroy');
     });
-
-    Route::get('/activity-logs', [ActivityLogController::class, 'index'])
-     ->name('activity_logs.index');
 
     // Supplier
     Route::prefix('suppliers')->name('suppliers.')->middleware('role:superadmin,inventory')->group(function () {
@@ -109,8 +122,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::put('/{restock}', [RestockController::class, 'update'])->name('update');
         Route::delete('/{restock}', [RestockController::class, 'destroy'])->name('destroy');
     });
-
-    // --- DIVISI 3: KASIR (Cashier & Super Admin) ---
+    // --------------------------------------------------------
+    // GROUP 3: DIVISI KASIR (Cashier + Super Admin)
+    // --------------------------------------------------------
     Route::get('/orders', [AdminOrderController::class, 'index'])
         ->name('orders.index')
         ->middleware('role:superadmin,cashier');
@@ -119,7 +133,4 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         ->name('orders.ship')
         ->middleware('role:superadmin,cashier');
 
-    // --- DIVISI 4: MANAJEMEN USER ---
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 });
