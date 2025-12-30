@@ -72,7 +72,7 @@
                     {{-- Foto Background --}}
                     <div class="absolute inset-0 bg-slate-800">
                         @if ($emp->image_photo)
-                            {{-- KODE BARU: Langsung ambil dari folder public/employee --}}
+                            
                             <img src="{{ asset('employee/' . $emp->image_photo) }}"
                                 class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity">
                         @else
