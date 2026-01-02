@@ -15,23 +15,35 @@ class CheckRole
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $roles = null): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
         if (!Auth::check()) {
             return redirect('/')->with('error', 'Akses ditolak! Silakan login.');
         }
 
-        $userRole = Auth::user()->role;
+        $userRole = strtolower(trim(Auth::user()->role ?? ''));
 
-        if (is_null($roles) || $roles === '') {
-            // no roles specified => deny
-            return redirect('/')->with('error', 'Akses ditolak!');
+        // Collect allowed roles from either a single comma-separated string or multiple params
+        $allowed = [];
+        foreach ($roles as $r) {
+            if (is_string($r) && $r !== '') {
+                $parts = array_map('trim', explode(',', $r));
+                foreach ($parts as $p) {
+                    if ($p !== '') {
+                        $allowed[] = strtolower($p);
+                    }
+                }
+            }
         }
 
-        $allowed = array_map('trim', explode(',', $roles));
+        // If no roles specified, deny access
+        if (empty($allowed)) {
+            return response()->view('errors.unauthorized', ['allowedRoles' => []], 403);
+        }
 
+        // Check membership
         if (!in_array($userRole, $allowed)) {
-            return redirect('/')->with('error', 'Akses ditolak! Anda tidak memiliki izin.');
+            return response()->view('errors.unauthorized', ['allowedRoles' => $allowed], 403);
         }
 
         return $next($request);

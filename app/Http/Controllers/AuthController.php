@@ -30,7 +30,7 @@ class AuthController extends Controller
             // Regular customers go to home
             $user = Auth::user();
             if (in_array($user->role, ['superadmin', 'admin', 'inventory', 'cashier'])) {
-                return redirect()->intended('/admin');
+                return redirect('/admin');
             }
             
             return redirect()->intended('/');

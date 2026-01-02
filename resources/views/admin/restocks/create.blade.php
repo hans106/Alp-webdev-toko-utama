@@ -52,9 +52,10 @@
             <div class="mb-6">
                 <label for="qty" class="block text-sm font-bold text-gray-700 mb-2">Jumlah Masuk <span class="text-red-500">*</span></label>
                 <input type="number" id="qty" name="qty" value="{{ old('qty') }}" 
-                    placeholder="Contoh: 50"
+                    placeholder="Contoh: 20 (Maksimal 30)"
                     class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('qty') border-red-500 @enderror"
-                    required min="1">
+                    required min="1" max="30">
+                <p class="text-xs text-gray-500 mt-1">⚠️ Maksimal 30 barang per restock</p>
                 @error('qty')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror

@@ -23,6 +23,17 @@
             <span class="font-medium">Dashboard</span>
         </a>
 
+                {{-- Group: ADMIN --}}
+        <div class="pt-3 pb-1 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Super Admin</div>
+
+        <a href="{{ route('admin.users.index') }}"
+            class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('admin.users.*') ? 'bg-orange-500 text-white shadow-md' : '' }}">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            User
+        </a>
+        
         {{-- MENU PEGAWAI (SUDAH DIPERBAIKI) --}}
         <a href="{{ route('admin.employees.index') }}"
             class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors group {{ request()->routeIs('admin.employees.*') ? 'bg-orange-500 text-white shadow-md' : '' }}">
@@ -70,13 +81,9 @@
             Restock Barang
         </a>
 
-        <a href="{{ route('admin.activity_logs.index') }}"
-            class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors group {{ request()->routeIs('admin.activity_logs.*') ? 'bg-orange-500 text-white shadow-md' : '' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-            </svg>
-            <span class="font-medium">Security Product</span>
-        </a>
+
+
+
 
         {{-- Group: TRANSAKSI --}}
         <div class="pt-3 pb-1 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Kasir & Transaksi</div>
@@ -88,17 +95,14 @@
             </svg>
             Pesanan Masuk
         </a>
-
-        {{-- Group: ADMIN --}}
-        <div class="pt-3 pb-1 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Super Admin</div>
-
-        <a href="{{ route('admin.users.index') }}"
-            class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('admin.users.*') ? 'bg-orange-500 text-white shadow-md' : '' }}">
+        <a href="{{ route('admin.restock-verifications.index') }}"
+            class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('admin.restock-verifications.*') ? 'bg-orange-500 text-white shadow-md' : '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
             </svg>
-            User
+            Checklist Nota Harga
         </a>
+
 
     </nav>
 

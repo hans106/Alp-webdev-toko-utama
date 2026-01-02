@@ -23,13 +23,13 @@
         </div>
     @endif
 
-    {{-- FORM PENCARIAN --}}
+    {{-- FORM PENCARIAN (hanya cari berdasarkan nama) --}}
     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8">
         <form action="{{ route('admin.suppliers.index') }}" method="GET">
             <div class="flex gap-4 items-end">
                 <div class="flex-1">
                     <input type="text" name="search" value="{{ request('search') }}" 
-                        placeholder="Cari nama atau telepon supplier..."
+                        placeholder="Cari nama supplier..."
                         class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#A41025] focus:border-transparent transition">
                 </div>
                 <button type="submit" class="bg-[#1A0C0C] text-white px-6 py-2 rounded-xl font-bold hover:bg-[#2d1515] transition">
@@ -46,8 +46,6 @@
             <thead class="bg-[#1A0C0C] text-white">
                 <tr>
                     <th class="px-6 py-3 text-left text-sm font-semibold">Nama Supplier</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold">Telepon</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold">Alamat</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold">Aksi</th>
                 </tr>
             </thead>
@@ -58,23 +56,10 @@
                     <td class="px-6 py-4">
                         <div class="text-sm font-bold text-gray-900">{{ $supplier->name }}</div>
                     </td>
-
-                    {{-- Kolom Telepon --}}
-                    <td class="px-6 py-4 text-sm text-gray-600">
-                        {{ $supplier->phone ?? '-' }}
-                    </td>
-
-                    {{-- Kolom Alamat --}}
-                    <td class="px-6 py-4 text-sm text-gray-600">
-                        <span class="line-clamp-1">{{ $supplier->address ?? '-' }}</span>
-                    </td>
                     
                     {{-- Kolom Aksi --}}
                     <td class="px-6 py-4 text-sm font-medium">
                         <div class="flex gap-2">
-                            {{-- Tombol VIEW --}}
-                            <a href="{{ route('admin.suppliers.show', $supplier) }}" class="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md transition font-medium">Lihat</a>
-                            
                             {{-- Tombol EDIT --}}
                             <a href="{{ route('admin.suppliers.edit', $supplier) }}" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md transition font-medium">Edit</a>
                             
@@ -91,7 +76,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="4" class="px-6 py-10 text-center text-gray-500">
+                    <td colspan="2" class="px-6 py-10 text-center text-gray-500">
                         <div class="flex flex-col items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 8.646 4 4 0 010-8.646M9 9H3m18 0h-6" />

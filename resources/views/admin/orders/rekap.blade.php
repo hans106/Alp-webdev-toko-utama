@@ -60,8 +60,21 @@
 
                     {{-- Tombol Aksi --}}
                     <td class="p-4 text-right">
-                        {{-- Logika Tombol Kirim --}}
-                        @if($order->status == 'paid' || $order->status == 'settlement' || $order->status == 'capture')
+                        {{-- Logika Tombol Pending (Terima/Tolak) --}}
+                        @if($order->status == 'pending')
+                            <div class="flex gap-2 justify-end">
+                                <form action="{{ route('admin.orders.approve', $order->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Terima pesanan ini?')">
+                                    @csrf
+                                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-md transition-all">
+                                        ✓ Terima
+                                    </button>
+                                </form>
+                                <button type="button" onclick="openRejectModal({{ $order->id }})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-md transition-all">
+                                    ✕ Tolak
+                                </button>
+                            </div>
+                        {{-- Logika Tombol Kirim (Status Lunas) --}}
+                        @elseif($order->status == 'paid' || $order->status == 'settlement' || $order->status == 'capture')
                             <form action="{{ route('admin.orders.ship', $order->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin mau kirim barang ini?')">
                                 @csrf
                                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md transition-all flex items-center gap-2 ml-auto">
@@ -71,7 +84,7 @@
                         @elseif($order->status == 'sent')
                             <span class="text-xs text-gray-400 italic">Sedang dalam pengiriman</span>
                         @else
-                            <span class="text-xs text-gray-400 italic">Menunggu Pembayaran</span>
+                            <span class="text-xs text-gray-400 italic">-</span>
                         @endif
                     </td>
                 </tr>
@@ -95,3 +108,82 @@
     </div>
 
 @endsection
+
+{{-- Modal Tolak Pesanan --}}
+<div id="rejectModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-96">
+        <h3 class="text-lg font-bold text-gray-800 mb-4">Tolak Pesanan</h3>
+        
+        <form id="rejectForm" method="POST">
+            @csrf
+            
+            <div class="mb-4">
+                <label for="reason" class="block text-sm font-medium text-gray-700 mb-2">Alasan Penolakan</label>
+                <select name="reason" id="reason" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    <option value="">-- Pilih Alasan --</option>
+                    <option value="belum_bayar">Belum Bayar</option>
+                    <option value="scan_invalid">Scan/Bukti Invalid</option>
+                    <option value="stok_habis">Stok Habis</option>
+                    <option value="lainnya">Lainnya (Masukan Manual)</option>
+                </select>
+            </div>
+
+            <div id="customReasonDiv" class="mb-4 hidden">
+                <label for="customReason" class="block text-sm font-medium text-gray-700 mb-2">Alasan Lainnya</label>
+                <textarea name="custom_reason" id="customReason" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="Masukkan alasan penolakan..."></textarea>
+            </div>
+
+            <div class="flex gap-3 justify-end">
+                <button type="button" onclick="closeRejectModal()" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold rounded-lg transition-all">
+                    Batal
+                </button>
+                <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-all">
+                    Tolak Pesanan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openRejectModal(orderId) {
+    document.getElementById('rejectModal').classList.remove('hidden');
+    document.getElementById('rejectForm').action = `/admin/orders/${orderId}/reject`;
+    document.getElementById('reason').value = '';
+    document.getElementById('customReason').value = '';
+    document.getElementById('customReasonDiv').classList.add('hidden');
+}
+
+function closeRejectModal() {
+    document.getElementById('rejectModal').classList.add('hidden');
+}
+
+// Show custom reason input when "Lainnya" is selected
+document.addEventListener('DOMContentLoaded', function() {
+    const reasonSelect = document.getElementById('reason');
+    if (reasonSelect) {
+        reasonSelect.addEventListener('change', function() {
+            const customReasonDiv = document.getElementById('customReasonDiv');
+            if (this.value === 'lainnya') {
+                customReasonDiv.classList.remove('hidden');
+                document.getElementById('customReason').required = true;
+            } else {
+                customReasonDiv.classList.add('hidden');
+                document.getElementById('customReason').required = false;
+            }
+        });
+    }
+});
+
+// Close modal when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('rejectModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeRejectModal();
+            }
+        });
+    }
+});
+</script>

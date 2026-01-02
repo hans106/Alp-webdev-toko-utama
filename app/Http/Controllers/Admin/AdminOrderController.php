@@ -16,6 +16,58 @@ class AdminOrderController extends Controller
         return view('admin.orders.rekap', compact('orders'));
     }
 
+    // FUNGSI TERIMA PESANAN (Validasi pembayaran, scan QR valid) + LOG
+    public function approve($id) 
+    {
+        $order = Order::findOrFail($id);
+
+        // Hanya order dengan status 'pending' yang bisa diterima
+        if($order->status !== 'pending'){
+            return redirect()->back()->with('error', 'Pesanan tidak bisa diterima. Status harus "pending"!');
+        }
+
+        // Update status jadi 'paid' (validasi pembayaran berhasil)
+        $oldStatus = $order->status;
+        $order->update(['status' => 'paid']);
+
+        // --- 📹 REKAM CCTV (ORDER DITERIMA) ---
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'APPROVE ORDER',
+            'description' => "Menerima & Validasi Pesanan #{$order->id} (pembayaran valid). Status: '{$oldStatus}' -> 'paid'."
+        ]);
+        // ------------------------------------
+        
+        return redirect()->back()->with('success', 'Pesanan Diterima! ✅ Status berubah menjadi PAID');
+    }
+
+    // FUNGSI TOLAK PESANAN (Belum bayar, scan invalid, pending) + LOG
+    public function reject($id, Request $request) 
+    {
+        $order = Order::findOrFail($id);
+
+        // Hanya order dengan status 'pending' yang bisa ditolak
+        if($order->status !== 'pending'){
+            return redirect()->back()->with('error', 'Pesanan tidak bisa ditolak. Status harus "pending"!');
+        }
+
+        $reason = $request->input('reason', 'Tidak ada alasan ditentukan');
+
+        // Update status jadi 'cancelled' (tolak pesanan)
+        $oldStatus = $order->status;
+        $order->update(['status' => 'cancelled']);
+
+        // --- 📹 REKAM CCTV (ORDER DITOLAK) ---
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'REJECT ORDER',
+            'description' => "Menolak Pesanan #{$order->id}. Alasan: {$reason}. Status: '{$oldStatus}' -> 'cancelled'."
+        ]);
+        // ------------------------------------
+        
+        return redirect()->back()->with('success', 'Pesanan Ditolak! ❌ Pelanggan akan dihubungi untuk konfirmasi ulang');
+    }
+
     // FUNGSI KIRIM BARANG (+ LOG)
     public function ship($id) 
     {

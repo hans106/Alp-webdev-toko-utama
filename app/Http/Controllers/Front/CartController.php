@@ -24,7 +24,7 @@ class CartController extends Controller
         return view('front.cart', compact('carts', 'totalPrice'));
     }
 
-    // 2. TAMBAH KE KERANJANG
+    // 2. TAMBAH KE KERANJANG (Support redirect back atau JSON untuk AJAX)
     public function store(Request $request, $id)
     {
         if (Auth::user()->role === 'admin') {
@@ -42,8 +42,15 @@ class CartController extends Controller
                             ->first();
 
         if ($existingCart) {
-            $existingCart->qty += 1;
-            $existingCart->save();
+            if ($existingCart->qty < $product->stock) {
+                $existingCart->qty += 1;
+                $existingCart->save();
+            } else {
+                if ($request->expectsJson()) {
+                    return response()->json(['error' => 'Stok tidak cukup'], 422);
+                }
+                return redirect()->back()->with('error', 'Stok tidak cukup!');
+            }
         } else {
             Cart::create([
                 'user_id' => Auth::id(),
@@ -52,36 +59,78 @@ class CartController extends Controller
             ]);
         }
 
-        return redirect()->route('cart.index')->with('success', 'Barang masuk keranjang!');
+        if ($request->expectsJson()) {
+            $cart = Cart::where('user_id', Auth::id())
+                        ->where('product_id', $id)
+                        ->first();
+            return response()->json([
+                'success' => true,
+                'message' => 'Barang masuk keranjang!',
+                'cart' => $cart,
+                'cartCount' => Cart::where('user_id', Auth::id())->count()
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Barang masuk keranjang!');
     }
 
-    // 3. UPDATE JUMLAH (+/-)
+    // 3. UPDATE JUMLAH (+/-) dengan validasi stock dan auto-remove jika qty < 1
     public function update(Request $request, $id)
     {
         $cart = Cart::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        $product = $cart->product;
         
         if ($request->type == 'minus') {
-            // PERBAIKAN: qty
             if ($cart->qty > 1) {
                 $cart->decrement('qty');
+            } else {
+                // Qty < 1, hapus dari cart
+                $cart->delete();
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Barang dihapus dari keranjang',
+                        'cartCount' => Cart::where('user_id', Auth::id())->count()
+                    ]);
+                }
+                return redirect()->back()->with('success', 'Barang dihapus dari keranjang.');
             }
-        } else {
-            // PERBAIKAN: qty
-            if ($cart->qty < $cart->product->stock) {
+        } elseif ($request->type == 'plus') {
+            if ($cart->qty < $product->stock) {
                 $cart->increment('qty');
             } else {
+                if ($request->expectsJson()) {
+                    return response()->json(['error' => 'Stok tidak cukup!'], 422);
+                }
                 return redirect()->back()->with('error', 'Stok mentok bang!');
             }
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'qty' => $cart->qty,
+                'cartCount' => Cart::where('user_id', Auth::id())->count()
+            ]);
         }
 
         return redirect()->back();
     }
 
-    // 4. HAPUS ITEM (Tetap sama)
+    // 4. HAPUS ITEM
     public function destroy($id)
     {
         $cart = Cart::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
         $cart->delete();
+        
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Barang dihapus dari keranjang.',
+                'cartCount' => Cart::where('user_id', Auth::id())->count()
+            ]);
+        }
+        
         return redirect()->back()->with('success', 'Barang dihapus dari keranjang.');
     }
 }

@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Route;
 // DAFTAR IMPORT CONTROLLER
 // ==========================================
 use App\Http\Controllers\AuthController; 
-use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\EmployeeController; // Pastikan ini ada
 
 // 1. Controller Area Depan (Pembeli)
@@ -21,6 +20,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\RestockController;
+use App\Http\Controllers\Admin\RestockVerificationController;
 use App\Http\Controllers\Admin\UserController; // Pastikan ini ada
 use App\Http\Controllers\Admin\EventController;
 
@@ -73,22 +73,20 @@ Route::middleware(['auth'])->group(function () {
 
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
 
+    // Dashboard accessible by all 3 admin roles (superadmin, inventory, cashier)
+    Route::get('/', [ProductController::class, 'dashboard'])->name('dashboard')->middleware('role:superadmin,inventory,cashier');
+
     // --------------------------------------------------------
     // GROUP 1: KHUSUS SUPER ADMIN (Full Access)
     // --------------------------------------------------------
     Route::middleware(['role:superadmin'])->group(function () {
         
-        // 1. Dashboard Utama
-        Route::get('/', [ProductController::class, 'dashboard'])->name('dashboard');
-        // 2. Manajemen User (INI YANG ABANG CARI)
-        // Pakai resource biar lengkap (Index, Create, Edit, Delete)
+        // 2. Manajemen User
         Route::resource('users', UserController::class);
         // 3. Manajemen Pegawai (Employee - Profil Web)
         Route::resource('employees', EmployeeController::class)->except(['create', 'edit', 'show']);
         // 4. Manajemen Event
         Route::resource('events', EventController::class)->except(['create', 'edit', 'show']);
-        // 5. Activity Log (CCTV System)
-        Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity_logs.index');
     });
 
     // --------------------------------------------------------
@@ -124,11 +122,29 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::put('/{restock}', [RestockController::class, 'update'])->name('update');
         Route::delete('/{restock}', [RestockController::class, 'destroy'])->name('destroy');
     });
+
+    // Restock Verification (Checklist Nota Harga)
+    Route::prefix('restock-verifications')->name('restock-verifications.')->middleware('role:superadmin,cashier')->group(function () {
+        Route::get('/', [RestockVerificationController::class, 'index'])->name('index');
+        Route::get('/{verification}/edit', [RestockVerificationController::class, 'edit'])->name('edit');
+        Route::put('/{verification}', [RestockVerificationController::class, 'update'])->name('update');
+    });
+
     // --------------------------------------------------------
     // GROUP 3: DIVISI KASIR (Cashier + Super Admin)
     // --------------------------------------------------------
     Route::get('/orders', [AdminOrderController::class, 'index'])
         ->name('orders.index')
+        ->middleware('role:superadmin,cashier');
+    
+    // Approve (accept) order
+    Route::post('/orders/{id}/approve', [AdminOrderController::class, 'approve'])
+        ->name('orders.approve')
+        ->middleware('role:superadmin,cashier');
+    
+    // Reject order
+    Route::post('/orders/{id}/reject', [AdminOrderController::class, 'reject'])
+        ->name('orders.reject')
         ->middleware('role:superadmin,cashier');
         
     Route::post('/orders/{id}/ship', [AdminOrderController::class, 'ship'])

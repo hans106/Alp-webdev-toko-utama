@@ -80,7 +80,6 @@
                         <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Produk</th>
                         <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Supplier</th>
                         <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Qty Masuk</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Harga Modal</th>
                         <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tanggal</th>
                         <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
@@ -104,24 +103,30 @@
                             +{{ $restock->qty }}
                         </td>
 
-                        {{-- Harga Modal --}}
-                        <td class="px-6 py-4 text-sm text-gray-600">
-                            Rp {{ number_format($restock->buy_price, 0, ',', '.') }}
-                        </td>
-
-                        {{-- Tanggal --}}
-                        <td class="px-6 py-4 text-sm text-gray-600">
-                            {{ \Carbon\Carbon::parse($restock->date)->format('d/m/Y') }}
+                        {{-- Tanggal dengan Warning jika lewat --}}
+                        <td class="px-6 py-4 text-sm">
+                            @php
+                                $restockDate = \Carbon\Carbon::parse($restock->date);
+                                $isOverdue = $restockDate->isPast();
+                            @endphp
+                            
+                            <div class="flex items-center gap-2">
+                                <span class="{{ $isOverdue ? 'text-red-600 font-bold' : 'text-gray-600' }}">
+                                    {{ $restockDate->format('d/m/Y') }}
+                                </span>
+                                @if($isOverdue)
+                                    <span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+                                        ⚠️ LEWAT JATUH TEMPO
+                                    </span>
+                                @endif
+                            </div>
                         </td>
                         
-                        {{-- Kolom Aksi --}}
+                        {{-- Kolom Aksi (hanya Read & Delete) --}}
                         <td class="px-6 py-4 text-sm font-medium">
                             <div class="flex gap-2">
                                 {{-- Tombol VIEW --}}
                                 <a href="{{ route('admin.restocks.show', $restock) }}" class="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md transition">Lihat</a>
-                                
-                                {{-- Tombol EDIT --}}
-                                <a href="{{ route('admin.restocks.edit', $restock) }}" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md transition">Edit</a>
                                 
                                 {{-- Tombol DELETE --}}
                                 <form action="{{ route('admin.restocks.destroy', $restock) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin? Stok produk akan berkurang.');" class="inline">
@@ -136,7 +141,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-10 text-center text-gray-500">
+                        <td colspan="5" class="px-6 py-10 text-center text-gray-500">
                             <div class="flex flex-col items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />

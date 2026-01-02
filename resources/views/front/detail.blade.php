@@ -3,15 +3,6 @@
 @section('content')
     <div class="max-w-6xl mx-auto px-4 md:px-8 py-10">
 
-        {{-- BREADCRUMB --}}
-        <nav class="text-sm font-medium text-slate-500 mb-6 flex items-center gap-2">
-            <a href="{{ route('home') }}" class="hover:text-[#8B0000] transition">Beranda</a>
-            <span class="text-slate-300">/</span>
-            <a href="{{ route('catalog') }}" class="hover:text-[#8B0000] transition">Katalog</a>
-            <span class="text-slate-300">/</span>
-            <span class="text-slate-900">{{ $product->name }}</span>
-        </nav>
-
         {{-- ALERT SUCCESS/ERROR --}}
         @if (session('success'))
             <div class="bg-green-100 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-2">
@@ -84,21 +75,70 @@
                         {{-- TOMBOL BELI / LOGIN / EDIT --}}
                         @auth
                             @if (Auth::user()->role === 'customer')
-                                <form action="{{ route('cart.store', $product->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit"
-                                        class="w-full bg-[#6B0F1A] text-white font-bold py-4 px-6 rounded-xl 
-                                               border border-[#7A1620]
-                                               hover:bg-[#7D1521] hover:border-[#D4AF37] 
-                                               hover:shadow-[0_0_10px_rgba(212,175,55,0.25)]
-                                               transition transform hover:-translate-y-0.5 
-                                               flex justify-center items-center gap-3 text-lg">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                        </svg>
-                                        Masukkan Keranjang
-                                    </button>
-                                </form>
+                                @php
+                                    $cartItem = \App\Models\Cart::where('user_id', Auth::id())
+                                                                ->where('product_id', $product->id)
+                                                                ->first();
+                                @endphp
+                                
+                                @if($cartItem)
+                                    {{-- Jika sudah ada di cart, tampilkan +/- buttons --}}
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-center gap-4 bg-slate-100 rounded-xl p-4 border border-slate-200">
+                                            <form action="{{ route('cart.update', $cartItem->id) }}" method="POST" class="cart-update-form">
+                                                @csrf @method('PUT')
+                                                <input type="hidden" name="type" value="minus">
+                                                <button type="submit"
+                                                    class="w-10 h-10 rounded-full bg-white hover:bg-rose-500 hover:text-white flex items-center justify-center font-bold text-slate-700 shadow-sm transition"
+                                                    title="Kurangi jumlah">
+                                                    −
+                                                </button>
+                                            </form>
+                                            <span class="font-bold text-lg text-slate-800 w-12 text-center" id="qty-display">{{ $cartItem->qty }}</span>
+                                            <form action="{{ route('cart.update', $cartItem->id) }}" method="POST" class="cart-update-form">
+                                                @csrf @method('PUT')
+                                                <input type="hidden" name="type" value="plus">
+                                                <button type="submit"
+                                                    class="w-10 h-10 rounded-full bg-white hover:bg-emerald-500 hover:text-white flex items-center justify-center font-bold text-slate-700 shadow-sm transition"
+                                                    title="Tambah jumlah">
+                                                    +
+                                                </button>
+                                            </form>
+                                        </div>
+                                        
+                                        <form action="{{ route('cart.destroy', $cartItem->id) }}" method="POST" class="cart-remove-form">
+                                            @csrf @method('DELETE')
+                                            <button type="submit"
+                                                class="w-full bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-xl 
+                                                       hover:bg-slate-400
+                                                       transition text-lg"
+                                                onclick="return confirm('Hapus dari keranjang?')">
+                                                Hapus dari Keranjang
+                                            </button>
+                                        </form>
+                                        
+                                        <p class="text-xs text-center text-slate-500 mt-2">
+                                            Produk sudah dalam keranjang. Ubah jumlah sesuai kebutuhan.
+                                        </p>
+                                    </div>
+                                @else
+                                    {{-- Jika belum ada di cart, tampilkan tombol add --}}
+                                    <form action="{{ route('cart.store', $product->id) }}" method="POST" class="cart-add-form">
+                                        @csrf
+                                        <button type="submit"
+                                            class="w-full bg-[#6B0F1A] text-white font-bold py-4 px-6 rounded-xl 
+                                                   border border-[#7A1620]
+                                                   hover:bg-[#7D1521] hover:border-[#D4AF37] 
+                                                   hover:shadow-[0_0_10px_rgba(212,175,55,0.25)]
+                                                   transition transform hover:-translate-y-0.5 
+                                                   flex justify-center items-center gap-3 text-lg">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                            Masukkan Keranjang
+                                        </button>
+                                    </form>
+                                @endif
                             @else
                                 <a href="{{ route('admin.products.edit', $product->id) }}"
                                     class="block w-full bg-[#FDBA31] text-[#8B0000] text-center font-bold py-4 px-6 rounded-xl hover:bg-[#f8b122] transition shadow-lg">
@@ -145,4 +185,108 @@
             </div>
         @endif
     </div>
+
+    <script>
+        // AJAX Form Submission untuk Cart Operations (stay on page)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle Add to Cart
+            const addToCartForm = document.querySelector('.cart-add-form');
+            if (addToCartForm) {
+                addToCartForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    fetch(this.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                        },
+                        body: new FormData(this)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Reload halaman untuk show updated cart buttons
+                            location.reload();
+                        } else {
+                            alert(data.error || 'Gagal menambah ke keranjang');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan. Coba lagi.');
+                    });
+                });
+            }
+
+            // Handle Update Cart Quantity
+            const updateForms = document.querySelectorAll('.cart-update-form');
+            updateForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    fetch(this.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                        },
+                        body: new FormData(this)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update qty display
+                            const qtyDisplay = document.querySelector('#qty-display');
+                            if (qtyDisplay) {
+                                qtyDisplay.textContent = data.qty;
+                            }
+                        } else {
+                            alert(data.error || 'Gagal update kuantitas');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan. Coba lagi.');
+                    });
+                });
+            });
+
+            // Handle Remove from Cart
+            const removeForm = document.querySelector('.cart-remove-form');
+            if (removeForm) {
+                removeForm.addEventListener('submit', function(e) {
+                    if (!confirm('Hapus dari keranjang?')) {
+                        e.preventDefault();
+                        return;
+                    }
+                    
+                    e.preventDefault();
+                    
+                    fetch(this.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                        },
+                        body: new FormData(this)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Reload untuk show tombol "Masukkan Keranjang" lagi
+                            location.reload();
+                        } else {
+                            alert('Gagal hapus dari keranjang');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan. Coba lagi.');
+                    });
+                });
+            }
+        });
+    </script>
 @endsection

@@ -7,6 +7,7 @@ use App\Models\Restock;
 use App\Models\Supplier;
 use App\Models\Product;
 use App\Models\ActivityLog; // ✅ Import Log
+use App\Models\RestockVerification; // ✅ Import RestockVerification
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth; // ✅ WAJIB IMPORT AUTH
@@ -64,7 +65,7 @@ class RestockController extends Controller
         $validated = $request->validate([
             'supplier_id' => 'required|exists:suppliers,id',
             'product_id'  => 'required|exists:products,id',
-            'qty'         => 'required|integer|min:1',
+            'qty'         => 'required|integer|min:1|max:30', // ✅ Max 30 barang
             'buy_price'   => 'required|numeric|min:0',
             'date'        => 'required|date',
         ]);
@@ -90,11 +91,18 @@ class RestockController extends Controller
                 'description' => "Beli {$product->name} (Qty: {$validated['qty']}) dari {$supplier->name}. Total Stok: {$oldStock} -> {$newStock}."
             ]);
             // -----------------------------
+
+            // ✅ AUTO-CREATE VERIFICATION untuk restock yang baru dibuat
+            RestockVerification::create([
+                'restock_id' => $restock->id,
+                'status' => 'pending',
+                'expected_total' => $restock->getExpectedTotal()
+            ]);
         });
 
         return redirect()
             ->route('admin.restocks.index')
-            ->with('success', 'Restock berhasil dicatat & Stok bertambah.');
+            ->with('success', 'Restock berhasil dicatat & Stok bertambah. Silakan lakukan verifikasi nota harga.');
     }
 
     // ==========================================
