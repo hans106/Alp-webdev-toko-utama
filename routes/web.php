@@ -61,6 +61,8 @@ Route::middleware(['auth'])->group(function () {
     // Riwayat
     Route::get('/my-orders', [FrontOrderController::class, 'index'])->name('orders.index');
     Route::get('/my-orders/{id}', [FrontOrderController::class, 'show'])->name('orders.show');
+
+    Route::get('/my-orders/reset-token/{id}', [FrontOrderController::class, 'resetToken'])->name('orders.reset');
 });
 
 

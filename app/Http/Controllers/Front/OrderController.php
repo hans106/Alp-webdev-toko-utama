@@ -11,6 +11,9 @@ use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+// --- INI PENTING: Panggil Library Midtrans ---
+use Midtrans\Config;
+use Midtrans\Snap;
 
 class OrderController extends Controller
 {
@@ -24,14 +27,51 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        // Ambil order beserta item produknya
+        // 1. Ambil data order
         $order = Order::with('orderItems.product')
                         ->where('user_id', Auth::id())
                         ->where('id', $id)
                         ->firstOrFail();
 
+        // 2. LOGIC MIDTRANS (WAJIB ADA DISINI)
+        // Cek: Jika status pending DAN snap_token belum punya, mintakan ke Midtrans
+        if ($order->status == 'pending' && empty($order->snap_token)) {
+            
+            // Konfigurasi Midtrans
+            Config::$serverKey = config('midtrans.server_key');
+            Config::$isProduction = config('midtrans.is_production');
+            Config::$isSanitized = true;
+            Config::$is3ds = true;
+
+            // Data yang dikirim ke Midtrans
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $order->invoice_code . '-' . rand(), // Tambah angka acak biar unik
+                    'gross_amount' => (int) $order->total_price, // Pastikan integer
+                ],
+                'customer_details' => [
+                    'first_name' => Auth::user()->name,
+                    'email' => Auth::user()->email,
+                ],
+            ];
+
+            try {
+                // Minta Token
+                $snapToken = Snap::getSnapToken($params);
+                
+                // Simpan Token ke Database
+                $order->snap_token = $snapToken;
+                $order->save();
+                
+            } catch (\Exception $e) {
+                // Kalau error koneksi, tampilkan errornya (untuk debugging)
+                // dd($e->getMessage()); 
+            }
+        }
+
         return view('front.orders.detail', compact('order'));
     }
+
     public function store(Request $request)
     {
         $carts = Cart::where('user_id', Auth::id())->get();
@@ -40,31 +80,27 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Keranjang kosong!');
         }
 
-        // 2. Hitung Total Harga
+        // Hitung Total Harga
         $totalPrice = 0;
         foreach($carts as $cart) {
             $totalPrice += $cart->product->price * $cart->qty;
         }
 
-        // 3. Mulai Transaksi Database (Biar aman)
+        // Mulai Transaksi Database
         DB::transaction(function () use ($carts, $totalPrice) {
             
-            // A. Simpan Order Utama
+            // A. Buat Order Baru
             $order = Order::create([
                 'user_id'     => Auth::id(),
                 'total_price' => $totalPrice,
-                'status'      => 'pending', // Atau 'paid' tergantung logika abang
-                'invoice_number' => 'INV-' . time(), // Contoh nomor invoice
+                'status'      => 'pending',
+                'invoice_code'=> 'INV-' . strtoupper(\Illuminate\Support\Str::random(10)), // Perbaikan nama kolom invoice
             ]);
 
-            // B. Pindahkan Item dari Cart ke OrderItems
+            // B. Pindahkan Item
             foreach ($carts as $cart) {
-                // Kurangi Stok Produk (Opsional, kalau mau langsung potong stok)
-                $cart->product->decrement('stock', $cart->qty);
-
-                // Masukkan ke tabel order_items
-                // Pastikan Abang punya model OrderItem ya
-                $order->orderItems()->create([
+                OrderItem::create([
+                    'order_id'   => $order->id,
                     'product_id' => $cart->product_id,
                     'qty'        => $cart->qty,
                     'price'      => $cart->product->price,
@@ -74,17 +110,28 @@ class OrderController extends Controller
             // C. Kosongkan Keranjang
             Cart::where('user_id', Auth::id())->delete();
 
-            // ==========================================
-            // 📹 PASANG CCTV (AUDIT TRAIL) DISINI
-            // ==========================================
+            // D. Log Aktivitas
             ActivityLog::create([
                 'user_id' => Auth::id(),
                 'action'  => 'ORDER MASUK',
-                'description' => "User " . Auth::user()->name . " membuat pesanan baru #" . $order->invoice_number . " senilai Rp " . number_format($totalPrice)
+                'description' => "User " . Auth::user()->name . " membuat pesanan baru # " . $order->invoice_code
             ]);
-            // ==========================================
         });
 
-        return redirect()->route('front.orders.index')->with('success', 'Pesanan berhasil dibuat!');
+        return redirect()->route('orders.index')->with('success', 'Pesanan berhasil dibuat!');
+    }
+    public function resetToken($id)
+    {
+        $order = Order::where('user_id', Auth::id())->where('id', $id)->firstOrFail();
+
+        // Cuma boleh reset kalau statusnya masih pending
+        if($order->status == 'pending') {
+            $order->snap_token = null; // Hapus token lama
+            $order->save();
+            
+            return redirect()->back()->with('success', 'Link pembayaran berhasil diperbarui!');
+        }
+
+        return redirect()->back()->with('error', 'Pesanan tidak bisa direset.');
     }
 }
