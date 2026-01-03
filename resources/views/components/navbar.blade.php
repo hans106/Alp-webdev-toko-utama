@@ -37,6 +37,22 @@
 
             {{-- 3. DESKTOP RIGHT MENU (Cart & Auth) --}}
             <div class="hidden md:flex items-center gap-6">
+
+                {{-- Icon Favorit (Wishlist) - hanya untuk customer --}}
+                @auth
+                    @if (Auth::user()->role === 'customer')
+                        <button id="favorites-btn" type="button"
+                            class="relative text-amber-200 hover:text-amber-400 transition group" title="Favorit">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:scale-110 transition"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                            <span id="favorites-count" class="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm hidden">0</span>
+                        </button>
+                    @endif
+                @endauth
+                
                 {{-- Icon Keranjang --}}
                 @if (!Auth::check() || Auth::user()->role !== 'superadmin') 
                     @php
@@ -57,6 +73,8 @@
                         @endif
                     </a>
                 @endif
+
+                
 
                 @auth
                     {{-- Dropdown User --}}
@@ -168,6 +186,20 @@
                             class="ml-1 bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{{ $cartCountMobile }}</span>
                     @endif
                 </a>
+
+                {{-- Link Favorit Mobile - hanya untuk customer --}}
+                @auth
+                    @if (Auth::user()->role === 'customer')
+                        <button id="favorites-btn-mobile" type="button"
+                            class="flex items-center gap-2 px-4 py-2 bg-[#1A0C0C] border border-[#3b1d1d] rounded-full text-amber-200 hover:text-white hover:border-amber-400 transition relative">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                            Favorit
+                            <span id="favorites-count-mobile" class="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
+                        </button>
+                    @endif
+                @endauth
             @endif
 
             @auth
@@ -212,6 +244,25 @@
     }
 </style>
 
+{{-- Favorites Modal --}}
+<div id="favorites-modal" class="hidden fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-96 overflow-hidden flex flex-col">
+        {{-- Modal Header --}}
+        <div class="bg-[#1A0C0C] px-6 py-4 flex justify-between items-center">
+            <h2 class="text-xl font-bold text-amber-400">Produk Favorit Saya</h2>
+            <button id="close-favorites-modal" type="button" class="text-amber-200 hover:text-white transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        {{-- Modal Content --}}
+        <div id="favorites-list" class="overflow-y-auto flex-1 p-6 space-y-4 bg-[#F8F5F3]">
+            <p class="text-center text-[#7c5b58] py-8">Memuat...</p>
+        </div>
+    </div>
+</div>
+
 <script>
     const btn = document.getElementById('mobile-menu-btn');
     const menu = document.getElementById('mobile-menu');
@@ -219,4 +270,107 @@
     btn.addEventListener('click', () => {
         menu.classList.toggle('hidden');
     });
+
+    // Favorites modal handler
+    const favoritesBtn = document.getElementById('favorites-btn');
+    const favoriteBtnMobile = document.getElementById('favorites-btn-mobile');
+    const favoritesModal = document.getElementById('favorites-modal');
+    const closeFavoritesBtn = document.getElementById('close-favorites-modal');
+
+    function openFavoritesModal() {
+        favoritesModal.classList.remove('hidden');
+        loadFavorites();
+    }
+
+    function closeFavoritesModal() {
+        favoritesModal.classList.add('hidden');
+    }
+
+    if (favoritesBtn) favoritesBtn.addEventListener('click', openFavoritesModal);
+    if (favoriteBtnMobile) favoriteBtnMobile.addEventListener('click', openFavoritesModal);
+    if (closeFavoritesBtn) closeFavoritesBtn.addEventListener('click', closeFavoritesModal);
+
+    favoritesModal?.addEventListener('click', function(e) {
+        if (e.target === this) closeFavoritesModal();
+    });
+
+    function loadFavorites() {
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        fetch('/favorites/list', {
+            method: 'GET',
+            headers: {
+                'X-CSRF-TOKEN': token,
+                'Accept': 'application/json'
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            const listContainer = document.getElementById('favorites-list');
+            const countElement = document.getElementById('favorites-count');
+            const countElementMobile = document.getElementById('favorites-count-mobile');
+            
+            if (data.success && data.favorites.length > 0) {
+                listContainer.innerHTML = data.favorites.map(fav => `
+                    <div class="flex items-center justify-between bg-white border border-[#E8D6D0] rounded-lg p-4 hover:shadow-md transition">
+                        <div class="flex items-center gap-4 flex-1">
+                            <img src="${fav.product.image_main}" alt="${fav.product.name}" class="w-16 h-16 object-contain rounded">
+                            <div class="flex-1">
+                                <a href="/produk/${fav.product.slug}" class="font-semibold text-[#1A0C0C] hover:text-[#A41025] transition">
+                                    ${fav.product.name}
+                                </a>
+                                <p class="text-[#7c5b58] text-sm">Rp ${Number(fav.product.price).toLocaleString('id-ID')}</p>
+                            </div>
+                        </div>
+                        <button type="button" class="unfavorite-btn ml-4 text-[#A41025] hover:text-[#820c1d] transition" data-wishlist-id="${fav.id}" title="Hapus dari favorit">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L10 16.364l5.682-5.682a4.5 4.5 0 00-6.364-6.364L10 7.636l-.318-.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                        </button>
+                    </div>
+                `).join('');
+                countElement?.classList.remove('hidden');
+                countElement.textContent = data.favorites.length;
+                countElementMobile?.classList.remove('hidden');
+                countElementMobile.textContent = data.favorites.length;
+                
+                // Attach unfavorite handlers
+                document.querySelectorAll('.unfavorite-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        unfavoritProduct(this.dataset.wishlistId);
+                    });
+                });
+            } else {
+                listContainer.innerHTML = '<p class="text-center text-[#7c5b58] py-8">Belum ada produk favorit</p>';
+                countElement?.classList.add('hidden');
+                countElementMobile?.classList.add('hidden');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Gagal memuat favorit');
+        });
+    }
+
+    function unfavoritProduct(wishlistId) {
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        fetch(`/favorites/remove/${wishlistId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': token,
+                'Accept': 'application/json'
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                loadFavorites();
+            } else {
+                alert('Gagal menghapus favorit');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Gagal menghapus favorit');
+        });
+    }
 </script>

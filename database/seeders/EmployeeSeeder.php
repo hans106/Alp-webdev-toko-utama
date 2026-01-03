@@ -25,7 +25,7 @@ class EmployeeSeeder extends Seeder
         ]);
 
         Employee::create([
-            'name' => 'Lim Salim',
+            'name' => 'Iin Salim',
             'position' => 'Operational Manager',
             'phone' => '085104818000',
             'image_photo' => 'LimSalim.jpeg',

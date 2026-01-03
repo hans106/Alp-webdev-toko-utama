@@ -90,6 +90,7 @@ class CartController extends Controller
                     return response()->json([
                         'success' => true,
                         'message' => 'Barang dihapus dari keranjang',
+                        'newQty' => 0,
                         'cartCount' => Cart::where('user_id', Auth::id())->count()
                     ]);
                 }
@@ -109,7 +110,7 @@ class CartController extends Controller
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'qty' => $cart->qty,
+                'newQty' => $cart->qty,
                 'cartCount' => Cart::where('user_id', Auth::id())->count()
             ]);
         }

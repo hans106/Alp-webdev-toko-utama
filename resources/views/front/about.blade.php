@@ -27,7 +27,7 @@
                     {{-- Pastikan file gambar ini ada di public/lokasi/ --}}
                     <img src="{{ asset('lokasi/Utama_bagian_dalam.jpg') }}" alt="Foto Sejarah Toko" class="w-full h-auto object-cover">
                     <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
-                        <p class="font-bold text-lg">1959</p>
+                        <p class="font-bold text-lg">1955</p>
                         <p class="text-sm text-slate-300">CX22+C36, Karanganyar, Central Java.</p>
                     </div>
                 </div>
@@ -45,14 +45,14 @@
                     "Toko Nyah Waing menjadi saksi bisu perkembangan ekonomi Karanganyar dari masa ke masa."
                 </div>
                 <p>
-                    Tahun 1982, Bp. Liem Kong Hong meninggal dunia. Bisnis usaha dipegang sepenuhnya oleh Ibu Meliati dibantu putra-putrinya (Ivan Purnomo dan Iin Salim).
+                    Tahun 1987, Bp. Liem Kong Hong meninggal dunia. Bisnis usaha dipegang sepenuhnya oleh Ibu Meliati dibantu putra-putrinya (Ivan Purnomo dan Iin Salim).
                 </p>
                 <p>
                     Oleh Bp. Ivan Purnomo, usaha ini diberi nama baru: <strong>Toko Utama</strong>. Barang yang dijual semakin bervariasi, mulai dari 9 bahan pokok hingga <em>consumer goods</em>.
                 </p>
                 <p>
                     Di tahun 1990-an, permintaan produk rokok meningkat pesat. Toko ini pun dikenal sebagai Grosir Rokok besar di wilayah Karanganyar dengan motto: <br>
-                    <span class="font-bold text-rose-700">"Melayani dan Untung Bersama, Selalu Baru dan Lebih Miring Harganya."</span>
+                    <span class="font-bold text-rose-700">"Melayani dan Untung Bersama, Selalu Baru dan Lebih Murah Harganya."</span>
                 </p>
             </div>
         </div>

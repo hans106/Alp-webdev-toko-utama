@@ -33,6 +33,20 @@
                         class="w-full h-auto object-contain max-h-[400px] drop-shadow-lg transform hover:scale-105 transition duration-500">
 
                     {{-- PERBAIKAN 2: Kode Galeri (productImages) SAYA HAPUS total biar gak error --}}
+
+                    @auth
+                        <button id="favorite-btn" data-product-id="{{ $product->id }}" class="absolute top-4 right-4 p-2 rounded-full bg-white shadow hover:scale-105 transition">
+                            @if(isset($isFavorited) && $isFavorited)
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-rose-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.657l-6.828-6.829a4 4 0 010-5.656z" />
+                                </svg>
+                            @else
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4 4 0 015.656 0L12 8.343l2.026-2.025a4 4 0 115.656 5.656L12 20.657l-7.682-7.683a4 4 0 010-5.656z" />
+                                </svg>
+                            @endif
++                        </button>
++                    @endauth
                 
                 </div>
 
@@ -154,6 +168,78 @@
 
                     </div>
                 </div>
+            </div>
+        </div>
+
+        {{-- REVIEW SECTION --}}
+        <div class="mt-8 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+            <h2 class="text-2xl font-bold mb-4">Ulasan Pelanggan</h2>
+
+            @php $avgRounded = round($avgRating); @endphp
+            <div class="flex items-center gap-4 mb-4">
+                <div class="flex items-center">
+                    @for ($i = 1; $i <= 5; $i++)
+                        @if ($i <= $avgRounded)
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.176 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                        @else
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-200" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.176 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                        @endif
+                    @endfor
+                </div>
+                <div class="text-sm text-slate-600">Rata-rata dari {{ $reviews->count() }} ulasan</div>
+            </div>
+
+            @auth
+                <form id="review-form" action="{{ route('product.review.store', $product->id) }}" method="POST" class="mb-6">
+                    @csrf
+                    <div class="flex items-center gap-3 mb-3">
+                        <label class="font-bold">Rating:</label>
+                        <select name="rating" id="rating" class="border rounded px-3 py-2">
+                            <option value="5">5 - Sangat Baik</option>
+                            <option value="4">4 - Baik</option>
+                            <option value="3">3 - Cukup</option>
+                            <option value="2">2 - Kurang</option>
+                            <option value="1">1 - Buruk</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <textarea name="comment" id="comment" rows="4" class="w-full border rounded p-3" placeholder="Tulis ulasan Anda"></textarea>
+                    </div>
+                    <button type="submit" class="bg-rose-600 text-white px-4 py-2 rounded font-bold">Kirim Ulasan</button>
+                </form>
+            @else
+                <p class="mb-4">Silakan <a href="{{ route('login') }}" class="text-rose-600 font-bold">login</a> untuk menulis ulasan.</p>
+            @endauth
+
+            <div id="reviews-list" class="space-y-4">
+                @forelse ($reviews as $rev)
+                    <div class="border rounded p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="font-bold">{{ $rev->user->name ?? 'Pengguna' }}</div>
+                            <div class="flex items-center gap-1">
+                                @for ($s = 1; $s <= 5; $s++)
+                                    @if ($s <= $rev->rating)
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.176 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                    @else
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-200" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.176 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                    @endif
+                                @endfor
+                            </div>
+                        </div>
+                        <div class="text-slate-700">{{ $rev->comment }}</div>
+                        <div class="text-xs text-slate-400 mt-2">{{ $rev->created_at->diffForHumans() }}</div>
+                    </div>
+                @empty
+                    <div class="text-slate-500">Belum ada ulasan untuk produk ini.</div>
+                @endforelse
             </div>
         </div>
 
@@ -284,6 +370,72 @@
                     .catch(error => {
                         console.error('Error:', error);
                         alert('Terjadi kesalahan. Coba lagi.');
+                    });
+                });
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const favBtn = document.getElementById('favorite-btn');
+            if (favBtn) {
+                favBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productId = this.dataset.productId;
+                    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+                    fetch(`/produk/${productId}/favorite`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            // simple: reload to reflect new favorite state
+                            location.reload();
+                        } else if (data.error) {
+                            alert(data.error);
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('Gagal update favorit');
+                    });
+                });
+            }
+
+            const reviewForm = document.getElementById('review-form');
+            if (reviewForm) {
+                reviewForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const action = this.action;
+                    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    const formData = new FormData(this);
+
+                    fetch(action, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            // reload to update reviews and average
+                            location.reload();
+                        } else if (data.error) {
+                            alert(data.error);
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('Gagal mengirim ulasan');
                     });
                 });
             }

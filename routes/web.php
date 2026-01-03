@@ -14,6 +14,8 @@ use App\Http\Controllers\Front\PageController;
 use App\Http\Controllers\Front\CartController;
 use App\Http\Controllers\Front\CheckoutController;
 use App\Http\Controllers\Front\OrderController as FrontOrderController; 
+use App\Http\Controllers\Front\ProductInteractionController;
+use App\Http\Controllers\Front\FavoritesController;
 
 // 2. Controller Area Belakang (Admin)
 use App\Http\Controllers\Admin\ProductController;
@@ -23,6 +25,7 @@ use App\Http\Controllers\Admin\RestockController;
 use App\Http\Controllers\Admin\RestockVerificationController;
 use App\Http\Controllers\Admin\UserController; // Pastikan ini ada
 use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\API\MidtransCallbackController;
 
 
 // ==========================================
@@ -34,12 +37,32 @@ Route::get('/tentang-kami', [PageController::class, 'about'])->name('about');
 Route::get('/katalog', [CatalogController::class, 'index'])->name('catalog');
 Route::get('/produk/{slug}', [CatalogController::class, 'show'])->name('front.product');
 
+// Product interactions: reviews and favorites
+Route::post('/produk/{id}/review', [ProductInteractionController::class, 'storeReview'])
+    ->name('product.review.store')->middleware('auth');
+
+Route::post('/produk/{id}/favorite', [ProductInteractionController::class, 'toggleFavorite'])
+    ->name('product.favorite.toggle')->middleware('auth');
+
+// Favorites modal endpoints
+Route::get('/favorites/list', [FavoritesController::class, 'list'])
+    ->name('favorites.list')->middleware('auth');
+Route::delete('/favorites/remove/{wishlistId}', [FavoritesController::class, 'remove'])
+    ->name('favorites.remove')->middleware('auth');
+
 // Authentication
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// ==========================================
+// MIDTRANS CALLBACK (Public - Tanpa Auth)
+// ==========================================
+Route::post('/midtrans-callback', [MidtransCallbackController::class, 'callback'])
+    ->name('midtrans.callback')
+    ->withoutMiddleware(['web']);  // Bypass CSRF jika diperlukan
 
 
 // ==========================================

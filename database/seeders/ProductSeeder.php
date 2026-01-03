@@ -55,7 +55,7 @@ class ProductSeeder extends Seeder
         // 3. PRODUK
         // --- ROKOK ---
         $daftarRokok = [
-            ['brand' => 'bentoel', 'name' => 'Dunhill Filter 16', 'price' => 32500, 'image' => '1._Dunhill_Filter16_Evoque_Rp_32.500.png'],
+            ['brand' => 'bentoel', 'name' => 'Dunhill Evoque 16', 'price' => 32500, 'image' => '1._Dunhill_Filter16_Evoque_Rp_32.500.png'],
             ['brand' => 'bentoel', 'name' => 'Dunhill Blue 20', 'price' => 28500, 'image' => '2._Dunhill_Blue_20_Rp_28.500.png'],
             ['brand' => 'bentoel', 'name' => 'Dunhill Green 20', 'price' => 28500, 'image' => '3._Dunhill_Green_20_Rp_28.500.png'],
             ['brand' => 'bentoel', 'name' => 'Lucky Strike Purple 20', 'price' => 30000, 'image' => '4._Lucky_Strike_Purple_20_Rp_30.000.png'],
@@ -68,22 +68,22 @@ class ProductSeeder extends Seeder
             ['brand' => 'bentoel', 'name' => 'Country Light 20', 'price' => 27000, 'image' => '11._Country_Light__20_Rp_27.000.png'],
             ['brand' => 'bentoel', 'name' => 'Country Red 20', 'price' => 27000, 'image' => '12._Country_Red_20_Rp_27.000.png'],
             ['brand' => 'bentoel', 'name' => 'Bentoel Sejati 12', 'price' => 9500, 'image' => '13._Bentoel_Sejati_12_Rp_9.500.png'],
-            ['brand' => 'jti', 'name' => 'Camel Purple 16', 'price' => 19500, 'image' => '14._Camel_Purple_16_Rp_19.500.png'],
-            ['brand' => 'jti', 'name' => 'Camel Purple 12', 'price' => 25500, 'image' => '15._Camel_Purple_12_Rp_25.500.png'],
+            ['brand' => 'jti', 'name' => 'Camel Purple 16', 'price' => 25500, 'image' => '14._Camel_Purple_16_Rp_19.500.png'],
+            ['brand' => 'jti', 'name' => 'Camel Purple 12', 'price' => 19500, 'image' => '15._Camel_Purple_12_Rp_25.500.png'],
             ['brand' => 'jti', 'name' => 'Camel Connect 20', 'price' => 30000, 'image' => '16._Camel_Connect_20_Rp_30.000.png'],
             ['brand' => 'jti', 'name' => 'Camel Blue 16', 'price' => 23000, 'image' => '17._Camel_Blue16_Rp_23.000.png'],
             ['brand' => 'jti', 'name' => 'Camel Ice Red 16', 'price' => 25500, 'image' => '18._Camel_Ice_Red_16_Rp_25.500.png'],
-            ['brand' => 'jti', 'name' => 'Camel Kretek 12', 'price' => 25500, 'image' => '19._Camel_Kretek_12_Rp_14.000.png'],
+            ['brand' => 'jti', 'name' => 'Camel Kretek 12', 'price' => 15500, 'image' => '19._Camel_Kretek_12_Rp_14.000.png'],
             ['brand' => 'djarum', 'name' => 'LA Ice Purple 16', 'price' => 33500, 'image' => '20._LA_IcePurple_16_Rp_33.500.png'],
-            ['brand' => 'djarum', 'name' => 'Tenor Hijau 12', 'price' => 9500, 'image' => '21._Tenor_Hijau_12_Rp_9.500.png'],
-            ['brand' => 'djarum', 'name' => 'Tenor Teh Manis 12', 'price' => 9500, 'image' => '22._Tenor_teh_manis_12_Rp_9.500.png'],
-            ['brand' => 'djarum', 'name' => 'Viper Red 16', 'price' => 21000, 'image' => '23._Viper_Red_16_Rp_21.000.png'],
+            ['brand' => 'djarum', 'name' => 'Tenor Hijau 12', 'price' => 10000, 'image' => '21._Tenor_Hijau_12_Rp_9.500.png'],
+            ['brand' => 'djarum', 'name' => 'Tenor Teh Manis 12', 'price' => 10000, 'image' => '22._Tenor_teh_manis_12_Rp_9.500.png'],
+            ['brand' => 'djarum', 'name' => 'Viper Red 16', 'price' => 21500, 'image' => '23._Viper_Red_16_Rp_21.000.png'],
             ['brand' => 'djarum', 'name' => 'Djarum 76', 'price' => 16000, 'image' => '24._Djarum76_12_Rp_16.000.png'],
             ['brand' => 'djarum', 'name' => 'Djarum 76 Apel 12', 'price' => 14500, 'image' => '25._76_Apel_12_Rp_14.500.png'],
             ['brand' => 'djarum', 'name' => 'Djarum 76 Nanas 12', 'price' => 14500, 'image' => '26._Djarum76_Nanas_12_Rp_14.500.png'],
             ['brand' => 'djarum', 'name' => 'Djarum 76 Filter Gold', 'price' => 23000, 'image' => '27._Djarum_76_Filter_Gold_12_Rp_23.000.png'],
-            ['brand' => 'djarum', 'name' => 'LA Ice 16', 'price' => 35000, 'image' => '28._LA_Ice_16_Rp_35.500.png'],
-            ['brand' => 'djarum', 'name' => 'LA Mentol 16', 'price' => 35000, 'image' => '29._LA_Mentol_16__Rp_35.500.png'],
+            ['brand' => 'djarum', 'name' => 'LA Ice 16', 'price' => 33500, 'image' => '28._LA_Ice_16_Rp_35.500.png'],
+            ['brand' => 'djarum', 'name' => 'LA Mentol 16', 'price' => 33500, 'image' => '29._LA_Mentol_16__Rp_35.500.png'],
             ['brand' => 'djarum', 'name' => 'LA Light 16', 'price' => 33500, 'image' => '30._LA_Light_16_Rp_33.500.png'],
             ['brand' => 'djarum', 'name' => 'LA Bold 12', 'price' => 22500, 'image' => '31._LA_Bold_12_Rp_22.500.png'],
             ['brand' => 'djarum', 'name' => 'LA Bold 20', 'price' => 38000, 'image' => '32._LA_Bold_20_Rp_38.000.png'],
@@ -111,7 +111,7 @@ class ProductSeeder extends Seeder
             ['brand' => 'mayora', 'name' => 'Astor', 'price' => 19000, 'image' => '3._Astor_Rp_19.000_per_box.png'],
             ['brand' => 'marie-regal', 'name' => 'Roti Regal', 'price' => 23000, 'image' => '4._Roti Regal_Rp_23.000_per_pc.png'],
             ['brand' => 'nissin', 'name' => 'Crispy Crackers', 'price' => 10000, 'image' => '5._Crispy_Crackers_Rp_10.000.png'],
-            ['brand' => 'mayora', 'name' => 'Bang Bang Maxx', 'price' => 27000, 'image' => '6._Bang_Bang_Maxx_Rp_27.000.png'],
+            ['brand' => 'mayora', 'name' => 'Beng Beng Maxx', 'price' => 37000, 'image' => '6._Bang_Bang_Maxx_Rp_27.000.png'],
         ];
 
         foreach ($daftarSnack as $snack) {
@@ -163,7 +163,7 @@ class ProductSeeder extends Seeder
 
         // --- SABUN ---
         $daftarSabun = [
-            ['brand' => 'wings', 'name' => 'DIV Bar Soap', 'price' => 2900, 'image' => '1._DIV_Rp2.900_pc.png'],
+            ['brand' => 'wings', 'name' => 'GIV Bar Soap', 'price' => 2900, 'image' => '1._DIV_Rp2.900_pc.png'],
             ['brand' => 'wings', 'name' => 'Claudia Bar Soap', 'price' => 2100, 'image' => '2._Claudia_Rp2.100_pc.png'],
             ['brand' => 'bkp', 'name' => 'Shinzui Bar Soap', 'price' => 4500, 'image' => '3._Shinzui_Rp4.500_pc.png'],
             ['brand' => 'unilever', 'name' => 'Lifebuoy Bar Soap', 'price' => 3200, 'image' => '4._Lifebuoy_Rp3.200_pc.png'],

@@ -47,7 +47,7 @@
                     {{-- Badge Tahun Floating --}}
                     <div
                         class="absolute bottom-6 left-6 bg-white/90 backdrop-blur text-[#800000] px-5 py-3 rounded-xl shadow-lg border-l-4 border-[#800000]">
-                        <span class="font-bold text-2xl font-serif">1959</span>
+                        <span class="font-bold text-2xl font-serif">1955</span>
                     </div>
                 </div>
             </div>
@@ -64,7 +64,7 @@
                 </h2>
 
                 <p class="text-slate-600 text-base md:text-lg leading-relaxed mb-8 text-justify">
-                    Bermula dari sebuah gudang kecil penampung hasil bumi pada tahun 1959,
+                    Bermula dari sebuah gudang kecil penampung hasil bumi pada tahun 1955,
                     <span class="font-bold text-[#800000]">Toko Utama</span> telah bertransformasi menjadi pusat
                     perbelanjaan modern di Karanganyar. Kami memadukan kenyamanan modern dengan kehangatan tradisional yang
                     tak lekang oleh waktu.
@@ -163,7 +163,7 @@
                                         </svg>
                                     </span>
                                     <span class="text-slate-700 text-xs md:text-lg leading-tight md:leading-normal">Harga
-                                        kompetitif & bersaing.</span>
+                                        kompetitif</span>
                                 </li>
                                 <li class="flex items-start gap-2 md:gap-4">
                                     <span
@@ -225,7 +225,7 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-sm md:text-xl font-bold text-[#2B0A0A] mb-1 md:mb-3">Harga Miring</h3>
+                        <h3 class="text-sm md:text-xl font-bold text-[#2B0A0A] mb-1 md:mb-3">Harga Murah</h3>
                         <p class="text-slate-500 text-xs md:text-base leading-relaxed">
                             Harga bersaing, hemat untuk belanja bulanan.
                         </p>

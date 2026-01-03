@@ -128,7 +128,7 @@
                             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-slate-800 mb-2">Keranjang Kosong</h3>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Kerangan Kosong</h3>
                 <p class="text-slate-500 mb-6">Wah, belum ada belanjaan nih. Yuk cari barang!</p>
                 <a href="{{ route('catalog') }}"
                     class="inline-flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition">
@@ -137,7 +137,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
-                    Kembali ke Katalog
+                    Kembali ke Belanja
                 </a>
             </div>
         @endif

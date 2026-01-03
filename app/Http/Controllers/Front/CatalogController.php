@@ -70,8 +70,16 @@ class CatalogController extends Controller
             $q->latest()->take(4); 
         }])->whereHas('products')->get();
 
+        // Preload user favorites to avoid N+1 queries
+        $userFavorites = collect();
+        if (Auth::check()) {
+            $userFavorites = \App\Models\Wishlist::where('user_id', Auth::id())
+                ->pluck('product_id')
+                ->flip(); // Flip untuk quick lookup by product_id
+        }
+
         // Kirim ke View
-        return view('front.catalog', compact('products', 'categories', 'brands', 'groupedProducts'));
+        return view('front.catalog', compact('products', 'categories', 'brands', 'groupedProducts', 'userFavorites'));
     }
 
     // Halaman Detail Produk
@@ -94,6 +102,18 @@ class CatalogController extends Controller
             ->take(4)
             ->get();
 
-        return view('front.detail', compact('product', 'relatedProducts'));
+        // Load product reviews and average rating
+        $reviews = $product->reviews()->with('user')->latest()->get();
+        $avgRating = $product->reviews()->avg('rating') ?? 0;
+
+        // Check if current user has this product in wishlist (favorite)
+        $isFavorited = false;
+        if (Auth::check()) {
+            $isFavorited = \App\Models\Wishlist::where('user_id', Auth::id())
+                ->where('product_id', $product->id)
+                ->exists();
+        }
+
+        return view('front.detail', compact('product', 'relatedProducts', 'reviews', 'avgRating', 'isFavorited'));
     }
 }

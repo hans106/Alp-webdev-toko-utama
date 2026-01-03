@@ -72,32 +72,9 @@
                     {{-- Foto Banner --}}
                     <div class="absolute inset-0 bg-slate-800 h-full">
                         
-                        {{-- PERBAIKAN DI SINI: --}}
-                        {{-- 1. Cek folder 'storage/events' --}}
-                        {{-- 2. Asset arahkan ke 'storage/events' --}}
-                        
-                        @php
-                            $imageUrl = null;
-                            // possible paths to check (storage symlink and direct public folders)
-                            $candidates = [
-                                public_path('storage/events/' . $event->image),
-                                public_path('storage/Event/' . $event->image),
-                                public_path('events/' . $event->image),
-                                public_path('Event/' . $event->image),
-                            ];
-
-                            foreach ($candidates as $c) {
-                                if ($event->image && file_exists($c)) {
-                                    // build asset path corresponding to the candidate
-                                    $rel = str_replace(public_path() . DIRECTORY_SEPARATOR, '', $c);
-                                    $imageUrl = asset(str_replace('\\', '/', $rel));
-                                    break;
-                                }
-                            }
-                        @endphp
-
-                        @if ($imageUrl)
-                            <img src="{{ $imageUrl }}" alt="{{ $event->title }}"
+                        {{-- Image URL yang benar menggunakan Storage disk 'public' --}}
+                        @if ($event->image && \Illuminate\Support\Facades\Storage::disk('public')->exists('events/' . $event->image))
+                            <img src="{{ asset('storage/events/' . $event->image) }}" alt="{{ $event->title }}"
                                 class="w-full h-full object-cover opacity-90 group-hover:scale-110 transition-transform duration-700">
                         @else
                             {{-- Placeholder jika gambar tidak ada/rusak --}}
