@@ -29,7 +29,7 @@ class AuthController extends Controller
             // Cek Role: Admin users (superadmin, admin, inventory, cashier) go to /admin
             // Regular customers go to home
             $user = Auth::user();
-            if (in_array($user->role, ['superadmin', 'admin', 'inventory', 'cashier'])) {
+            if (in_array($user->role, ['master', 'admin', 'inventory', 'admin_penjualan'])) {
                 return redirect('/admin');
             }
             

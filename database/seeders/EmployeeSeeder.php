@@ -28,7 +28,7 @@ class EmployeeSeeder extends Seeder
             'name' => 'Iin Salim',
             'position' => 'Operational Manager',
             'phone' => '085104818000',
-            'image_photo' => 'LimSalim.jpeg',
+            'image_photo' => 'IimSalim.jpeg',
         ]);
 
         Employee::create([

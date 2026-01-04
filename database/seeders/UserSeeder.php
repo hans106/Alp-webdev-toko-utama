@@ -12,11 +12,11 @@ class UserSeeder extends Seeder
     {
         // 1. SUPER ADMIN
         User::firstOrCreate([
-            'email' => 'superadmin@tokoUtama.com',
+            'email' => 'master@tokoUtama.com',
         ], [
             'name' => 'Owner (Super Admin)',
-            'password' => Hash::make('superadmin123'),
-            'role' => 'superadmin',
+            'password' => Hash::make('master123'),
+            'role' => 'master',
         ]);
 
         // 2. INVENTORY
@@ -28,13 +28,13 @@ class UserSeeder extends Seeder
             'role' => 'inventory',
         ]);
 
-        // 3. CASHIER
+        // 3. ADMIN PENJUALAN
         User::firstOrCreate([
-            'email' => 'kasir@tokoUtama.com',
+            'email' => 'penjualan@tokoUtama.com',
         ], [
             'name' => 'Staff Kasir',
-            'password' => Hash::make('kasir123'),
-            'role' => 'cashier',
+            'password' => Hash::make('penjualan123'),
+            'role' => 'admin_penjualan',
         ]);
 
         // 4. CUSTOMER

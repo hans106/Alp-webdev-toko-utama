@@ -54,7 +54,7 @@
                 @endauth
                 
                 {{-- Icon Keranjang --}}
-                @if (!Auth::check() || Auth::user()->role !== 'superadmin') 
+                @if (!Auth::check() || Auth::user()->role !== 'master') 
                     @php
                         $cartCount = Auth::check() ? \App\Models\Cart::where('user_id', Auth::id())->sum('qty') : 0;
                     @endphp
@@ -91,7 +91,8 @@
                         <div
                             class="absolute right-0 mt-4 w-48 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 border border-slate-100 transform translate-y-2 group-hover:translate-y-0">
                             
-                            @if (in_array(Auth::user()->role, ['superadmin', 'inventory', 'cashier']))
+                            @if (in_array(Auth::user()->role, ['master', 'inventory', 'admin_penjualan']))
+                                {{-- Link Dashboard Admin --}}
                                 <a href="{{ route('admin.dashboard') }}"
                                     class="block px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 font-medium">
                                     Dashboard Staff

@@ -24,7 +24,7 @@
         </a>
 
                 {{-- Group: ADMIN --}}
-        <div class="pt-3 pb-1 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Super Admin</div>
+        <div class="pt-3 pb-1 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Master</div>
 
         <a href="{{ route('admin.users.index') }}"
             class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('admin.users.*') ? 'bg-orange-500 text-white shadow-md' : '' }}">

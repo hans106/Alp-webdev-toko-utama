@@ -31,8 +31,8 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         // VALIDASI: Jangan sampai Role Penting terhapus!
-        if (in_array($user->role, ['superadmin', 'inventory', 'cashier'])) {
-            return back()->with('error', 'GAGAL: Akun Superadmin, Gudang, atau Kasir dilindungi sistem.');
+        if (in_array($user->role, ['master', 'inventory', 'admin_penjualan'])) {
+            return back()->with('error', 'GAGAL: Akun Master, Gudang, atau Kasir dilindungi sistem.');
         }
 
         // Simpan data dulu buat laporan CCTV

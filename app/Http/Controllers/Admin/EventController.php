@@ -31,7 +31,7 @@ class EventController extends Controller
             'title'       => 'required|string|max:255',
             'location'    => 'required|string|max:255',
             'event_date'  => 'required|date',
-            'description' => 'nullable|string', 
+            'description' => 'nullable|string',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
         ]);
 
@@ -39,11 +39,21 @@ class EventController extends Controller
         $filename = null;
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            // Nama file unik: waktu_namaasli.jpg
-            $filename = time() . '_' . $file->getClientOriginalName();
-            // Pindahkan file ke public/events
-            $file->storeAs('public/events', $filename);
+
+            // 1. Bersihkan nama file (hapus spasi & karakter aneh)
+            $cleanName = \Illuminate\Support\Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+            $extension = $file->getClientOriginalExtension();
+            $filename = time() . '_' . $cleanName . '.' . $extension;
+
+            // 2. Pastikan folder public/events ada (Auto Create)
+            $path = public_path('events');
+            if (!file_exists($path)) {
+                mkdir($path, 0777, true);
+            }
         }
+
+        // 3. Pindah file
+        $file->move($path, $filename);
 
         // 3. Simpan ke Database
         Event::create([
@@ -65,10 +75,7 @@ class EventController extends Controller
         return redirect()->route('admin.events.index')->with('success', 'Event berhasil ditambahkan!');
     }
 
-    /**
-     * Memperbarui data event (Edit).
-     */
-    public function update(Request $request, $id)
+public function update(Request $request, $id)
     {
         $event = Event::findOrFail($id);
 
@@ -83,17 +90,28 @@ class EventController extends Controller
 
         // 2. Logic Update Gambar
         if ($request->hasFile('image')) {
-            // Hapus file lama dari Storage
-            if ($event->image && \Illuminate\Support\Facades\Storage::exists('public/events/' . $event->image)) {
-                \Illuminate\Support\Facades\Storage::delete('public/events/' . $event->image);
+
+            // A. Hapus gambar lama jika ada
+            if ($event->image) {
+                $oldPath = public_path('events/' . $event->image);
+                if (File::exists($oldPath)) {
+                    File::delete($oldPath);
+                }
             }
 
+            // B. Upload gambar baru (DENGAN PEMBERSIH NAMA)
             $file = $request->file('image');
-            $filename = time() . '_' . $file->getClientOriginalName();
             
-            // Simpan file baru ke Storage
-            $file->storeAs('public/events', $filename);
-            
+            // --- LOGIC PEMBERSIH NAMA (Disamakan dengan STORE) ---
+            $cleanName = \Illuminate\Support\Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+            $extension = $file->getClientOriginalExtension();
+            $filename  = time() . '_' . $cleanName . '.' . $extension;
+            // -----------------------------------------------------
+
+            // Pindahkan langsung ke public/events
+            $file->move(public_path('events'), $filename);
+
+            // Update nama file di database
             $event->image = $filename;
         }
 
@@ -115,40 +133,22 @@ class EventController extends Controller
         return redirect()->route('admin.events.index')->with('success', 'Event berhasil diperbarui!');
     }
 
-    /**
-     * Menghapus event.
-     */
     public function destroy($id)
     {
         $event = Event::findOrFail($id);
-        $title = $event->title; // Simpan judul buat log sebelum dihapus
+        $title = $event->title;
 
-        // 1. Hapus File Gambar Fisik — coba beberapa lokasi (storage disk dan public folders)
+        // Hapus file fisik di public/events
         if ($event->image) {
-            // a) Hapus dari storage disk 'public/events'
-            if (\Illuminate\Support\Facades\Storage::disk('public')->exists('events/' . $event->image)) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete('events/' . $event->image);
-            }
+            $path = public_path('events/' . $event->image);
 
-            // b) Hapus juga jika ada di folder public/Event atau public/events (legacy / seeder)
-            $publicPaths = [
-                public_path('events/' . $event->image),
-                public_path('Event/' . $event->image),
-                public_path('storage/events/' . $event->image),
-                public_path('storage/Event/' . $event->image),
-            ];
-
-            foreach ($publicPaths as $p) {
-                if (File::exists($p)) {
-                    File::delete($p);
-                }
+            if (File::exists($path)) {
+                File::delete($path);
             }
         }
 
-        // 2. Hapus Data dari Database
         $event->delete();
 
-        // 3. Catat ke CCTV
         ActivityLog::create([
             'user_id'     => Auth::id(),
             'action'      => 'DELETE EVENT',
@@ -156,6 +156,6 @@ class EventController extends Controller
             'ip_address'  => request()->ip()
         ]);
 
-        return redirect()->route('admin.events.index')->with('success', 'Event berhasil dihapus.');
+        return redirect()->back()->with('success', 'Event berhasil dihapus.');
     }
 }

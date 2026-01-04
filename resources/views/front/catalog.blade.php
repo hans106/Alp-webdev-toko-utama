@@ -146,25 +146,67 @@
                                 {{ $item->name }}
                             </a>
 
-                            {{-- Price & Cart --}}
+                            {{-- BAGIAN HARGA & TOMBOL CART INTERAKTIF --}}
                             <div class="mt-auto pt-3 border-t border-[#F1E2DD] flex justify-between items-center">
+
+                                {{-- Harga Produk --}}
                                 <div class="text-base md:text-lg font-extrabold text-[#1A0C0C]">
                                     Rp {{ number_format($item->price, 0, ',', '.') }}
                                 </div>
 
-                                <form action="{{ route('cart.store', $item->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit"
-                                        class="bg-[#F8F5F3] text-[#7c5b58] p-2 rounded-lg
-                                    hover:bg-[#A41025] hover:text-white transition shadow-sm"
-                                        title="Masukkan Keranjang">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                        </svg>
-                                    </button>
-                                </form>
+                                {{-- LOGIKA TOMBOL --}}
+                                @php
+                                    // Cek apakah user sudah punya item ini di keranjang
+                                    $cartItem = null;
+                                    if (auth()->check()) {
+                                        $cartItem = \App\Models\Cart::where('user_id', auth()->id())
+                                            ->where('product_id', $item->id)
+                                            ->first();
+                                    }
+                                @endphp
+
+                                {{-- WRAPPER UNTUK JAVASCRIPT (ID INI PENTING) --}}
+                                <div id="action-{{ $item->id }}" class="relative z-10">
+
+                                    @if ($cartItem)
+                                        {{-- TAMPILAN 1: SUDAH ADA DI CART (TOMBOL PLUS MINUS) --}}
+                                        <div
+                                            class="flex items-center gap-2 bg-[#F8F5F3] rounded-lg px-2 py-1.5 border border-[#E8D6D0]">
+                                            {{-- Tombol Minus --}}
+                                            <button type="button"
+                                                onclick="updateQty({{ $item->id }}, 'minus', {{ $cartItem->id }})"
+                                                class="w-6 h-6 rounded-md bg-white hover:bg-[#E8D6D0] flex items-center justify-center font-bold text-[#7c5b58] shadow-sm transition text-sm">
+                                                -
+                                            </button>
+
+                                            {{-- Angka Qty --}}
+                                            <span id="qty-text-{{ $item->id }}"
+                                                class="font-bold w-6 text-center text-[#1A0C0C] text-sm">
+                                                {{ $cartItem->qty }}
+                                            </span>
+
+                                            {{-- Tombol Plus --}}
+                                            <button type="button"
+                                                onclick="updateQty({{ $item->id }}, 'plus', {{ $cartItem->id }})"
+                                                class="w-6 h-6 rounded-md bg-white hover:bg-[#E8D6D0] flex items-center justify-center font-bold text-[#7c5b58] shadow-sm transition text-sm">
+                                                +
+                                            </button>
+                                        </div>
+                                    @else
+                                        {{-- TAMPILAN 2: BELUM ADA DI CART (TOMBOL KERANJANG BIASA) --}}
+                                        <button type="button" onclick="addToCart({{ $item->id }})"
+                                            class="bg-[#F8F5F3] text-[#7c5b58] p-2 rounded-lg hover:bg-[#A41025] hover:text-white transition shadow-sm group">
+
+                                            {{-- Icon Keranjang --}}
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                        </button>
+                                    @endif
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -186,157 +228,123 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle Add to Cart button clicks
-            const addToCartBtns = document.querySelectorAll('.add-to-cart-btn');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-            addToCartBtns.forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const productId = this.dataset.productId;
-                    addToCart(productId);
-                });
-            });
+        // 1. FUNGSI TAMBAH KE CART (Klik Icon Keranjang)
+        function addToCart(productId) {
+            // Cek Login (Kalau user belum login, lempar ke halaman login)
+            @guest
+            window.location.href = "{{ route('login') }}";
+            return;
+        @endguest
 
-            function addToCart(productId) {
-                const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-                fetch(`/cart/add/${productId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': token,
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Find the cart actions container and replace button with quantity selector
-                            const container = document.querySelector(`.cart-actions-${productId}`);
-                            if (container) {
-                                const stock = parseInt(container.dataset.stock);
-                                const currentQty = data.cart.qty || 1;
-
-                                container.innerHTML = `
-                                <div class="flex items-center gap-2 bg-[#F8F5F3] rounded-lg px-2 py-1.5 border border-[#E8D6D0]">
-                                    <button type="button" 
-                                        class="qty-minus-btn w-6 h-6 rounded-md bg-white hover:bg-[#E8D6D0] 
-                                        flex items-center justify-center font-bold text-[#7c5b58] shadow-sm transition text-sm"
-                                        data-product-id="${productId}"
-                                        data-cart-id="${data.cart.id}">
-                                        -
-                                    </button>
-                                    <span class="qty-display font-bold w-6 text-center text-[#1A0C0C] text-sm">
-                                        ${currentQty}
-                                    </span>
-                                    <button type="button" 
-                                        class="qty-plus-btn w-6 h-6 rounded-md bg-white hover:bg-[#E8D6D0] 
-                                        flex items-center justify-center font-bold text-[#7c5b58] shadow-sm transition text-sm"
-                                        data-product-id="${productId}"
-                                        data-cart-id="${data.cart.id}"
-                                        data-stock="${stock}"
-                                        data-current-qty="${currentQty}">
-                                        +
-                                    </button>
-                                </div>
-                            `;
-
-                                // Add event listeners to new buttons
-                                attachQuantityListeners(productId);
-                            }
-                        } else if (data.error) {
-                            alert(data.error);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Gagal menambahkan ke keranjang');
-                    });
-            }
-
-            function attachQuantityListeners(productId) {
-                const container = document.querySelector(`.cart-actions-${productId}`);
-                const minusBtn = container.querySelector('.qty-minus-btn');
-                const plusBtn = container.querySelector('.qty-plus-btn');
-
-                minusBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    updateQuantity(productId, 'minus', this);
-                });
-
-                plusBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    updateQuantity(productId, 'plus', this);
-                });
-            }
-
-            function updateQuantity(productId, type, button) {
-                const cartId = button.dataset.cartId;
-                const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-                const container = document.querySelector(`.cart-actions-${productId}`);
-                const stock = parseInt(container.dataset.stock);
-                const qtyDisplay = container.querySelector('.qty-display');
-                const currentQty = parseInt(qtyDisplay.textContent);
-
-                // Check stock limit before sending request for plus
-                if (type === 'plus' && currentQty >= stock) {
-                    alert('Stok tidak cukup!');
-                    return;
+        // Panggil Server
+        fetch(`/cart/add/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
                 }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // SUKSES: Ganti Icon Keranjang jadi Tombol (+ 1 -)
+                    // Kita pakai cart_id yang dikirim dari Langkah 1 tadi
+                    renderControlButtons(productId, data.cart_id, data.qty);
+                } else {
+                    alert(data.error || 'Gagal menambahkan');
+                }
+            })
+            .catch(err => console.error(err));
+        }
 
-                fetch(`/cart/update/${cartId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': token,
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            type: type
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Update quantity display
-                            const newQty = data.newQty !== undefined ? data.newQty : currentQty;
+        // 2. FUNGSI UPDATE QTY (Klik Plus atau Minus)
+        function updateQty(productId, type, cartId) {
+            // Ambil elemen angka sekarang
+            const qtySpan = document.getElementById(`qty-text-${productId}`);
+            let currentQty = parseInt(qtySpan.innerText);
 
-                            if (newQty < 1) {
-                                // If qty becomes 0, reset to add to cart button
-                                container.innerHTML = `
-                                <button type="button" 
-                                    class="add-to-cart-btn bg-[#F8F5F3] text-[#7c5b58] p-2 rounded-lg
-                                    hover:bg-[#A41025] hover:text-white transition shadow-sm"
-                                    data-product-id="${productId}"
-                                    title="Masukkan Keranjang">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                </button>
-                            `;
-
-                                // Re-attach event listener for add to cart button
-                                const newBtn = container.querySelector('.add-to-cart-btn');
-                                newBtn.addEventListener('click', function(e) {
-                                    e.preventDefault();
-                                    addToCart(productId);
-                                });
-                            } else {
-                                qtyDisplay.textContent = newQty;
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Gagal mengupdate keranjang');
-                    });
+            // Jika tombol MINUS dan Qty sisa 1 -> Berarti mau DIHAPUS
+            if (type === 'minus' && currentQty <= 1) {
+                deleteCartItem(productId, cartId);
+                return;
             }
 
+            // Panggil Server untuk Update (+ atau -)
+            fetch(`/cart/update/${cartId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        type: type
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update angkanya saja
+                        qtySpan.innerText = data.newQty;
+                    } else {
+                        alert(data.error || 'Gagal update stock');
+                    }
+                })
+                .catch(err => console.error(err));
+        }
 
-        });
+        // 3. FUNGSI HAPUS ITEM (Balik ke Icon Keranjang)
+        function deleteCartItem(productId, cartId) {
+            fetch(`/cart/delete/${cartId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // Render ulang jadi Icon Keranjang Biasa
+                        renderAddToCartIcon(productId);
+                    }
+                });
+        }
+
+        // --- HELPER HTML RENDERER ---
+
+        // Ganti HTML jadi Tombol +/-
+        function renderControlButtons(productId, cartId, qty) {
+            const container = document.getElementById(`action-${productId}`);
+            container.innerHTML = `
+            <div class="flex items-center gap-2 bg-[#F8F5F3] rounded-lg px-2 py-1.5 border border-[#E8D6D0]">
+                <button type="button" onclick="updateQty(${productId}, 'minus', ${cartId})" 
+                    class="w-6 h-6 rounded-md bg-white hover:bg-[#E8D6D0] flex items-center justify-center font-bold text-[#7c5b58] shadow-sm transition text-sm">-</button>
+                
+                <span id="qty-text-${productId}" class="font-bold w-6 text-center text-[#1A0C0C] text-sm">${qty}</span>
+
+                <button type="button" onclick="updateQty(${productId}, 'plus', ${cartId})" 
+                    class="w-6 h-6 rounded-md bg-white hover:bg-[#E8D6D0] flex items-center justify-center font-bold text-[#7c5b58] shadow-sm transition text-sm">+</button>
+            </div>
+        `;
+        }
+
+        // Ganti HTML balik jadi Icon Keranjang
+        function renderAddToCartIcon(productId) {
+            const container = document.getElementById(`action-${productId}`);
+            container.innerHTML = `
+            <button type="button" onclick="addToCart(${productId})"
+                class="bg-[#F8F5F3] text-[#7c5b58] p-2 rounded-lg hover:bg-[#A41025] hover:text-white transition shadow-sm group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+            </button>
+        `;
+        }
     </script>
 
     <script>

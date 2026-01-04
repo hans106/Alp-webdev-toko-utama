@@ -5,6 +5,10 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Event;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+
+// For downloading placeholder images when source images are not present
+use Illuminate\Support\Str;
 
 class EventSeeder extends Seeder
 {
@@ -60,6 +64,31 @@ class EventSeeder extends Seeder
 
         foreach ($events as $event) {
             Event::create($event);
+
+            // Ensure the image file exists in storage/app/public/events.
+            // If not present, generate/download a placeholder (ui-avatars) and save with the seeded filename.
+            if (! empty($event['image'])) {
+                $dir = storage_path('app/public/events');
+                if (! is_dir($dir)) {
+                    Storage::disk('public')->makeDirectory('events');
+                }
+
+                $target = $dir . DIRECTORY_SEPARATOR . $event['image'];
+                if (! file_exists($target)) {
+                    // Build a placeholder URL using the event title (fallback)
+                    $nameForUrl = isset($event['title']) ? urlencode($event['title']) : 'Event';
+                    $placeholder = "https://ui-avatars.com/api/?name={$nameForUrl}&background=111827&color=fff&size=1024";
+
+                    try {
+                        $img = @file_get_contents($placeholder);
+                        if ($img) {
+                            file_put_contents($target, $img);
+                        }
+                    } catch (\Exception $e) {
+                        // ignore failure to download; views will fallback to generated avatars
+                    }
+                }
+            }
         }
     }
 }

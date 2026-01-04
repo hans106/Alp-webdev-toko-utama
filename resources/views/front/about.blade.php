@@ -36,24 +36,42 @@
             {{-- Teks Cerita --}}
             <div class="w-full lg:w-1/2 text-slate-600 text-lg leading-relaxed space-y-6 text-justify">
                 <p>
-                    <strong class="text-rose-700">Tahun 1959.</strong> Usaha keluarga ini mulai berdiri. Berawal saat itu masih banyak petani palawija di Karanganyar, Karangpandan, Jumapolo dan sekitarnya.
+                    Usaha keluarga ini mulai berdiri pada <strong class="text-rose-700">tahun 1959</strong>. Berawal saat itu masih banyak petani palawija di Karanganyar, Karangpandan, Jumapolo dan sekitarnya. Hasil pertanian adalah beras, jagung, kedele, kacang hijau.
                 </p>
                 <p>
-                    <strong>Bp. Liem Kong Hong</strong> dan istrinya <strong>Ibu Meliati</strong> mengelola usaha dengan menerima hasil pertanian tersebut dari Petani. Usaha ini banyak dikenal dengan nama <strong>"Toko Nyah Waing"</strong>.
+                    <strong>Bp. Liem Kong Hong</strong> dan istrinya <strong>Ibu Meliati</strong> mengelola usaha dengan menerima hasil pertanian tersebut dari Petani (semacam pengepul). Kemudian setelah terkumpul cukup banyak kemudian dijual ke kota Solo, diangkut dengan pedati sapi.
                 </p>
-                <div class="bg-rose-50 p-6 rounded-xl border-l-4 border-rose-500 italic text-slate-700">
-                    "Toko Nyah Waing menjadi saksi bisu perkembangan ekonomi Karanganyar dari masa ke masa."
+                <p>
+                    Lokasi usaha awal di Selatan Pasar Karanganyar yang sekarang menjadi Taman Pancasila. Karena dekat pasar dan pasar tsb serta area terminal (th 1970 an) menjadi salah satu pusat perekonomian Karanganyar, usaha mengalami peningkatan dengan produk yg dijual sesuai permintaan pasar seperti Minyak tanah, minyak goreng, tapioka, gandum mulai dijual ditempat ini.
+                </p>
+                <div class="bg-rose-50 p-5 rounded-xl border-l-4 border-rose-500 text-slate-700 italic">
+                    "Usaha ini banyak dikenal dengan nama <strong>toko Nyah Waing</strong> (nama lain Ibu Meliati), sampai sekarangpun terkadang pelanggan lama/masyarakat asli Karanganyar menyebutnya demikian."
                 </div>
                 <p>
-                    Tahun 1987, Bp. Liem Kong Hong meninggal dunia. Bisnis usaha dipegang sepenuhnya oleh Ibu Meliati dibantu putra-putrinya (Ivan Purnomo dan Iin Salim).
+                    <strong class="text-rose-700">Th 1982</strong> Bp Liem Kong Hong meninggal dunia, bisnis usaha dipegang sepunuhnya oleh Ibu Meliati dan dibantu putra putrinya (Ivan Purnomo dan Iin Salim).
                 </p>
                 <p>
-                    Oleh Bp. Ivan Purnomo, usaha ini diberi nama baru: <strong>Toko Utama</strong>. Barang yang dijual semakin bervariasi, mulai dari 9 bahan pokok hingga <em>consumer goods</em>.
+                    Seiring dengan berjalannya waktu dan perubahan zaman, usaha inipun menjadi semacam toko grosiran sembako, dimana dari desa desa kecil di Karanganyar dan sekitar membeli barang dagangan di tempat ini untuk dijual kembali di daerah/kampung/rumah masing masing.
                 </p>
                 <p>
-                    Di tahun 1990-an, permintaan produk rokok meningkat pesat. Toko ini pun dikenal sebagai Grosir Rokok besar di wilayah Karanganyar dengan motto: <br>
-                    <span class="font-bold text-rose-700">"Melayani dan Untung Bersama, Selalu Baru dan Lebih Murah Harganya."</span>
+                    Oleh <strong>Bp. Ivan Purnomo</strong> usaha ini diberi nama/brand <strong>Toko Utama</strong>. Barang barang yang dijualpun semakin bervariasi selain menyediakan 9 bahan pokok juga menyediakan barang barang consumer good lainnya (snack, roti, kerupuk, minuman kemasan, kopi, rokok dll) sesuai permintaan pasar.
                 </p>
+                <p>
+                    Di tahun 1990an permintaan produk rokok semakin meningkat, perputaran di barang dagangan ini meningkat pesat sehingga produk rokok di toko ini mencapai 40% dari seluruh produk yg lain yang dijual. Toko ini menjadi dikenal sebagai toko grosir rokok besar utk wilayah Karanganyar sampai sekarang.
+                </p>
+                <p>
+                    Toko Utama sebagai toko Grosiran semakin hari juga semakin menghadapi tantangan dari pesaing pesaing usaha sejenis. Untuk itu toko Utama berusaha keras untuk tetap bisa eksis dalam pelayanan dan harga yang ditawarkan, sesuai dengan motto selama ini:
+                </p>
+                <ul class="space-y-2 mt-2 font-bold text-rose-700 list-none">
+                    <li class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Melayani dan untung bersama
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Selalu baru dan lebih murah/miring harga
+                    </li>
+                </ul>
             </div>
         </div>
     </section>
@@ -79,25 +97,17 @@
             @if($events->count() > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($events as $event)
-                        @php
-                            $imageUrl = null;
-                            $candidates = [
-                                public_path('storage/events/' . $event->image),
-                                public_path('storage/Event/' . $event->image),
-                                public_path('events/' . $event->image),
-                                public_path('Event/' . $event->image),
-                            ];
-                            foreach ($candidates as $c) {
-                                if ($event->image && file_exists($c)) {
-                                    $rel = str_replace(public_path() . DIRECTORY_SEPARATOR, '', $c);
-                                    $imageUrl = asset(str_replace('\\', '/', $rel));
-                                    break;
-                                }
-                            }
-                            if (! $imageUrl) {
-                                $imageUrl = 'https://ui-avatars.com/api/?name=' . urlencode($event->title) . '&background=111827&color=fff&size=1024';
-                            }
-                        @endphp
+                                @php
+                                    $imageUrl = null;
+                                    // Prefer storage disk 'public' (storage/app/public/events -> public/storage/events after storage:link)
+                                    if ($event->image && \Illuminate\Support\Facades\Storage::disk('public')->exists('events/' . $event->image)) {
+                                        $imageUrl = \Illuminate\Support\Facades\Storage::url('events/' . $event->image);
+                                    }
+
+                                    if (! $imageUrl) {
+                                        $imageUrl = 'https://ui-avatars.com/api/?name=' . urlencode($event->title) . '&background=111827&color=fff&size=1024';
+                                    }
+                                @endphp
 
                         <div class="group relative overflow-hidden rounded-2xl shadow-lg cursor-pointer h-72"
                              onclick="openModal('{{ $imageUrl }}', '{{ $event->title }}', '{{ $event->location }}', '{{ \Carbon\Carbon::parse($event->event_date)->isoFormat('D MMMM Y') }}', '{{ $event->description }}')">

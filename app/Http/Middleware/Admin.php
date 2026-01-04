@@ -17,9 +17,9 @@ class Admin
     public function handle(Request $request, Closure $next): Response
     {
         // Cek apakah user sudah login dan memiliki role admin
-        if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'superadmin'])) {
+        if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'master'])) {
             // Jika bukan admin atau superadmin, redirect ke home
-            return redirect('/')->with('error', 'Akses ditolak! Hanya admin yang bisa mengakses area ini.');
+            return redirect('/')->with('error', 'Akses ditolak! Hanya master yang bisa mengakses area ini.');
         }
 
         return $next($request);

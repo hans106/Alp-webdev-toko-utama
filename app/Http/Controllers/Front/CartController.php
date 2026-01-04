@@ -14,9 +14,9 @@ class CartController extends Controller
     public function index()
     {
         $carts = Cart::with('product')->where('user_id', Auth::id())->get();
-        
+
         $totalPrice = 0;
-        foreach($carts as $cart) {
+        foreach ($carts as $cart) {
             // PERBAIKAN: Pakai 'qty' bukan 'quantity'
             $totalPrice += $cart->product->price * $cart->qty;
         }
@@ -38,8 +38,8 @@ class CartController extends Controller
         }
 
         $existingCart = Cart::where('user_id', Auth::id())
-                            ->where('product_id', $id)
-                            ->first();
+            ->where('product_id', $id)
+            ->first();
 
         if ($existingCart) {
             if ($existingCart->qty < $product->stock) {
@@ -55,19 +55,34 @@ class CartController extends Controller
             Cart::create([
                 'user_id' => Auth::id(),
                 'product_id' => $id,
-                'qty' => 1 
+                'qty' => 1
             ]);
         }
 
+        // if ($request->expectsJson()) {
+        //     $cart = Cart::where('user_id', Auth::id())
+        //                 ->where('product_id', $id)
+        //                 ->first();
+        //     return response()->json([
+        //         'success' => true,
+        //         'message' => 'Barang masuk keranjang!',
+        //         'cart' => $cart,
+        //         'cartCount' => Cart::where('user_id', Auth::id())->count()
+        //     ]);
+        // }
+
         if ($request->expectsJson()) {
-            $cart = Cart::where('user_id', Auth::id())
-                        ->where('product_id', $id)
-                        ->first();
+            // Ambil object cart yang baru saja dibuat atau diupdate
+            $cart = $existingCart ?? \App\Models\Cart::where('user_id', Auth::id())
+                ->where('product_id', $id)
+                ->first();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Barang masuk keranjang!',
-                'cart' => $cart,
-                'cartCount' => Cart::where('user_id', Auth::id())->count()
+                'cartCount' => \App\Models\Cart::where('user_id', Auth::id())->count(),
+                'cart_id' => $cart->id, // <--- TAMBAHAN PENTING: Biar JS tahu ID cart-nya
+                'qty' => $cart->qty
             ]);
         }
 
@@ -79,7 +94,7 @@ class CartController extends Controller
     {
         $cart = Cart::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
         $product = $cart->product;
-        
+
         if ($request->type == 'minus') {
             if ($cart->qty > 1) {
                 $cart->decrement('qty');
@@ -123,7 +138,7 @@ class CartController extends Controller
     {
         $cart = Cart::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
         $cart->delete();
-        
+
         if (request()->expectsJson()) {
             return response()->json([
                 'success' => true,
@@ -131,7 +146,7 @@ class CartController extends Controller
                 'cartCount' => Cart::where('user_id', Auth::id())->count()
             ]);
         }
-        
+
         return redirect()->back()->with('success', 'Barang dihapus dari keranjang.');
     }
 }

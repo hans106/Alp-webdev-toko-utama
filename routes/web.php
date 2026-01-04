@@ -96,13 +96,13 @@ Route::middleware(['auth'])->group(function () {
 
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
 
-    // Dashboard accessible by all 3 admin roles (superadmin, inventory, cashier)
-    Route::get('/', [ProductController::class, 'dashboard'])->name('dashboard')->middleware('role:superadmin,inventory,cashier');
+    // Dashboard accessible by all 3 admin roles (master, inventory, admin_penjualan)
+    Route::get('/', [ProductController::class, 'dashboard'])->name('dashboard')->middleware('role:master,inventory,admin_penjualan');
 
     // --------------------------------------------------------
-    // GROUP 1: KHUSUS SUPER ADMIN (Full Access)
+    // GROUP 1: KHUSUS MASTER (Full Access)
     // --------------------------------------------------------
-    Route::middleware(['role:superadmin'])->group(function () {
+    Route::middleware(['role:master'])->group(function () {
         
         // 2. Manajemen User
         Route::resource('users', UserController::class);
@@ -113,9 +113,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     });
 
     // --------------------------------------------------------
-    // GROUP 2: DIVISI GUDANG (Inventory + Super Admin)
+    // GROUP 2: DIVISI GUDANG (Inventory + Master)
     // --------------------------------------------------------
-    Route::prefix('products')->name('products.')->middleware('role:superadmin,inventory')->group(function () {
+    Route::prefix('products')->name('products.')->middleware('role:master,inventory')->group(function () {
         Route::get('/', [ProductController::class, 'index'])->name('index');
         Route::get('/create', [ProductController::class, 'create'])->name('create');
         Route::post('/', [ProductController::class, 'store'])->name('store');
@@ -125,7 +125,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     });
 
     // Supplier
-    Route::prefix('suppliers')->name('suppliers.')->middleware('role:superadmin,inventory')->group(function () {
+    Route::prefix('suppliers')->name('suppliers.')->middleware('role:master,inventory')->group(function () {
         Route::get('/', [SupplierController::class, 'index'])->name('index');
         Route::get('/create', [SupplierController::class, 'create'])->name('create');
         Route::post('/', [SupplierController::class, 'store'])->name('store');
@@ -136,7 +136,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     });
 
     // Restock
-    Route::prefix('restocks')->name('restocks.')->middleware('role:superadmin,inventory')->group(function () {
+    Route::prefix('restocks')->name('restocks.')->middleware('role:master,inventory')->group(function () {
         Route::get('/', [RestockController::class, 'index'])->name('index');
         Route::get('/create', [RestockController::class, 'create'])->name('create');
         Route::post('/', [RestockController::class, 'store'])->name('store');
@@ -147,31 +147,30 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     });
 
     // Restock Verification (Checklist Nota Harga)
-    Route::prefix('restock-verifications')->name('restock-verifications.')->middleware('role:superadmin,cashier')->group(function () {
+    Route::prefix('restock-verifications')->name('restock-verifications.')->middleware('role:master,admin_penjualan')->group(function () {
         Route::get('/', [RestockVerificationController::class, 'index'])->name('index');
         Route::get('/{verification}/edit', [RestockVerificationController::class, 'edit'])->name('edit');
         Route::put('/{verification}', [RestockVerificationController::class, 'update'])->name('update');
     });
 
     // --------------------------------------------------------
-    // GROUP 3: DIVISI KASIR (Cashier + Super Admin)
+    // GROUP 3: DIVISI KASIR (admin penjualan + Master)
     // --------------------------------------------------------
     Route::get('/orders', [AdminOrderController::class, 'index'])
         ->name('orders.index')
-        ->middleware('role:superadmin,cashier');
+        ->middleware('role:master,admin_penjualan');
     
     // Approve (accept) order
     Route::post('/orders/{id}/approve', [AdminOrderController::class, 'approve'])
         ->name('orders.approve')
-        ->middleware('role:superadmin,cashier');
+        ->middleware('role:master,admin_penjualan');
     
     // Reject order
     Route::post('/orders/{id}/reject', [AdminOrderController::class, 'reject'])
         ->name('orders.reject')
-        ->middleware('role:superadmin,cashier');
+        ->middleware('role:master,admin_penjualan');
         
     Route::post('/orders/{id}/ship', [AdminOrderController::class, 'ship'])
         ->name('orders.ship')
-        ->middleware('role:superadmin,cashier');
-
+        ->middleware('role:master,admin_penjualan');
 });

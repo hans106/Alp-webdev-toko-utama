@@ -56,7 +56,7 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-slate-600">{{ $user->email }}</td>
                             <td class="px-6 py-4 text-sm">
-                                @if(in_array($user->role, ['superadmin', 'inventory', 'cashier']))
+                                @if(in_array($user->role, ['master', 'inventory', 'admin_penjualan']))
                                     <span class="px-2 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200 uppercase">
                                         {{ $user->role }}
                                     </span>
@@ -69,8 +69,8 @@
                             <td class="px-6 py-4 text-sm text-slate-500">{{ $user->created_at->format('d M Y') }}</td>
                             <td class="px-6 py-4 text-right">
                                 {{-- LOGIKA TOMBOL DELETE: --}}
-                                {{-- Hanya muncul jika role BUKAN superadmin, inventory, atau cashier --}}
-                                @if(!in_array($user->role, ['superadmin', 'inventory', 'cashier']))
+                                {{-- Hanya muncul jika role BUKAN superadmin, inventory, atau admin_penjualan --}}
+                                @if(!in_array($user->role, ['master', 'inventory', 'admin_penjualan']))
                                     <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Hapus user ini? Data tidak bisa dikembalikan.')">
                                         @csrf
                                         @method('DELETE')

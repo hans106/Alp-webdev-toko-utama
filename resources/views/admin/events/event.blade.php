@@ -71,23 +71,15 @@
 
                     {{-- Foto Banner --}}
                     <div class="absolute inset-0 bg-slate-800 h-full">
-                        
-                        {{-- Image URL yang benar menggunakan Storage disk 'public' --}}
-                        @if ($event->image && \Illuminate\Support\Facades\Storage::disk('public')->exists('events/' . $event->image))
-                            <img src="{{ asset('storage/events/' . $event->image) }}" alt="{{ $event->title }}"
-                                class="w-full h-full object-cover opacity-90 group-hover:scale-110 transition-transform duration-700">
+
+                        @if ($event->image)
+                            {{-- Langsung ke folder events --}}
+                            <img src="{{ asset('events/' . $event->image) }}" alt="{{ $event->title }}"class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110">
                         @else
-                            {{-- Placeholder jika gambar tidak ada/rusak --}}
+                            {{-- Placeholder kalau gak ada gambar --}}
                             <div
-                                class="w-full h-full bg-gradient-to-br from-purple-800 to-indigo-900 flex items-center justify-center">
-                                <div class="text-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white/20 mx-auto mb-2"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <span class="text-white/30 font-bold text-xl uppercase tracking-widest">No Image</span>
-                                </div>
+                                class="h-16 w-16 bg-slate-100 rounded-lg flex items-center justify-center text-xs text-slate-400 border border-slate-200">
+                                No Img
                             </div>
                         @endif
 
@@ -212,8 +204,10 @@
                         {{-- Input Gambar --}}
                         <div class="mb-6">
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Banner (Opsional)</label>
+
+                            {{-- PERUBAHAN: Ganti text-slate-500 jadi text-slate-900 --}}
                             <input type="file" name="image" accept="image/*"
-                                class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200">
+                                class="w-full text-sm text-slate-900 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200">
                         </div>
 
                         {{-- Tombol Bawah --}}

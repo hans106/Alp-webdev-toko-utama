@@ -27,10 +27,9 @@
                 <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg text-left mb-4">
                     @php
                         $rolesText = [
-                            'superadmin' => '👤 Super Admin (Pemilik)',
-                            'admin' => '👤 Admin',
+                            'master' => '👤 Super Admin (Pemilik)',
                             'inventory' => '📦 Staff Gudang (Inventory)',
-                            'cashier' => '💳 Staff Kasir (Cashier)',
+                            'admin_penjualan' => '💳 Staff Kasir (Admin Penjualan)',
                         ];
                         $allowedRoles = $allowedRoles ?? [];
                     @endphp
