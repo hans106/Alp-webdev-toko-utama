@@ -50,7 +50,7 @@
 
                 {{-- Tombol Submit & Kembali --}}
                 <div class="flex gap-3 pt-4 border-t border-gray-100">
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-blue-700 transition shadow-md">
+                    <button type="submit" class="bg-primary text-white px-6 py-2.5 rounded-lg font-bold hover:bg-primary-700 transition shadow-md">
                         Update Supplier
                     </button>
                     <a href="{{ route('admin.suppliers.index') }}" class="bg-gray-100 text-gray-600 px-6 py-2.5 rounded-lg font-bold hover:bg-gray-200 transition">

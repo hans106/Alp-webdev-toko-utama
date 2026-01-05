@@ -38,11 +38,11 @@
                 <div class="relative">
                     <input type="text" name="search" value="{{ request('search') }}" 
                         placeholder="Nama Produk atau Supplier"
-                        class="w-full pl-4 pr-4 py-2 border rounded-xl focus:ring-blue-500 focus:border-blue-500 transition">
+                        class="w-full pl-4 pr-4 py-2 border rounded-xl focus:ring-primary focus:border-primary transition">
                 </div>
 
                 {{-- Filter Supplier --}}
-                <select name="supplier_id" class="w-full py-2 px-2 border rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white transition">
+                <select name="supplier_id" class="w-full py-2 px-2 border rounded-xl focus:ring-primary focus:border-primary bg-white transition">
                     <option value="">Suplier</option>
                     @foreach($suppliers as $supplier)
                         <option value="{{ $supplier->id }}" {{ request('supplier_id') == $supplier->id ? 'selected' : '' }}>
@@ -52,7 +52,7 @@
                 </select>
 
                 {{-- Filter Produk --}}
-                <select name="product_id" class="w-full py-2 px-4 border rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white transition">
+                <select name="product_id" class="w-full py-2 px-4 border rounded-xl focus:ring-primary focus:border-primary bg-white transition">
                     <option value="">Semua Produk</option>
                     @foreach($products as $product)
                         <option value="{{ $product->id }}" {{ request('product_id') == $product->id ? 'selected' : '' }}>
@@ -86,20 +86,52 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($restocks as $restock)
-                    <tr class="hover:bg-gray-50 transition">
+                    @php $isDone = (
+                        $restock->checklist_status === 'sudah_fix' &&
+                        (int) ($restock->checked_qty ?? 0) >= 1 &&
+                        strlen(trim((string) ($restock->checklist_notes ?? ''))) > 0
+                    ); @endphp
+                    <tr class="{{ $isDone ? 'bg-emerald-900 text-white' : 'hover:bg-gray-50' }} transition">
                         {{-- Produk --}}
                         <td class="px-6 py-4">
-                            <div class="text-sm font-bold text-gray-900">{{ $restock->product->name }}</div>
-                            <div class="text-xs text-gray-400">SKU: {{ $restock->product->slug }}</div>
+                            <div class="flex items-center gap-3">
+                                @php
+                                    $imgSrc = null;
+                                    $imgPath = $restock->product->image_main ?? null;
+                                    // 1) full URL
+                                    if ($imgPath && preg_match('/^https?:\/\//i', $imgPath)) {
+                                        $imgSrc = $imgPath;
+                                    }
+                                    // 2) public path as-is
+                                    elseif ($imgPath && file_exists(public_path($imgPath))) {
+                                        $imgSrc = asset($imgPath);
+                                    }
+                                    // 3) public products folder
+                                    elseif ($imgPath && file_exists(public_path('products/' . $imgPath))) {
+                                        $imgSrc = asset('products/' . $imgPath);
+                                    }
+                                    // 4) fallback to logo
+                                    else {
+                                        $imgSrc = asset('logo/logo_utama.jpeg');
+                                    }
+                                @endphp
+                                <div class="w-12 h-12 bg-slate-50 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200">
+                                    <img src="{{ $imgSrc }}" class="w-full h-full object-contain" onerror="this.onerror=null;this.src='{{ asset('logo/logo_utama.jpeg') }}';">
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold {{ $isDone ? 'text-white' : 'text-gray-900' }}">{{ $restock->product->name }}</div>
+                                    <div class="text-xs {{ $isDone ? 'text-white/80' : 'text-gray-400' }}">SKU: {{ $restock->product->slug }}</div>
+                                </div>
+                            </div>
                         </td>
 
                         {{-- Supplier --}}
-                        <td class="px-6 py-4 text-sm text-gray-600">
+                        <td class="px-6 py-4 {{ $isDone ? 'text-white' : 'text-sm text-gray-600' }}">
                             {{ $restock->supplier->name }}
                         </td>
 
                         {{-- Qty Masuk --}}
-                        <td class="px-6 py-4 text-sm font-bold text-blue-600">
+                        <td class="px-6 py-4 {{ $isDone ? 'text-white font-bold' : 'text-sm font-bold text-primary' }}">
                             +{{ $restock->qty }}
                         </td>
 
@@ -111,7 +143,7 @@
                             @endphp
                             
                             <div class="flex items-center gap-2">
-                                <span class="{{ $isOverdue ? 'text-red-600 font-bold' : 'text-gray-600' }}">
+                                <span class="{{ $isOverdue ? ($isDone ? 'text-white/80' : 'text-red-600 font-bold') : ($isDone ? 'text-white/80' : 'text-gray-600') }}">
                                     {{ $restockDate->format('d/m/Y') }}
                                 </span>
                                 @if($isOverdue)
@@ -124,12 +156,31 @@
                         
                         {{-- Kolom Aksi (hanya Read & Delete) --}}
                         <td class="px-6 py-4 text-sm font-medium">
-                            <div class="flex gap-2">
+                            <div class="flex items-center gap-2">
                                 {{-- Tombol VIEW --}}
-                                <a href="{{ route('admin.restocks.show', $restock) }}" class="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md transition">Lihat</a>
-                                
-                                {{-- Tombol CHECKLIST (menggantikan Hapus) --}}
-                                <a href="{{ route('admin.restocks.checklist', $restock) }}" class="text-yellow-600 hover:text-yellow-800 bg-yellow-50 px-3 py-1 rounded-md transition">Checklist</a>
+                                <a href="{{ route('admin.restocks.show', $restock) }}" class="{{ $isDone ? 'bg-white/10 text-white' : 'text-primary hover:text-primary-700 bg-primary-50' }} px-3 py-1 rounded-md transition">Lihat</a>
+
+                                @if (! $isDone)
+                                    {{-- Tombol EDIT --}}
+                                    <a href="{{ route('admin.restocks.edit', $restock) }}" class="px-3 py-1 rounded-md text-primary hover:text-primary-700 bg-primary-50 transition">Edit</a>
+
+                                    {{-- Tombol CANCEL (Delete) --}}
+                                    <form action="{{ route('admin.restocks.destroy', $restock) }}" method="POST" onsubmit="return confirm('Batal restock ini?');">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-500 transition">Batal</button>
+                                    </form>
+
+                                    {{-- Tombol CHECKLIST (menggantikan Hapus) --}}
+                                    <a href="{{ route('admin.restocks.checklist', $restock) }}" class="flex items-center gap-2 px-3 py-1 rounded-md transition text-yellow-600 hover:text-yellow-800 bg-yellow-50" title="Buka Checklist">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </a>
+                                @endif
+
+                                @if($isDone)
+                                    <span class="ml-2 inline-flex items-center text-xs font-bold px-2 py-0.5 rounded-full bg-white text-emerald-900" title="Checklist Selesai">Selesai</span>
+                                @endif
                             </div>
                         </td>
                     </tr>

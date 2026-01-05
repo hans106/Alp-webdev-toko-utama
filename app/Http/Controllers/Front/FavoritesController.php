@@ -33,7 +33,13 @@ class FavoritesController extends Controller
                     'name' => $fav->product->name,
                     'slug' => $fav->product->slug,
                     'price' => $fav->product->price,
-                    'image_main' => $fav->product->image_main ? \Storage::url($fav->product->image_main) : asset('logo/logo_utama.jpeg'),
+                    'image_main' => (function() use ($fav) {
+                        $imgPath = $fav->product->image_main ?? null;
+                        if ($imgPath && preg_match('/^https?:\/\//i', $imgPath)) return $imgPath;
+                        if ($imgPath && file_exists(public_path($imgPath))) return asset($imgPath);
+                        if ($imgPath && file_exists(public_path('products/' . $imgPath))) return asset('products/' . $imgPath);
+                        return asset('logo/logo_utama.jpeg');
+                    })(),
                 ]
             ])
         ]);

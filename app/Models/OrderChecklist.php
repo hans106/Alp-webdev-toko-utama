@@ -31,4 +31,9 @@ class OrderChecklist extends Model
     {
         return $this->belongsTo(User::class, 'admin_id');
     }
+
+    public function items()
+    {
+        return $this->hasMany(OrderChecklistItem::class);
+    }
 }

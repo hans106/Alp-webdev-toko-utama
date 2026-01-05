@@ -88,9 +88,9 @@
                     </a>
                     {{-- Admin 3 --}}
                     <a href="https://wa.me/6283146018000?text=Halo%20Hans,%20bisa%20bantu%20saya..." target="_blank"
-                       class="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl hover:border-blue-600 hover:shadow-md transition-all">
-                        <div class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">A</div>
-                        <div><h4 class="font-bold text-sm text-slate-800">Hans Vere Liem</h4><span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">Support</span></div>
+                       class="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl hover:border-primary hover:shadow-md transition-all">
+                        <div class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold">A</div>
+                        <div><h4 class="font-bold text-sm text-slate-800">Hans Vere Liem</h4><span class="text-[10px] bg-primary-50 text-primary px-1.5 py-0.5 rounded">Support</span></div>
                     </a>
                 </div>
             </div>

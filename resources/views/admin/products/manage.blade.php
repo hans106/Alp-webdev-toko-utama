@@ -42,15 +42,20 @@
                         <div class="flex items-center gap-3">
                             {{-- Foto Produk Kecil --}}
                             <div class="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden border border-gray-200">
-                                @if($product->image_main)
-                                    <img src="{{ $product->image_main ? Storage::url($product->image_main) : asset('logo/logo_utama.jpeg') }}" class="w-full h-full object-cover">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center text-gray-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                    </div>
-                                @endif
+                                @php
+                                    $imgSrc = null;
+                                    $imgPath = $product->image_main ?? null;
+                                    if ($imgPath && preg_match('/^https?:\/\//i', $imgPath)) {
+                                        $imgSrc = $imgPath;
+                                    } elseif ($imgPath && file_exists(public_path($imgPath))) {
+                                        $imgSrc = asset($imgPath);
+                                    } elseif ($imgPath && file_exists(public_path('products/' . $imgPath))) {
+                                        $imgSrc = asset('products/' . $imgPath);
+                                    } else {
+                                        $imgSrc = asset('logo/logo_utama.jpeg');
+                                    }
+                                @endphp
+                                <img src="{{ $imgSrc }}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='{{ asset('logo/logo_utama.jpeg') }}';">
                             </div>
                             <div>
                                 <p class="font-bold text-gray-800">{{ $product->name }}</p>
@@ -80,7 +85,7 @@
                     </td>
                     <td class="p-4 text-right">
                         <div class="flex items-center justify-end gap-2">
-                            <a href="{{ route('admin.products.edit', $product->id) }}" class="text-gray-400 hover:text-blue-600 transition p-2 rounded-lg hover:bg-blue-50">
+                            <a href="{{ route('admin.products.edit', $product->id) }}" class="text-gray-400 hover:text-primary transition p-2 rounded-lg hover:bg-primary-50">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>

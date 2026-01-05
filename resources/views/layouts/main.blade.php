@@ -22,9 +22,17 @@
                         sans: ['"Plus Jakarta Sans"', 'sans-serif'],
                     },
                     colors: {
-                        primary: '#4F46E5', // Indigo modern
-                        secondary: '#10B981', // Emerald segar
-                        dark: '#0F172A', // Slate gelap
+                        // Maroon / Premium red palette (primary must not be transparent)
+                        primary: {
+                            DEFAULT: '#6B0F0F', // deep maroon
+                            50: '#FFF5F5',
+                            100: '#FCEAEA',
+                            200: '#F3D6D6',
+                            700: '#4A0A0A', // darker shade for emphasis
+                        },
+                        // Supporting accents
+                        accent: '#E1B56A', // warm gold
+                        dark: '#0F172A', // keep dark for text/contrast
                     }
                 }
             }

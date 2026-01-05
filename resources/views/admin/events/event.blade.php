@@ -74,7 +74,7 @@
 
                         @if ($event->image)
                             {{-- Langsung ke folder events --}}
-                            <img src="{{ asset('events/' . $event->image) }}" alt="{{ $event->title }}"class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110">
+                            <img src="{{ asset('events/' . $event->image) }}" alt="{{ $event->title }}" class="h-full w-full object-cover object-top scale-105 -translate-y-2 transition-transform duration-500 group-hover:scale-110">
                         @else
                             {{-- Placeholder kalau gak ada gambar --}}
                             <div

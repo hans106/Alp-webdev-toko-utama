@@ -88,10 +88,21 @@
                 <div class="w-16 h-1 bg-rose-600 mx-auto rounded-full mt-3"></div>
             </div>
 
-            {{-- AMBIL DATA LANGSUNG DARI MODEL (Cara Cepat Tanpa Ubah Controller) --}}
+            {{-- AMBIL DATA DENGAN PENGAMANAN: cek apakah tabel 'events' ada dulu --}}
             @php
-                // Mengambil data event dari database yang sudah di-seed
-                $events = \App\Models\Event::orderBy('event_date', 'desc')->get();
+                use Illuminate\Support\Facades\Schema;
+                use Illuminate\Database\QueryException;
+
+                $events = collect();
+                try {
+                    if (Schema::hasTable('events')) {
+                        $events = \App\Models\Event::orderBy('event_date', 'desc')->get();
+                    }
+                } catch (QueryException $e) {
+                    // Log dan tetap lanjutkan dengan koleksi kosong agar halaman tidak error
+                    \Log::warning('Events table missing or DB error: ' . $e->getMessage());
+                    $events = collect();
+                }
             @endphp
 
             @if($events->count() > 0)
@@ -99,11 +110,18 @@
                     @foreach($events as $event)
                                 @php
                                     $imageUrl = null;
-                                    // Prefer storage disk 'public' (storage/app/public/events -> public/storage/events after storage:link)
-                                    if ($event->image && \Illuminate\Support\Facades\Storage::disk('public')->exists('events/' . $event->image)) {
-                                        $imageUrl = \Illuminate\Support\Facades\Storage::url('events/' . $event->image);
+                                    // Prefer public/events folder (place exposable images in public/events/)
+                                    // 1) If stored as full URL, use directly
+                                    if ($event->image && preg_match('#^https?://#i', $event->image)) {
+                                        $imageUrl = $event->image;
                                     }
 
+                                    // 2) If file exists in public/events, serve via asset()
+                                    if (! $imageUrl && $event->image && file_exists(public_path('events/' . $event->image))) {
+                                        $imageUrl = asset('events/' . $event->image);
+                                    }
+
+                                    // 3) Fallback to generated avatar
                                     if (! $imageUrl) {
                                         $imageUrl = 'https://ui-avatars.com/api/?name=' . urlencode($event->title) . '&background=111827&color=fff&size=1024';
                                     }

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\ActivityLog; // ✅ WAJIB IMPORT LOG
+use App\Models\OrderChecklist;
+use App\Models\OrderChecklistItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; // ✅ WAJIB IMPORT AUTH
 
@@ -26,19 +28,54 @@ class AdminOrderController extends Controller
             return redirect()->back()->with('error', 'Pesanan tidak bisa diterima. Status harus "pending"!');
         }
 
-        // Update status jadi 'paid' (validasi pembayaran berhasil)
+        // Update status jadi 'accepted' (diterima oleh admin)
         $oldStatus = $order->status;
-        $order->update(['status' => 'paid']);
+        $order->update(['status' => 'accepted']);
 
         // --- 📹 REKAM CCTV (ORDER DITERIMA) ---
         ActivityLog::create([
             'user_id' => Auth::id(),
             'action' => 'APPROVE ORDER',
-            'description' => "Menerima & Validasi Pesanan #{$order->id} (pembayaran valid). Status: '{$oldStatus}' -> 'paid'."
+            'description' => "Menerima Pesanan #{$order->id}. Status: '{$oldStatus}' -> 'accepted'."
         ]);
         // ------------------------------------
-        
-        return redirect()->back()->with('success', 'Pesanan Diterima! ✅ Status berubah menjadi PAID');
+
+        // Create a checklist record so admin_penjualan can immediately check items
+        $existing = OrderChecklist::where('order_id', $order->id)->first();
+        if (! $existing) {
+            $itemsCount = $order->orderItems()->sum('qty');
+            $checklist = OrderChecklist::create([
+                'order_id' => $order->id,
+                'admin_id' => Auth::id(),
+                'recipient_name' => $order->user->name ?? 'Pelanggan',
+                'items_count' => $itemsCount,
+                'status' => 'belum_selesai',
+                'sent_at' => null
+            ]);
+
+            foreach ($order->orderItems as $oi) {
+                OrderChecklistItem::create([
+                    'order_checklist_id' => $checklist->id,
+                    'product_id' => $oi->product_id,
+                    'qty_required' => $oi->qty,
+                    // assume ordered quantity is correct and mark it checked so it can be printed immediately
+                    'qty_checked' => $oi->qty,
+                    'status' => 'checked',
+                ]);
+            }
+
+            // Since we marked all items as checked, mark checklist as done
+            $checklist->status = 'sudah_fix';
+            $checklist->save();
+
+            ActivityLog::create([
+                'user_id' => Auth::id(),
+                'action' => 'CREATE CHECKLIST ON APPROVE',
+                'description' => "Checklist for Order #{$order->id} created when order was accepted. Items: {$itemsCount}."
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Pesanan Diterima! ✅ Pelanggan dapat melakukan pembayaran sekarang');
     }
 
     // FUNGSI TOLAK PESANAN (Belum bayar, scan invalid, pending) + LOG
@@ -73,22 +110,49 @@ class AdminOrderController extends Controller
     {
         $order = Order::findOrFail($id);
 
-        if($order->status == 'paid' || $order->status == 'settlement'){
+        // Allow sending virtual nota when order is accepted or already paid
+        if(in_array($order->status, ['paid','settlement','capture','accepted'])){
             // Simpan status lama buat laporan
             $oldStatus = $order->status;
 
             // Update status jadi 'nota_sent'
             $order->update(['status' => 'nota_sent']);
 
-            // Buat virtual nota / checklist
+            // Reuse checklist if it exists; otherwise create and mark sent
+            $checklist = OrderChecklist::where('order_id', $order->id)->first();
             $itemsCount = $order->orderItems()->sum('qty');
-            \App\Models\OrderChecklist::create([
-                'order_id' => $order->id,
-                'admin_id' => Auth::id(),
-                'recipient_name' => $order->user->name,
-                'items_count' => $itemsCount,
-                'sent_at' => now()
-            ]);
+            if (! $checklist) {
+                $checklist = OrderChecklist::create([
+                    'order_id' => $order->id,
+                    'admin_id' => Auth::id(),
+                    'recipient_name' => $order->user->name,
+                    'items_count' => $itemsCount,
+                    'sent_at' => now(),
+                    'status' => 'belum_selesai'
+                ]);
+
+                foreach ($order->orderItems as $oi) {
+                    OrderChecklistItem::create([
+                        'order_checklist_id' => $checklist->id,
+                        'product_id' => $oi->product_id,
+                        'qty_required' => $oi->qty,
+                        // assume ordered quantity is correct and mark it checked so it can be printed immediately
+                        'qty_checked' => $oi->qty,
+                        'status' => 'checked',
+                    ]);
+                }
+            } else {
+                // Ensure any previously-created items that weren't checked are set to checked (allow print)
+                foreach ($checklist->items as $it) {
+                    if ($it->qty_checked < $it->qty_required) {
+                        $it->qty_checked = $it->qty_required;
+                        $it->status = 'checked';
+                        $it->save();
+                    }
+                }
+
+                $checklist->update(['sent_at' => now(), 'items_count' => $itemsCount]);
+            }
 
             // --- 📹 REKAM CCTV (NOTA DIKIRIM) ---
             ActivityLog::create([

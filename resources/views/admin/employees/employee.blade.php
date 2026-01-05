@@ -34,7 +34,7 @@
         {{-- HEADER --}}
         <div class="mb-6 px-4">
             <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">
-                <span class="text-blue-600">Select</span> Your Employee
+                <span class="text-primary">Select</span> Your Employee
             </h1>
             <p class="text-slate-500 text-sm">Geser ke kanan untuk melihat seluruh tim.</p>
         </div>
@@ -52,15 +52,15 @@
 
             {{-- 1. KARTU RECRUIT NEW --}}
             <div @click="showModal = true; editMode = false; currentEmployee = {}"
-                class="group min-w-[280px] h-[450px] border-4 border-dashed border-slate-300 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-2 relative flex-shrink-0">
+                class="group min-w-[280px] h-[450px] border-4 border-dashed border-slate-300 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary-50 transition-all duration-300 transform hover:-translate-y-2 relative shrink-0">
                 <div
-                    class="w-20 h-20 bg-slate-200 text-slate-400 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                    class="w-20 h-20 bg-slate-200 text-slate-400 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-slate-400 group-hover:text-blue-600">Recruit New</h3>
+                <h3 class="text-xl font-bold text-slate-400 group-hover:text-primary">Recruit New</h3>
                 <p class="text-sm text-slate-400">Tambah Pegawai</p>
             </div>
 
@@ -74,10 +74,10 @@
                         @if ($emp->image_photo)
                             
                             <img src="{{ asset('employee/' . $emp->image_photo) }}"
-                                class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity">
+                                class="w-full h-full object-cover object-top scale-105 -translate-y-2 transition-transform transition-opacity duration-500 opacity-80 group-hover:opacity-100 group-hover:scale-110">
                         @else
                             <img src="https://ui-avatars.com/api/?name={{ urlencode($emp->name) }}&background=random&size=512"
-                                class="w-full h-full object-cover opacity-80">
+                                class="w-full h-full object-cover object-top scale-105 -translate-y-2 transition-transform transition-opacity duration-500 opacity-80 group-hover:scale-110">
                         @endif
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90">
                         </div>
@@ -91,7 +91,7 @@
 
                     {{-- Info Pegawai --}}
                     <div class="absolute bottom-0 left-0 w-full p-6 text-white">
-                        <p class="text-blue-300 font-bold text-xs uppercase tracking-widest mb-1">{{ $emp->position }}</p>
+                        <p class="text-primary-100 font-bold text-xs uppercase tracking-widest mb-1">{{ $emp->position }}</p>
                         <h2 class="text-2xl font-extrabold leading-tight mb-2">{{ $emp->name }}</h2>
                         <p class="text-slate-300 text-sm flex items-center gap-2 mb-4">
                             <span class="text-xs">📞</span> {{ $emp->phone ?? 'No Phone' }}
@@ -168,14 +168,14 @@
                         <div class="mb-6">
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Foto Profil</label>
                             <input type="file" name="image_photo" accept="image/*"
-                                class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
+                                class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-primary-50 file:text-primary hover:file:bg-primary-100">
                         </div>
 
                         <div class="flex justify-end gap-3 pt-4 border-t">
                             <button type="button" @click="showModal = false"
                                 class="px-5 py-2.5 text-slate-600 hover:bg-slate-100 rounded-xl text-sm font-medium">Batal</button>
                             <button type="submit"
-                                class="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-bold text-sm shadow-lg">Simpan</button>
+                                class="px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm shadow-lg">Simpan</button>
                         </div>
                     </form>
                 </div>

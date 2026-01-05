@@ -4,7 +4,7 @@
 <div class="container mx-auto px-4 py-8">
     
     {{-- Tombol Kembali --}}
-    <a href="{{ route('admin.products.index') }}" class="inline-flex items-center text-gray-500 hover:text-blue-600 mb-6 transition">
+    <a href="{{ route('admin.products.index') }}" class="inline-flex items-center text-gray-500 hover:text-primary mb-6 transition">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
@@ -84,9 +84,22 @@
                 
                 {{-- Tampilkan Foto Saat Ini --}}
                 @if($product->image_main)
+                    @php
+                        $imgSrc = null;
+                        $imgPath = $product->image_main ?? null;
+                        if ($imgPath && preg_match('/^https?:\/\//i', $imgPath)) {
+                            $imgSrc = $imgPath;
+                        } elseif ($imgPath && file_exists(public_path($imgPath))) {
+                            $imgSrc = asset($imgPath);
+                        } elseif ($imgPath && file_exists(public_path('products/' . $imgPath))) {
+                            $imgSrc = asset('products/' . $imgPath);
+                        } else {
+                            $imgSrc = asset('logo/logo_utama.jpeg');
+                        }
+                    @endphp
                     <div class="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200 inline-block">
                         <p class="text-xs text-gray-500 mb-2">Image: </p>
-                        <img src="{{ $product->image_main ? Storage::url($product->image_main) : asset('logo/logo_utama.jpeg') }}" alt="Current Image" class="h-32 object-contain rounded">
+                        <img src="{{ $imgSrc }}" alt="Current Image" class="h-32 object-contain rounded" onerror="this.onerror=null;this.src='{{ asset('logo/logo_utama.jpeg') }}';">
                     </div>
                 @endif
 

@@ -85,8 +85,8 @@
             </div>
 
             {{-- Info Box --}}
-            <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-6">
-                <p class="text-sm text-blue-800"><strong>ℹ️ Info:</strong> Stok produk akan otomatis bertambah sesuai jumlah yang Anda input.</p>
+            <div class="bg-primary-50 border border-primary-100 p-4 rounded-lg mb-6">
+                <p class="text-sm text-primary-700"><strong>ℹ️ Info:</strong> Stok produk akan otomatis bertambah sesuai jumlah yang Anda input.</p>
             </div>
 
             {{-- Tombol Submit & Kembali --}}

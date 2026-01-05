@@ -18,7 +18,10 @@ class RestockController extends Controller
     // ==========================================
     public function index(Request $request)
     {
-        $query = Restock::with(['supplier', 'product'])->latest();
+        // Put completed checklists at the bottom for better UX
+        $query = Restock::with(['supplier', 'product'])
+            ->orderByRaw("CASE WHEN checklist_status = 'sudah_fix' THEN 1 ELSE 0 END ASC")
+            ->latest();
 
         // Filter pencarian produk/supplier
         if ($request->has('search') && $request->search != '') {
@@ -122,15 +125,28 @@ class RestockController extends Controller
     public function updateChecklist(Request $request, Restock $restock)
     {
         $validated = $request->validate([
-            'checked_qty' => "required|integer|min:0|max:{$restock->qty}",
+            'checked_qty' => "required_if:checklist_status,sudah_fix|integer|min:1|max:{$restock->qty}",
             'checklist_status' => 'required|in:belum_selesai,sudah_fix',
-            'checklist_notes' => 'nullable|string|max:500'
+            'checklist_notes' => 'required_if:checklist_status,sudah_fix|string|max:500'
+        ], [
+            'checked_qty.required_if' => 'Jika ingin menandai Sudah Fix, jumlah checked harus diisi dan minimal 1.',
+            'checklist_notes.required_if' => 'Jika ingin menandai Sudah Fix, kolom notes harus diisi.'
         ]);
 
+        // Extra server-side guard: do not allow setting to 'sudah_fix' unless all required fields present
+        if ($validated['checklist_status'] === 'sudah_fix') {
+            $checkedQty = (int) ($request->input('checked_qty') ?? 0);
+            $notes = trim((string) ($request->input('checklist_notes') ?? ''));
+            if ($checkedQty < 1 || $notes === '') {
+                return redirect()->back()->withErrors(['checklist_status' => 'Tidak dapat menandai Sudah Fix: pastikan Checked Qty dan Notes terisi dan valid.'])->withInput();
+            }
+        }
+
+        // Persist values safely even when 'checked_qty' was not required
         $restock->update([
-            'checked_qty' => $validated['checked_qty'],
+            'checked_qty' => $request->has('checked_qty') ? (int) $request->input('checked_qty') : ($restock->checked_qty ?? 0),
             'checklist_status' => $validated['checklist_status'],
-            'checklist_notes' => $validated['checklist_notes'] ?? null,
+            'checklist_notes' => $request->input('checklist_notes') ?? null,
         ]);
 
         // Log activity
@@ -138,7 +154,7 @@ class RestockController extends Controller
             'user_id' => Auth::id(),
             'action' => 'CHECKLIST RESTOCK',
             'description' => "Checklist Restock #{$restock->id} oleh " . Auth::user()->name
-                . ". Checked: {$validated['checked_qty']}/{$restock->qty}. Status: {$validated['checklist_status']}"
+                . ". Checked: " . ($request->input('checked_qty') ?? ($restock->checked_qty ?? 0)) . "/{$restock->qty}. Status: {$validated['checklist_status']}"
         ]);
 
         return redirect()->route('admin.restocks.index')->with('success', 'Checklist Restock disimpan.');

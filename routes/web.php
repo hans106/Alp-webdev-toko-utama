@@ -83,6 +83,7 @@ Route::middleware(['auth'])->group(function () {
     // Riwayat
     Route::get('/my-orders', [FrontOrderController::class, 'index'])->name('orders.index');
     Route::get('/my-orders/{id}', [FrontOrderController::class, 'show'])->name('orders.show');
+    Route::get('/my-orders/check-status/{id}', [FrontOrderController::class, 'checkPaymentStatus'])->name('orders.check_status'); 
 
     Route::get('/my-orders/reset-token/{id}', [FrontOrderController::class, 'resetToken'])->name('orders.reset');
     Route::get('/my-orders/generate-snap/{id}', [FrontOrderController::class, 'generateSnap'])->name('orders.generate_snap');
@@ -157,10 +158,22 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         ->name('orders.index')
         ->middleware('role:master,admin_penjualan');
     
+    
     // Approve (accept) order
     Route::post('/orders/{id}/approve', [AdminOrderController::class, 'approve'])
         ->name('orders.approve')
         ->middleware('role:master,admin_penjualan');
+
+    // Order Checklists (Admin Penjualan & Master)
+    Route::prefix('checklists')->name('checklists.')->middleware('role:master,admin_penjualan')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\OrderChecklistController::class, 'index'])->name('index');
+        Route::get('/{checklist}', [\App\Http\Controllers\Admin\OrderChecklistController::class, 'show'])->name('show');
+        Route::post('/item/{item}/update', [\App\Http\Controllers\Admin\OrderChecklistController::class, 'updateItem'])->name('item.update');
+        Route::post('/{checklist}/status', [\App\Http\Controllers\Admin\OrderChecklistController::class, 'updateStatus'])->name('status.update');
+        Route::post('/{checklist}/send', [\App\Http\Controllers\Admin\OrderChecklistController::class, 'send'])->name('send');
+        Route::get('/{checklist}/print', [\App\Http\Controllers\Admin\OrderChecklistController::class, 'print'])->name('print');
+    });
+
     
     // Reject order
     Route::post('/orders/{id}/reject', [AdminOrderController::class, 'reject'])

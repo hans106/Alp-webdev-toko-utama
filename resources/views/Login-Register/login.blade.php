@@ -28,7 +28,7 @@
                     <label class="block text-gray-700 font-bold mb-2 text-sm">Password</label>
                     <div class="relative">
                         <input type="password" name="password" id="loginPass"
-                            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition pr-10"
+                            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition pr-10"
                             placeholder="Masukkan password" required>
 
                         <button type="button" onclick="togglePassword('loginPass', this)"
@@ -51,10 +51,10 @@
                     </div>
                 </div>
                 <button type="submit"
-                    class="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700">Login</button>
+                    class="w-full bg-primary text-white font-bold py-2 rounded hover:bg-primary-700">Login</button>
             </form>
             <p class="text-center mt-4 text-sm">Belum punya akun? <a href="{{ route('register') }}"
-                    class="text-blue-600 font-bold">Daftar disini</a></p>
+                    class="text-primary font-bold">Daftar disini</a></p>
         </div>
     </div>
     <script>

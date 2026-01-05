@@ -47,9 +47,38 @@
                         @foreach ($carts as $cart)
                             <div
                                 class="flex items-center gap-4 p-6 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition">
-                                <div
-                                    class="w-20 h-20 bg-white border border-slate-200 rounded-lg overflow-hidden flex-shrink-0 p-1">
-                                    <img src="{{ $cart->product->image_main ? Storage::url($cart->product->image_main) : asset('logo/logo_utama.jpeg') }}" class="w-full h-full object-contain">
+                                
+                                {{-- GAMBAR PRODUK - SUDAH DIPERBAIKI --}}
+                                @php
+                                    $imgSrc = null;
+                                    $imgPath = $cart->product->image_main ?? null;
+                                    
+                                    // 1) Full URL (http/https)
+                                    if ($imgPath && preg_match('/^https?:\/\//i', $imgPath)) {
+                                        $imgSrc = $imgPath;
+                                    }
+                                    // 2) Path ada di public langsung (products/xxx.jpg)
+                                    elseif ($imgPath && file_exists(public_path($imgPath))) {
+                                        $imgSrc = asset($imgPath);
+                                    }
+                                    // 3) Cek di public/products/
+                                    elseif ($imgPath && file_exists(public_path('products/' . $imgPath))) {
+                                        $imgSrc = asset('products/' . $imgPath);
+                                    }
+                                    // 4) Cek di storage (jika pakai storage link)
+                                    elseif ($imgPath && file_exists(storage_path('app/public/' . $imgPath))) {
+                                        $imgSrc = asset('storage/' . $imgPath);
+                                    }
+                                    // 5) Fallback ke logo
+                                    else {
+                                        $imgSrc = asset('logo/logo_utama.jpeg');
+                                    }
+                                @endphp
+                                
+                                <div class="w-20 h-20 bg-white border border-slate-200 rounded-lg overflow-hidden flex-shrink-0 p-1">
+                                    <img src="{{ $imgSrc }}" 
+                                         class="w-full h-full object-contain"
+                                         onerror="this.onerror=null; this.src='{{ asset('logo/logo_utama.jpeg') }}';">
                                 </div>
 
                                 <div class="flex-grow">
@@ -114,8 +143,6 @@
                             class="block w-full bg-gradient-to-r from-primary to-indigo-700 text-white text-center font-bold py-4 rounded-xl hover:shadow-lg hover:shadow-indigo-500/30 transition transform hover:-translate-y-0.5">
                             Lanjut Pembayaran &rarr;
                         </a>
-
-                        {{-- NOTE: Tombol "Lanjut Belanja" yang di bawah sudah DIHAPUS sesuai request --}}
                     </div>
                 </div>
             </div>
@@ -128,7 +155,7 @@
                             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-slate-800 mb-2">Kerangan Kosong</h3>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Keranjang Kosong</h3>
                 <p class="text-slate-500 mb-6">Wah, belum ada belanjaan nih. Yuk cari barang!</p>
                 <a href="{{ route('catalog') }}"
                     class="inline-flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition">

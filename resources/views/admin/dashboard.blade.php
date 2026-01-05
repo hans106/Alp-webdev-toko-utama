@@ -67,13 +67,13 @@
             </div>
 
             {{-- Total Supplier --}}
-            <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition p-6 border-l-4 border-blue-500">
+            <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition p-6 border-l-4 border-primary">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-500 text-sm font-medium uppercase tracking-wider">Total Supplier</p>
                         <h3 class="text-3xl font-bold text-gray-800 mt-1">{{ \App\Models\Supplier::count() }}</h3>
                     </div>
-                    <div class="p-3 bg-blue-50 rounded-full text-blue-600">
+                    <div class="p-3 bg-primary-50 rounded-full text-primary">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -147,7 +147,7 @@
                                         '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>';
                                 } elseif (Str::contains($log->action, 'CREATE')) {
                                     // Kalau Tambah Baru (Biru + Icon Plus)
-                                    $iconBg = 'bg-blue-100 text-blue-600';
+                                    $iconBg = 'bg-primary-100 text-primary';
                                     $iconSvg =
                                         '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>';
                                 }

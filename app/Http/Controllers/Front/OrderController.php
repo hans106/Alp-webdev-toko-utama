@@ -11,9 +11,10 @@ use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-// --- INI PENTING: Panggil Library Midtrans ---
+// --- Library Midtrans ---
 use Midtrans\Config;
 use Midtrans\Snap;
+use Midtrans\Transaction;
 
 class OrderController extends Controller
 {
@@ -33,40 +34,9 @@ class OrderController extends Controller
                         ->where('id', $id)
                         ->firstOrFail();
 
-        // 2. LOGIC MIDTRANS (WAJIB ADA DISINI)
-        // Cek: Jika status pending DAN snap_token belum punya, mintakan ke Midtrans
-        if ($order->status == 'pending' && empty($order->snap_token)) {
-            
-            // Konfigurasi Midtrans
-            Config::$serverKey = config('midtrans.server_key');
-            Config::$isProduction = config('midtrans.is_production');
-            Config::$isSanitized = true;
-            Config::$is3ds = true;
-
-            // Data yang dikirim ke Midtrans
-            $params = [
-                'transaction_details' => [
-                    'order_id' => $order->invoice_code . '-' . rand(), // Tambah angka acak biar unik
-                    'gross_amount' => (int) $order->total_price, // Pastikan integer
-                ],
-                'customer_details' => [
-                    'first_name' => Auth::user()->name,
-                    'email' => Auth::user()->email,
-                ],
-            ];
-
-            try {
-                // Minta Token
-                $snapToken = Snap::getSnapToken($params);
-                
-                // Simpan Token ke Database
-                $order->snap_token = $snapToken;
-                $order->save();
-                
-            } catch (\Exception $e) {
-                // Kalau error koneksi, tampilkan errornya (untuk debugging)
-                // dd($e->getMessage()); 
-            }
+        // 2. LOGIC MIDTRANS - Generate token jika order accepted dan belum ada token
+        if ($order->status == 'accepted' && empty($order->snap_token)) {
+            $order->generateSnapToken();
         }
 
         return view('front.orders.detail', compact('order'));
@@ -94,7 +64,7 @@ class OrderController extends Controller
                 'user_id'     => Auth::id(),
                 'total_price' => $totalPrice,
                 'status'      => 'pending',
-                'invoice_code'=> 'INV-' . strtoupper(\Illuminate\Support\Str::random(10)), // Perbaikan nama kolom invoice
+                'invoice_code'=> 'INV-' . strtoupper(\Illuminate\Support\Str::random(10)),
             ]);
 
             // B. Pindahkan Item
@@ -120,13 +90,13 @@ class OrderController extends Controller
 
         return redirect()->route('orders.index')->with('success', 'Pesanan berhasil dibuat!');
     }
+
     public function resetToken($id)
     {
         $order = Order::where('user_id', Auth::id())->where('id', $id)->firstOrFail();
 
-        // Cuma boleh reset kalau statusnya masih pending
-        if($order->status == 'pending') {
-            $order->snap_token = null; // Hapus token lama
+        if($order->status == 'accepted') {
+            $order->snap_token = null;
             $order->save();
             
             return redirect()->back()->with('success', 'Link pembayaran berhasil diperbarui!');
@@ -135,40 +105,73 @@ class OrderController extends Controller
         return redirect()->back()->with('error', 'Pesanan tidak bisa direset.');
     }
 
-    // Generate Snap Token explicitly via AJAX (Midtrans Sandbox)
     public function generateSnap(Request $request, $id)
     {
         $order = Order::where('user_id', Auth::id())->where('id', $id)->firstOrFail();
 
-        if($order->status != 'pending') {
-            return response()->json(['success' => false, 'message' => 'Order tidak dalam status pending'], 400);
+        if($order->status != 'accepted') {
+            return response()->json(['success' => false, 'message' => 'Order tidak dapat menerima pembayaran saat ini. Tunggu konfirmasi penjualan.' ], 400);
+        }
+
+        // Generate atau regenerate snap token
+        $snapToken = $order->generateSnapToken();
+
+        if ($snapToken) {
+            return response()->json(['success' => true, 'snap_token' => $snapToken]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Gagal membuat token pembayaran. Silakan coba lagi.'], 500);
+        }
+    }
+
+    /**
+     * CEK STATUS PEMBAYARAN LANGSUNG KE MIDTRANS API
+     * Ini solusi untuk development tanpa callback URL
+     */
+    public function checkPaymentStatus($id)
+    {
+        $order = Order::where('user_id', Auth::id())->where('id', $id)->firstOrFail();
+
+        // Hanya cek jika status masih 'accepted' atau 'pending' (bisa dicek untuk menunggu pembayaran)
+        if (!in_array($order->status, ['accepted', 'pending'])) {
+            return redirect()->back()->with('info', 'Status pembayaran sudah: ' . $order->status);
         }
 
         // Konfigurasi Midtrans
         Config::$serverKey = config('midtrans.server_key');
         Config::$isProduction = config('midtrans.is_production');
-        Config::$isSanitized = true;
-        Config::$is3ds = true;
-
-        $params = [
-            'transaction_details' => [
-                'order_id' => $order->invoice_code . '-' . rand(),
-                'gross_amount' => (int) $order->total_price,
-            ],
-            'customer_details' => [
-                'first_name' => Auth::user()->name,
-                'email' => Auth::user()->email,
-            ],
-        ];
 
         try {
-            $snapToken = Snap::getSnapToken($params);
-            $order->snap_token = $snapToken;
-            $order->save();
+            // Cek status ke Midtrans API
+            $response = Transaction::status($order->invoice_code);
+            
+            $transactionStatus = $response->transaction_status ?? null;
+            $fraudStatus = $response->fraud_status ?? null;
 
-            return response()->json(['success' => true, 'snap_token' => $snapToken]);
+            // Update status berdasarkan response
+            $newStatus = match ($transactionStatus) {
+                'capture' => ($fraudStatus == 'accept') ? 'paid' : 'pending',
+                'settlement' => 'paid',
+                'pending' => 'pending',
+                'deny', 'cancel' => 'cancelled',
+                'expire' => 'expire',
+                default => null
+            };
+
+            if ($newStatus && $newStatus != 'pending') {
+                $order->update([
+                    'status' => $newStatus,
+                    'paid_at' => ($newStatus == 'paid') ? now() : null,
+                ]);
+                
+                return redirect()->back()->with('success', 'Status pembayaran diperbarui: ' . strtoupper($newStatus));
+            }
+
+            return redirect()->back()->with('info', 'Status pembayaran masih: PENDING. Silakan selesaikan pembayaran.');
+
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Gagal membuat token: ' . $e->getMessage()], 500);
+            // Jika order_id tidak ditemukan di Midtrans, coba dengan pattern lain
+            // Karena kita menambahkan timestamp/random di order_id
+            return redirect()->back()->with('error', 'Tidak dapat mengecek status: ' . $e->getMessage());
         }
     }
 }

@@ -37,6 +37,8 @@
                     <label class="block text-sm font-medium text-gray-700">Notes</label>
                     <textarea name="checklist_notes" rows="3" class="mt-1 block w-full border rounded-md px-3 py-2">{{ old('checklist_notes', $restock->checklist_notes) }}</textarea>
                     @error('checklist_notes') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                    <p id="checkError" class="text-red-500 text-sm mt-1 hidden"></p>
+                    <p class="text-xs text-gray-500 mt-1">Catatan: Untuk menandai <strong>Sudah Fix</strong>, pastikan <em>Checked Qty</em> minimal 1 dan <em>Notes</em> terisi.</p>
                 </div>
             </div>
 
@@ -46,4 +48,40 @@
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form[action="{{ route('admin.restocks.checklist.update', $restock) }}"]');
+            const status = form.querySelector('select[name="checklist_status"]');
+            const checkedQty = form.querySelector('input[name="checked_qty"]');
+            const notes = form.querySelector('textarea[name="checklist_notes"]');
+            const errorEl = document.getElementById('checkError');
+
+            function validateForSubmit() {
+                if (status.value === 'sudah_fix') {
+                    const qtyVal = parseInt(checkedQty.value || '0', 10);
+                    if (!notes.value.trim() || qtyVal < 1) {
+                        errorEl.textContent = 'Untuk menandai "Sudah Fix", pastikan Checked Qty minimal 1 dan Notes diisi.';
+                        errorEl.classList.remove('hidden');
+                        return false;
+                    }
+                }
+                errorEl.classList.add('hidden');
+                return true;
+            }
+
+            form.addEventListener('submit', function (e) {
+                if (!validateForSubmit()) {
+                    e.preventDefault();
+                    // scroll to form so user sees message
+                    form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+
+            [status, checkedQty, notes].forEach(function (el) {
+                el.addEventListener('input', validateForSubmit);
+                el.addEventListener('change', validateForSubmit);
+            });
+        });
+    </script>
 @endsection

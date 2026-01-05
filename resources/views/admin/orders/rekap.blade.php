@@ -30,7 +30,7 @@
                 @forelse($orders as $order)
                 <tr class="hover:bg-gray-50 transition-colors">
                     {{-- ID Order --}}
-                    <td class="p-4 font-mono text-sm text-blue-600 font-bold">
+                    <td class="p-4 font-mono text-sm text-primary font-bold">
                         #{{ $order->invoice_code ?? $order->id }}
                     </td>
 
@@ -53,8 +53,10 @@
                             <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-bold">PENDING</span>
                         @elseif($order->status == 'nota_sent')
                             <span class="px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold">NOTA TERKIRIM</span>
+                        @elseif($order->status == 'accepted')
+                            <span class="px-3 py-1 rounded-full bg-primary-50 text-primary text-xs font-bold">DITERIMA</span>
                         @elseif($order->status == 'sent')
-                            <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">DIKIRIM</span>
+                            <span class="px-3 py-1 rounded-full bg-primary-50 text-primary text-xs font-bold">DIKIRIM</span>
                         @else
                             <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-bold">{{ strtoupper($order->status) }}</span>
                         @endif
@@ -76,10 +78,10 @@
                                 </button>
                             </div>
                         {{-- Logika Tombol Kirim (Status Lunas) --}}
-                        @elseif($order->status == 'paid' || $order->status == 'settlement' || $order->status == 'capture')
+                        @elseif(in_array($order->status, ['paid','settlement','capture','accepted']))
                             <form action="{{ route('admin.orders.ship', $order->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin mau kirim nota virtual ini?')">
                                 @csrf
-                                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md transition-all flex items-center gap-2 ml-auto">
+                                <button type="submit" class="bg-primary hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md transition-all flex items-center gap-2 ml-auto">
                                     <span>Kirim Nota</span> ✉️
                                 </button>
                             </form>

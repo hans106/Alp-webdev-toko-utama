@@ -11,7 +11,6 @@ use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-// 👉 1. JANGAN LUPA DUA BARIS INI (PENTING!)
 use Midtrans\Config;
 use Midtrans\Snap;
 
@@ -48,16 +47,24 @@ class CheckoutController extends Controller
             abort(403);
         }
 
-        // VALIDASI INPUT (alamat minimal 10 kata, phone minimal 10 digit)
+        // VALIDASI INPUT (address must have at least 4 words; phone allow spaces/+, but require at least 10 digits)
         $request->validate([
-            'address' => [
-                'required', 'string', function($attribute, $value, $fail) {
-                    if (str_word_count($value) < 10) {
-                        $fail('Alamat harus terdiri dari minimal 10 kata.');
-                    }
+            'address' => ['required','string', function($attribute, $value, $fail) {
+                // Count words more robustly (ignore punctuation)
+                $words = preg_split('/\s+/', trim(strip_tags($value)));
+                $words = array_filter($words, function($w) {
+                    return preg_match('/\p{L}|\p{N}/u', $w);
+                });
+                if (count($words) < 4) {
+                    $fail('Alamat harus terdiri dari minimal 4 kata.');
                 }
-            ],
-            'phone' => ['required','string','regex:/^[0-9]{10,}$/'],
+            }],
+            'phone' => ['required','string', function($attribute, $value, $fail) {
+                $digits = preg_replace('/\D+/', '', $value);
+                if (strlen($digits) < 10) {
+                    $fail('Nomor WA harus berisi minimal 10 digit angka.');
+                }
+            }],
         ]);
 
         $user = Auth::user();
@@ -80,15 +87,13 @@ class CheckoutController extends Controller
                 // Gabung Alamat & No HP
                 $fullAddress = $request->address . " (No HP: " . $request->phone . ")";
 
-                // A. BUAT ORDER
+                // A. BUAT ORDER - DIPERBAIKI: Gunakan 'status' bukan 'payment_status'/'delivery_status'
                 $newOrder = Order::create([
                     'user_id' => $user->id,
                     'invoice_code' => 'INV-' . strtoupper(Str::random(10)),
                     'total_price' => $totalPrice,
-                    'payment_status' => 'pending', // Ubah jadi pending dulu
-                    'delivery_status' => 'pending',
+                    'status' => 'pending',  // <-- DIPERBAIKI: dari payment_status/delivery_status jadi status
                     'address' => $fullAddress,
-                    // 'snap_token' => null, (Nanti diisi di bawah)
                 ]);
 
                 // B. PINDAHKAN ITEM KE ORDER DETAILS
@@ -113,12 +118,12 @@ class CheckoutController extends Controller
                 ]);
 
                 // ==========================================
-                // 🔥 E. PROSES MIDTRANS (THE MAGIC) 🔥
+                // E. PROSES MIDTRANS (THE MAGIC)
                 // ==========================================
 
                 // 1. Set Konfigurasi
-                Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-                Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
+                Config::$serverKey = config('midtrans.server_key');
+                Config::$isProduction = config('midtrans.is_production', false);
                 Config::$isSanitized = true;
                 Config::$is3ds = true;
 
@@ -146,11 +151,10 @@ class CheckoutController extends Controller
             });
         } catch (\Exception $e) {
             // Kalau error, kembalikan ke halaman sebelumnya dengan pesan error
-            return redirect()->back()->with('error', 'Gagal memproses pesanan: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memproses pesanan: ' . $e->getMessage())->withInput();
         }
 
         // Redirect ke Halaman Detail Pesanan (Untuk Bayar)
-        // Pastikan nama route ini sesuai dengan route Abang (cek route list)
-        return redirect()->route('front.orders_details', $order->id)->with('success', 'Pesanan berhasil dibuat. Silakan bayar sekarang!');
+        return redirect()->route('orders.show', $order->id)->with('success', 'Pesanan berhasil dibuat. Silakan bayar sekarang!');
     }
 }

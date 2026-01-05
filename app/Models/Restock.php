@@ -16,7 +16,11 @@ class Restock extends Model
         'product_id',
         'date',
         'qty',
-        'buy_price'
+        'buy_price',
+        // Checklist related fields
+        'checked_qty',
+        'checklist_status',
+        'checklist_notes'
     ];
 
     public function supplier(): BelongsTo {

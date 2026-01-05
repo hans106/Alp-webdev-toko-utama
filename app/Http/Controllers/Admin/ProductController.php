@@ -123,8 +123,11 @@ class ProductController extends Controller
         $validated['slug'] = Str::slug($request->name);
 
         if ($request->hasFile('image_main')) {
-            $path = $request->file('image_main')->store('products', 'public');
-            $validated['image_main'] = $path;
+            // Move uploaded file to public/products so images are publicly accessible
+            $file = $request->file('image_main');
+            $filename = time() . '_' . preg_replace('/[^A-Za-z0-9\-_.]/', '_', $file->getClientOriginalName());
+            $file->move(public_path('products'), $filename);
+            $validated['image_main'] = 'products/' . $filename;
         }
 
         $product = Product::create($validated);
@@ -177,11 +180,16 @@ class ProductController extends Controller
         $validated['slug'] = Str::slug($request->name);
 
         if ($request->hasFile('image_main')) {
-            if ($product->image_main) {
-                Storage::disk('public')->delete($product->image_main);
+            // Remove previous public file if it exists
+            if ($product->image_main && file_exists(public_path($product->image_main))) {
+                @unlink(public_path($product->image_main));
             }
-            $path = $request->file('image_main')->store('products', 'public');
-            $validated['image_main'] = $path;
+
+            // Move uploaded file to public/products so images are publicly accessible
+            $file = $request->file('image_main');
+            $filename = time() . '_' . preg_replace('/[^A-Za-z0-9\-_.]/', '_', $file->getClientOriginalName());
+            $file->move(public_path('products'), $filename);
+            $validated['image_main'] = 'products/' . $filename;
         }
 
         $product->update($validated);
@@ -215,8 +223,8 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $namaProduk = $product->name; // Simpan nama sebelum dihapus
 
-        if ($product->image_main) {
-            Storage::disk('public')->delete($product->image_main);
+        if ($product->image_main && file_exists(public_path($product->image_main))) {
+            @unlink(public_path($product->image_main));
         }
 
         $product->delete();

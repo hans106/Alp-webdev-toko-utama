@@ -43,7 +43,7 @@
                 <div class="mb-6">
                     <label class="block font-bold text-slate-700 mb-2 text-sm">Alamat Lengkap Pengiriman <span class="text-red-500">*</span></label>
                     <textarea id="address" name="address" rows="3" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition" placeholder="Jalan, Nomor Rumah, RT/RW, Kelurahan, Patokan..." required>{{ old('address') }}</textarea>
-                    <p id="address-feedback" class="text-xs text-slate-400 mt-1">*Tulis alamat lengkap minimal 10 kata.</p>
+                    <p id="address-feedback" class="text-xs text-slate-400 mt-1">*Tulis alamat lengkap minimal 4 kata.</p>
                 </div>
 
                 <div class="mb-8">
@@ -51,7 +51,7 @@
                     <input type="text" name="notes" value="{{ old('notes') }}" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition" placeholder="Contoh: Pagar warna hitam">
                 </div>
 
-                <button id="submit-order" type="submit" class="w-full bg-gradient-to-r from-primary to-indigo-600 text-white font-bold py-4 rounded-xl hover:shadow-lg transition transform hover:-translate-y-0.5 text-lg">
+                <button id="submit-order" type="submit" disabled aria-disabled="true" class="w-full opacity-50 cursor-not-allowed bg-gradient-to-r from-primary to-indigo-600 text-white font-bold py-4 rounded-xl hover:shadow-lg transition transform hover:-translate-y-0.5 text-lg">
                     Buat Pesanan
                 </button>
             </form>
@@ -87,7 +87,7 @@
                 function validateAddress() {
                     const text = addressInput.value.trim();
                     const words = text ? text.split(/\s+/).length : 0;
-                    const minWords = 10;
+                    const minWords = 4;
                     if (words >= minWords) {
                         addressInput.classList.remove('border-slate-300');
                         addressInput.classList.add('border-green-500');
@@ -104,17 +104,63 @@
                     }
                 }
 
-                phoneInput.addEventListener('input', validatePhone);
-                addressInput.addEventListener('input', validateAddress);
-
-                // Prevent submit if validations fail
-                document.querySelector('form[action="{{ route('checkout.process') }}"]').addEventListener('submit', function(e) {
+                // Update submit button state based on validations
+                function updateSubmitState() {
                     const okPhone = validatePhone();
                     const okAddress = validateAddress();
-                    if (!okPhone || !okAddress) {
-                        e.preventDefault();
-                        alert('Perbaiki data pengiriman sebelum membuat pesanan.');
+                    if (okPhone && okAddress) {
+                        submitBtn.disabled = false;
+                        submitBtn.removeAttribute('aria-disabled');
+                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    } else {
+                        submitBtn.disabled = true;
+                        submitBtn.setAttribute('aria-disabled', 'true');
+                        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
                     }
+                }
+
+                phoneInput.addEventListener('input', updateSubmitState);
+                addressInput.addEventListener('input', updateSubmitState);
+
+                // Run initial validation on page load
+                document.addEventListener('DOMContentLoaded', function() {
+                    updateSubmitState();
+                });
+
+                // Handle submit reliably: normalize, validate, disable button and submit programmatically
+                const checkoutForm = document.querySelector('form[action="{{ route('checkout.process') }}"]');
+                checkoutForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    // Normalize phone to digits only so server validation counts digits correctly
+                    phoneInput.value = phoneInput.value.replace(/\D/g, '');
+
+                    const okPhone = validatePhone();
+                    const okAddress = validateAddress();
+
+                    if (!okPhone || !okAddress) {
+                        alert('Perbaiki data pengiriman sebelum membuat pesanan.');
+                        updateSubmitState();
+                        return;
+                    }
+
+                    // Prevent double submit and show loading state
+                    submitBtn.disabled = true;
+                    submitBtn.setAttribute('aria-disabled', 'true');
+                    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    const originalHtml = submitBtn.innerHTML;
+                    submitBtn.innerHTML = 'Memproses...';
+
+                    // Submit the form programmatically
+                    checkoutForm.submit();
+
+                    // (If submission fails or page doesn't navigate, revert after timeout to allow retry)
+                    setTimeout(function() {
+                        submitBtn.disabled = false;
+                        submitBtn.removeAttribute('aria-disabled');
+                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        submitBtn.innerHTML = originalHtml;
+                    }, 5000);
                 });
             </script>
         </div>
@@ -126,9 +172,29 @@
                 <div class="space-y-4 mb-6 max-h-80 overflow-y-auto pr-2">
                     @foreach($carts as $cart)
                     <div class="flex gap-3 items-start border-b border-slate-50 pb-3 last:border-0">
-                        <div class="w-12 h-12 bg-slate-50 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200">
-                            <img src="{{ $cart->product->image_main ? Storage::url($cart->product->image_main) : asset('logo/logo_utama.jpeg') }}" class="w-full h-full object-contain">
-                        </div>
+                        @php
+                        $imgSrc = null;
+                        $imgPath = $cart->product->image_main ?? null;
+                        // 1) Full URL
+                        if ($imgPath && preg_match('/^https?:\/\//i', $imgPath)) {
+                            $imgSrc = $imgPath;
+                        }
+                        // 2) Public path as-is (e.g., 'products/foo.jpg' saved in DB)
+                        elseif ($imgPath && file_exists(public_path($imgPath))) {
+                            $imgSrc = asset($imgPath);
+                        }
+                        // 3) Public products folder
+                        elseif ($imgPath && file_exists(public_path('products/' . $imgPath))) {
+                            $imgSrc = asset('products/' . $imgPath);
+                        }
+                        // 4) fallback
+                        else {
+                            $imgSrc = asset('logo/logo_utama.jpeg');
+                        }
+                    @endphp
+                    <div class="w-12 h-12 bg-slate-50 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200">
+                        <img src="{{ $imgSrc }}" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='{{ asset('logo/logo_utama.jpeg') }}';">
+                    </div>
                         <div class="flex-grow text-sm">
                             <p class="font-bold text-slate-700 line-clamp-1">{{ $cart->product->name }}</p>
                             <div class="flex justify-between mt-1 text-slate-500">
@@ -140,7 +206,7 @@
                 </div>
 
                 <div class="border-t border-slate-200 pt-4 flex justify-between items-center">
-                    <span class="font-bold text-slate-600">Total Tagihan</span>
+                    <span class="font-bold text-slate-600">Total Harga</span>
                     <span class="text-2xl font-extrabold text-primary">Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
                 </div>
             </div>

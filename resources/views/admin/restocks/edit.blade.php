@@ -85,13 +85,13 @@
             </div>
 
             {{-- Info Box --}}
-            <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-6">
-                <p class="text-sm text-blue-800"><strong>ℹ️ Info:</strong> Stok produk akan disesuaikan otomatis berdasarkan perubahan jumlah.</p>
+            <div class="bg-primary-50 border border-primary-100 p-4 rounded-lg mb-6">
+                <p class="text-sm text-primary-700"><strong>ℹ️ Info:</strong> Stok produk akan disesuaikan otomatis berdasarkan perubahan jumlah.</p>
             </div>
 
             {{-- Tombol Submit & Kembali --}}
             <div class="flex gap-3">
-                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">
+                <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-primary-700 transition">
                     Update Restock
                 </button>
                 <a href="{{ route('admin.restocks.show', $restock) }}" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-bold hover:bg-gray-300 transition">

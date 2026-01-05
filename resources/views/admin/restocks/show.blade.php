@@ -41,8 +41,28 @@
                 {{-- Produk --}}
                 <div>
                     <label class="block text-sm font-bold text-gray-600 mb-2">Produk</label>
-                    <div class="text-base font-bold text-gray-900">{{ $restock->product->name }}</div>
-                    <div class="text-xs text-gray-400">SKU: {{ $restock->product->slug }}</div>
+                    <div class="flex items-center gap-4">
+                        @php
+                            $imgSrc = null;
+                            $imgPath = $restock->product->image_main ?? null;
+                            if ($imgPath && preg_match('/^https?:\/\//i', $imgPath)) {
+                                $imgSrc = $imgPath;
+                            } elseif ($imgPath && file_exists(public_path($imgPath))) {
+                                $imgSrc = asset($imgPath);
+                            } elseif ($imgPath && file_exists(public_path('products/' . $imgPath))) {
+                                $imgSrc = asset('products/' . $imgPath);
+                            } else {
+                                $imgSrc = asset('logo/logo_utama.jpeg');
+                            }
+                        @endphp
+                        <div class="w-20 h-20 bg-slate-50 rounded-lg overflow-hidden border border-slate-200 flex-shrink-0">
+                            <img src="{{ $imgSrc }}" alt="{{ $restock->product->name }}" class="w-full h-full object-contain" onerror="this.onerror=null;this.src='{{ asset('logo/logo_utama.jpeg') }}';">
+                        </div>
+                        <div>
+                            <div class="text-base font-bold text-gray-900">{{ $restock->product->name }}</div>
+                            <div class="text-xs text-gray-400">SKU: {{ $restock->product->slug }}</div>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- Supplier --}}
@@ -67,7 +87,7 @@
                 {{-- Total Modal --}}
                 <div>
                     <label class="block text-sm font-bold text-gray-600 mb-2">Total Modal</label>
-                    <div class="text-lg font-bold text-blue-600">Rp {{ number_format($restock->qty * $restock->buy_price, 0, ',', '.') }}</div>
+                    <div class="text-lg font-bold text-primary">Rp {{ number_format($restock->qty * $restock->buy_price, 0, ',', '.') }}</div>
                 </div>
 
                 {{-- Tanggal --}}
@@ -101,9 +121,9 @@
                 </div>
 
                 {{-- Harga Jual --}}
-                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <div class="bg-primary-50 p-4 rounded-lg border border-primary-100">
                     <div class="text-sm font-bold text-gray-600 mb-1">Harga Jual</div>
-                    <div class="text-2xl font-bold text-blue-600">Rp {{ number_format($restock->product->price, 0, ',', '.') }}</div>
+                    <div class="text-2xl font-bold text-primary">Rp {{ number_format($restock->product->price, 0, ',', '.') }}</div>
                 </div>
 
                 {{-- Margin --}}

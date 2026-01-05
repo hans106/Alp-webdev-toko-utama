@@ -1,14 +1,21 @@
-<aside class="w-64 bg-[#1a1c23] text-white flex-shrink-0 hidden md:flex flex-col border-r border-gray-800">
+<aside id="adminSidebar" class="w-64 bg-[#1a1c23] text-white shrink-0 fixed inset-y-0 left-0 z-40 transform -translate-x-full md:translate-x-0 md:static md:flex md:flex-col border-r md:border-gray-800 transition-transform duration-200 ease-in-out">
 
     {{-- 1. LOGO --}}
-    <div class="p-4 flex items-center gap-3 border-b border-gray-800 h-16 flex-shrink-0">
+    <div class="p-4 flex items-center gap-3 border-b border-gray-800 h-16">
         <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center font-bold text-white text-lg shadow-lg">
             <img src="{{ asset('logo/logo_utama.jpeg') }}" alt="Logo" class="w-full h-full object-cover">
         </div>
-        <div>
+        <div class="flex-1">
             <h1 class="font-bold text-base tracking-wide">Toko Utama</h1>
             <p class="text-[10px] text-gray-400 leading-tight">Admin Panel</p>
         </div>
+
+        {{-- Close button for mobile --}}
+        <button id="closeSidebarBtn" class="md:hidden text-gray-400 hover:text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
     </div>
 
     {{-- MENU NAVIGASI --}}
@@ -76,7 +83,7 @@
         <a href="{{ route('admin.restocks.index') }}"
             class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('admin.restocks.*') ? 'bg-orange-500 text-white shadow-md' : '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7 7h10M7 17h10" />
             </svg>
             Restock Barang
         </a>
@@ -95,6 +102,18 @@
             </svg>
             Pesanan Masuk
         </a>
+
+        {{-- Checklist Nota (Admin Penjualan) --}}
+        @if(in_array(Auth::user()->role, ['master', 'admin_penjualan']))
+        <a href="{{ route('admin.checklists.index') }}"
+            class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('admin.checklists.*') ? 'bg-orange-500 text-white shadow-md' : '' }}">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7 7h10M7 17h10" />
+            </svg>
+            Checklist Nota
+        </a>
+        @endif
+
 
 
     </nav>

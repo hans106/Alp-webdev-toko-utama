@@ -45,7 +45,7 @@
                 <label class="block text-sm font-bold text-gray-600 mb-2">Telepon</label>
                 <p class="text-lg text-gray-700">
                     @if($supplier->phone)
-                        <a href="tel:{{ $supplier->phone }}" class="text-blue-600 hover:underline">{{ $supplier->phone }}</a>
+                        <a href="tel:{{ $supplier->phone }}" class="text-primary hover:underline">{{ $supplier->phone }}</a>
                     @else
                         <span class="text-gray-400">-</span>
                     @endif

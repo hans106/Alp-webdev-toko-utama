@@ -326,7 +326,11 @@
                             // Update qty display
                             const qtyDisplay = document.querySelector('#qty-display');
                             if (qtyDisplay) {
-                                qtyDisplay.textContent = data.qty;
+                                qtyDisplay.textContent = data.newQty;
+                            }
+                            // If qty becomes 0, reload the page to show "Masukkan Keranjang" button
+                            if (data.newQty === 0) {
+                                setTimeout(() => location.reload(), 500);
                             }
                         } else {
                             alert(data.error || 'Gagal update kuantitas');

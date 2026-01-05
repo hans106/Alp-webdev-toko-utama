@@ -24,7 +24,7 @@
                 <p class="text-gray-700 font-medium mb-3">
                     ⚠️ Fitur ini hanya dapat diakses oleh:
                 </p>
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg text-left mb-4">
+                <div class="bg-primary-50 border-l-4 border-primary p-4 rounded-lg text-left mb-4">
                     @php
                         $rolesText = [
                             'master' => '👤 Super Admin (Pemilik)',
@@ -35,11 +35,11 @@
                     @endphp
                     
                     @forelse($allowedRoles as $role)
-                        <p class="text-blue-700 font-semibold text-sm">
+                        <p class="text-primary font-semibold text-sm">
                             {{ $rolesText[$role] ?? ucfirst($role) }}
                         </p>
                     @empty
-                        <p class="text-blue-700 font-semibold text-sm">Tidak ada akses yang tersedia</p>
+                        <p class="text-primary font-semibold text-sm">Tidak ada akses yang tersedia</p>
                     @endforelse
                 </div>
 
@@ -63,7 +63,7 @@
                 {{-- Login Button --}}
                 <a 
                     href="{{ route('login') }}" 
-                    class="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-all text-center">
+                    class="flex-1 px-4 py-3 bg-primary hover:bg-primary-700 text-white font-bold rounded-lg transition-all text-center">
                     🔓 Gunakan Akun Lain
                 </a>
             </div>
