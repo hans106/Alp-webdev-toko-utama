@@ -33,7 +33,7 @@ return new class extends Migration
 
         } else {
             // Add additional role options to the users.role enum (MySQL/Postgres)
-            DB::statement("ALTER TABLE `users` MODIFY `role` ENUM('superadmin','admin','inventory','cashier','customer') NOT NULL DEFAULT 'customer'");
+            DB::statement("ALTER TABLE `users` MODIFY `role` ENUM('master','inventory','admin_penjualan','customer') NOT NULL DEFAULT 'customer'");
         }
     }
 
