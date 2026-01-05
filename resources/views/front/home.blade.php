@@ -40,7 +40,7 @@
                 </div>
                 <div
                     class="h-64 md:h-[450px] rounded-3xl overflow-hidden relative shadow-2xl shadow-[#2B0A0A]/20 border border-[#E1B56A]/20 bg-white">
-                    <img src="{{ asset('lokasi/Utama_bagian_dalam.jpg') }}"
+                    <img src="/Lokasi/Utama_bagian_dalam.jpg"
                         class="w-full h-full object-cover group-hover:scale-110 transition duration-1000 ease-out"
                         alt="Sejarah Toko">
 
