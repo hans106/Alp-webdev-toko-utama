@@ -25,7 +25,7 @@
             <div class="w-full lg:w-1/2 sticky top-24">
                 <div class="relative rounded-3xl overflow-hidden shadow-2xl shadow-slate-200 border-4 border-white transform rotate-2 hover:rotate-0 transition duration-500">
                     {{-- Pastikan file gambar ini ada di public/lokasi/ --}}
-                    <img src="Lokasi/Utama_bagian_dalam.jpg" alt="Foto Sejarah Toko" class="w-full h-auto object-cover">
+                    <img src="/Lokasi/Utama_bagian_dalam.jpg" alt="Foto Sejarah Toko" class="w-full h-auto object-cover">
                     <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
                         <p class="font-bold text-lg">1955</p>
                         <p class="text-sm text-slate-300">CX22+C36, Karanganyar, Central Java.</p>
