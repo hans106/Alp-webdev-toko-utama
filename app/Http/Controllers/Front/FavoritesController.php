@@ -33,7 +33,7 @@ class FavoritesController extends Controller
                     'name' => $fav->product->name,
                     'slug' => $fav->product->slug,
                     'price' => $fav->product->price,
-                    'image_main' => asset($fav->product->image_main),
+                    'image_main' => $fav->product->image_main ? \Storage::url($fav->product->image_main) : asset('logo/logo_utama.jpeg'),
                 ]
             ])
         ]);

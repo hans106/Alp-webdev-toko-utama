@@ -22,7 +22,6 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\RestockController;
-use App\Http\Controllers\Admin\RestockVerificationController;
 use App\Http\Controllers\Admin\UserController; // Pastikan ini ada
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\API\MidtransCallbackController;
@@ -86,6 +85,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/my-orders/{id}', [FrontOrderController::class, 'show'])->name('orders.show');
 
     Route::get('/my-orders/reset-token/{id}', [FrontOrderController::class, 'resetToken'])->name('orders.reset');
+    Route::get('/my-orders/generate-snap/{id}', [FrontOrderController::class, 'generateSnap'])->name('orders.generate_snap');
 });
 
 
@@ -143,15 +143,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::get('/{restock}', [RestockController::class, 'show'])->name('show');
         Route::get('/{restock}/edit', [RestockController::class, 'edit'])->name('edit');
         Route::put('/{restock}', [RestockController::class, 'update'])->name('update');
+        Route::get('/{restock}/checklist', [RestockController::class, 'checklist'])->name('checklist')->middleware('role:master,inventory,admin_penjualan');
+        Route::post('/{restock}/checklist', [RestockController::class, 'updateChecklist'])->name('checklist.update')->middleware('role:master,inventory,admin_penjualan');
         Route::delete('/{restock}', [RestockController::class, 'destroy'])->name('destroy');
     });
 
-    // Restock Verification (Checklist Nota Harga)
-    Route::prefix('restock-verifications')->name('restock-verifications.')->middleware('role:master,admin_penjualan')->group(function () {
-        Route::get('/', [RestockVerificationController::class, 'index'])->name('index');
-        Route::get('/{verification}/edit', [RestockVerificationController::class, 'edit'])->name('edit');
-        Route::put('/{verification}', [RestockVerificationController::class, 'update'])->name('update');
-    });
+
 
     // --------------------------------------------------------
     // GROUP 3: DIVISI KASIR (admin penjualan + Master)

@@ -43,7 +43,7 @@
                             {{-- Foto Produk Kecil --}}
                             <div class="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden border border-gray-200">
                                 @if($product->image_main)
-                                    <img src="{{ asset('storage/'.$product->image_main) }}" class="w-full h-full object-cover">
+                                    <img src="{{ $product->image_main ? Storage::url($product->image_main) : asset('logo/logo_utama.jpeg') }}" class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-gray-300">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

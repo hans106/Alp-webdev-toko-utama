@@ -7,7 +7,6 @@ use App\Models\Restock;
 use App\Models\Supplier;
 use App\Models\Product;
 use App\Models\ActivityLog; // ✅ Import Log
-use App\Models\RestockVerification; // ✅ Import RestockVerification
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth; // ✅ WAJIB IMPORT AUTH
@@ -92,17 +91,11 @@ class RestockController extends Controller
             ]);
             // -----------------------------
 
-            // ✅ AUTO-CREATE VERIFICATION untuk restock yang baru dibuat
-            RestockVerification::create([
-                'restock_id' => $restock->id,
-                'status' => 'pending',
-                'expected_total' => $restock->getExpectedTotal()
-            ]);
         });
 
         return redirect()
             ->route('admin.restocks.index')
-            ->with('success', 'Restock berhasil dicatat & Stok bertambah. Silakan lakukan verifikasi nota harga.');
+            ->with('success', 'Restock berhasil dicatat & Stok bertambah.');
     }
 
     // ==========================================
@@ -112,6 +105,43 @@ class RestockController extends Controller
     {
         $restock->load(['supplier', 'product']);
         return view('admin.restocks.show', compact('restock'));
+    }
+
+    // ==========================================
+    // CHECKLIST RESTOCK (GET)
+    // ==========================================
+    public function checklist(Restock $restock)
+    {
+        $restock->load(['supplier', 'product']);
+        return view('admin.restocks.checklist', compact('restock'));
+    }
+
+    // ==========================================
+    // CHECKLIST RESTOCK (POST/UPDATE)
+    // ==========================================
+    public function updateChecklist(Request $request, Restock $restock)
+    {
+        $validated = $request->validate([
+            'checked_qty' => "required|integer|min:0|max:{$restock->qty}",
+            'checklist_status' => 'required|in:belum_selesai,sudah_fix',
+            'checklist_notes' => 'nullable|string|max:500'
+        ]);
+
+        $restock->update([
+            'checked_qty' => $validated['checked_qty'],
+            'checklist_status' => $validated['checklist_status'],
+            'checklist_notes' => $validated['checklist_notes'] ?? null,
+        ]);
+
+        // Log activity
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'CHECKLIST RESTOCK',
+            'description' => "Checklist Restock #{$restock->id} oleh " . Auth::user()->name
+                . ". Checked: {$validated['checked_qty']}/{$restock->qty}. Status: {$validated['checklist_status']}"
+        ]);
+
+        return redirect()->route('admin.restocks.index')->with('success', 'Checklist Restock disimpan.');
     }
 
     // ==========================================

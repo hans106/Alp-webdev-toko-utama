@@ -48,10 +48,16 @@ class CheckoutController extends Controller
             abort(403);
         }
 
-        // VALIDASI INPUT
+        // VALIDASI INPUT (alamat minimal 10 kata, phone minimal 10 digit)
         $request->validate([
-            'address' => 'required|string|max:255',
-            'phone' => 'required|string|max:15',
+            'address' => [
+                'required', 'string', function($attribute, $value, $fail) {
+                    if (str_word_count($value) < 10) {
+                        $fail('Alamat harus terdiri dari minimal 10 kata.');
+                    }
+                }
+            ],
+            'phone' => ['required','string','regex:/^[0-9]{10,}$/'],
         ]);
 
         $user = Auth::user();

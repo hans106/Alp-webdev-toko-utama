@@ -74,22 +74,31 @@ class AdminOrderController extends Controller
         $order = Order::findOrFail($id);
 
         if($order->status == 'paid' || $order->status == 'settlement'){
-            
             // Simpan status lama buat laporan
             $oldStatus = $order->status;
-            
-            // Update status jadi 'sent'
-            $order->update(['status' => 'sent']);
 
-            // --- 📹 REKAM CCTV (ORDER DIKIRIM) ---
+            // Update status jadi 'nota_sent'
+            $order->update(['status' => 'nota_sent']);
+
+            // Buat virtual nota / checklist
+            $itemsCount = $order->orderItems()->sum('qty');
+            \App\Models\OrderChecklist::create([
+                'order_id' => $order->id,
+                'admin_id' => Auth::id(),
+                'recipient_name' => $order->user->name,
+                'items_count' => $itemsCount,
+                'sent_at' => now()
+            ]);
+
+            // --- 📹 REKAM CCTV (NOTA DIKIRIM) ---
             ActivityLog::create([
                 'user_id' => Auth::id(),
-                'action' => 'UPDATE STATUS ORDER',
-                'description' => "Mengirim Pesanan #{$order->id} (Resi/Pengiriman). Status: '{$oldStatus}' -> 'sent'."
+                'action' => 'SEND VIRTUAL NOTA',
+                'description' => "Kirim Nota Virtual untuk Pesanan #{$order->id} kepada {$order->user->name} (Items: {$itemsCount}). Status: '{$oldStatus}' -> 'nota_sent'."
             ]);
             // ------------------------------------
-            
-            return redirect()->back()->with('success', 'Pesanan Berhasil Dikirim! 🚚');
+
+            return redirect()->back()->with('success', 'Nota Virtual Berhasil Dikirim ke Checklist.');
         }
         return redirect()->back()->with('error', 'Pesanan Belum Lunas atau Sudah Dikirim!');
     }

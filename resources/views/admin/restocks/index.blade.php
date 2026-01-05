@@ -128,14 +128,8 @@
                                 {{-- Tombol VIEW --}}
                                 <a href="{{ route('admin.restocks.show', $restock) }}" class="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md transition">Lihat</a>
                                 
-                                {{-- Tombol DELETE --}}
-                                <form action="{{ route('admin.restocks.destroy', $restock) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin? Stok produk akan berkurang.');" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md transition">
-                                        Hapus
-                                    </button>
-                                </form>
+                                {{-- Tombol CHECKLIST (menggantikan Hapus) --}}
+                                <a href="{{ route('admin.restocks.checklist', $restock) }}" class="text-yellow-600 hover:text-yellow-800 bg-yellow-50 px-3 py-1 rounded-md transition">Checklist</a>
                             </div>
                         </td>
                     </tr>

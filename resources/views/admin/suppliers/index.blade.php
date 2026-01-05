@@ -46,6 +46,7 @@
             <thead class="bg-[#1A0C0C] text-white">
                 <tr>
                     <th class="px-6 py-3 text-left text-sm font-semibold">Nama Supplier</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold">No. Telepon</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold">Aksi</th>
                 </tr>
             </thead>
@@ -55,6 +56,11 @@
                     {{-- Kolom Nama --}}
                     <td class="px-6 py-4">
                         <div class="text-sm font-bold text-gray-900">{{ $supplier->name }}</div>
+                    </td>
+
+                    {{-- Kolom Telepon --}}
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                        {{ $supplier->phone ?? '-' }}
                     </td>
                     
                     {{-- Kolom Aksi --}}

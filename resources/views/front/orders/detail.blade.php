@@ -46,7 +46,7 @@
                                 <div class="flex items-center gap-4 border-b border-slate-50 pb-4 last:border-0 last:pb-0">
                                     {{-- Foto Produk Kecil --}}
                                     <div class="w-20 h-20 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 flex-shrink-0">
-                                        <img src="{{ asset( $item->product->image_main ) }}" 
+                                        <img src="{{ $item->product->image_main ? Storage::url($item->product->image_main) : asset('logo/logo_utama.jpeg') }}" 
                                              alt="{{ $item->product->name }}" 
                                              class="w-full h-full object-cover"
                                              onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Produk';">
@@ -176,8 +176,28 @@
                             }
                         });
                     @else
-                        alert("Token pembayaran belum siap. Refresh halaman.");
-                        location.reload();
+                        // Token belum ada: minta server buat token baru, lalu panggil snap
+                        fetch("{{ route('orders.generate_snap', $order->id) }}", {
+                            method: 'GET',
+                            headers: { 'Accept': 'application/json' }
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success && data.snap_token) {
+                                window.snap.pay(data.snap_token, {
+                                    onSuccess: function(result) { alert("Pembayaran Berhasil!"); window.location.reload(); },
+                                    onPending: function(result) { alert("Menunggu Pembayaran!"); window.location.reload(); },
+                                    onError: function(result) { alert("Pembayaran Gagal!"); location.reload(); },
+                                    onClose: function() { alert('Anda menutup popup pembayaran.'); }
+                                });
+                            } else {
+                                alert(data.message || 'Gagal membuat token pembayaran.');
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            alert('Gagal membuat token pembayaran.');
+                        });
                     @endif
                 });
             }

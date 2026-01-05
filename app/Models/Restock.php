@@ -27,20 +27,10 @@ class Restock extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function verification(): HasOne {
-        return $this->hasOne(RestockVerification::class);
-    }
-
     // Helper: Get total expected (qty × buy_price)
     public function getExpectedTotal()
     {
         return $this->qty * $this->buy_price;
-    }
-
-    // Helper: Get verification status
-    public function getVerificationStatus()
-    {
-        return $this->verification?->status ?? 'belum_dibuat';
     }
 }
 

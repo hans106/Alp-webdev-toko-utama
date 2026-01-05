@@ -95,13 +95,6 @@
             </svg>
             Pesanan Masuk
         </a>
-        <a href="{{ route('admin.restock-verifications.index') }}"
-            class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('admin.restock-verifications.*') ? 'bg-orange-500 text-white shadow-md' : '' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-            </svg>
-            Checklist Nota
-        </a>
 
 
     </nav>

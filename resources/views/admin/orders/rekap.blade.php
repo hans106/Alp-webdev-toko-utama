@@ -51,6 +51,8 @@
                             <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">LUNAS</span>
                         @elseif($order->status == 'pending')
                             <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-bold">PENDING</span>
+                        @elseif($order->status == 'nota_sent')
+                            <span class="px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold">NOTA TERKIRIM</span>
                         @elseif($order->status == 'sent')
                             <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">DIKIRIM</span>
                         @else
@@ -75,10 +77,10 @@
                             </div>
                         {{-- Logika Tombol Kirim (Status Lunas) --}}
                         @elseif($order->status == 'paid' || $order->status == 'settlement' || $order->status == 'capture')
-                            <form action="{{ route('admin.orders.ship', $order->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin mau kirim barang ini?')">
+                            <form action="{{ route('admin.orders.ship', $order->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin mau kirim nota virtual ini?')">
                                 @csrf
                                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md transition-all flex items-center gap-2 ml-auto">
-                                    <span>Kirim Barang</span> 🚚
+                                    <span>Kirim Nota</span> ✉️
                                 </button>
                             </form>
                         @elseif($order->status == 'sent')
@@ -88,6 +90,25 @@
                         @endif
                     </td>
                 </tr>
+
+                {{-- Catatan pembeli: tampilkan sebagai card terpisah jika ada catatan --}}
+                @if(!empty($order->notes))
+                <tr>
+                    <td colspan="5" class="p-4">
+                        <div class="bg-white border rounded-lg p-4 shadow-sm">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="font-bold">{{ $order->user->name ?? 'Guest' }}</p>
+                                    <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($order->created_at)->format('d/m/Y H:i') }}</p>
+                                </div>
+                                <div class="text-sm text-gray-700">
+                                    {{ $order->notes }}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                @endif
                 @empty
                 <tr>
                     <td colspan="5" class="p-8 text-center text-gray-400">

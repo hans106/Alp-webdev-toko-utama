@@ -86,7 +86,7 @@
                 @if($product->image_main)
                     <div class="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200 inline-block">
                         <p class="text-xs text-gray-500 mb-2">Image: </p>
-                        <img src="{{ asset($product->image_main) }}" alt="Current Image" class="h-32 object-contain rounded">
+                        <img src="{{ $product->image_main ? Storage::url($product->image_main) : asset('logo/logo_utama.jpeg') }}" alt="Current Image" class="h-32 object-contain rounded">
                     </div>
                 @endif
 

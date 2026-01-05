@@ -28,10 +28,12 @@
 
                 {{-- === MENU ACTIVITY (LOGIKA BARU - STYLE AMBER) === --}}
                 @auth
-                    <a href="{{ url('/my-orders') }}"
-                        class="text-amber-200 hover:text-amber-400 font-medium transition {{ request()->is('my-orders*') ? 'text-amber-400 font-semibold' : '' }}">
-                        Activity
-                    </a>
+                    @if (!in_array(Auth::user()->role, ['master','inventory','admin_penjualan']))
+                        <a href="{{ url('/my-orders') }}"
+                            class="text-amber-200 hover:text-amber-400 font-medium transition {{ request()->is('my-orders*') ? 'text-amber-400 font-semibold' : '' }}">
+                            Activity
+                        </a>
+                    @endif
                 @endauth
             </div>
 
@@ -165,14 +167,16 @@
 
             {{-- === MENU ACTIVITY MOBILE (FIXED STYLE) === --}}
             @auth
-                <a href="{{ url('/my-orders') }}"
-                    class="flex items-center gap-2 px-4 py-2 bg-[#1A0C0C] border border-[#3b1d1d] rounded-full text-amber-200 hover:text-white hover:border-amber-400 transition {{ request()->is('my-orders*') ? 'border-amber-400 text-amber-400' : '' }}">
-                    {{-- Ikon Clipboard List --}}
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                    Activity
-                </a>
+                @if (!in_array(Auth::user()->role, ['master','inventory','admin_penjualan']))
+                    <a href="{{ url('/my-orders') }}"
+                        class="flex items-center gap-2 px-4 py-2 bg-[#1A0C0C] border border-[#3b1d1d] rounded-full text-amber-200 hover:text-white hover:border-amber-400 transition {{ request()->is('my-orders*') ? 'border-amber-400 text-amber-400' : '' }}">
+                        {{-- Ikon Clipboard List --}}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        Activity
+                    </a>
+                @endif
             @endauth
 
 
@@ -313,15 +317,15 @@
             if (data.success && data.favorites.length > 0) {
                 listContainer.innerHTML = data.favorites.map(fav => `
                     <div class="flex items-center justify-between bg-white border border-[#E8D6D0] rounded-lg p-4 hover:shadow-md transition">
-                        <div class="flex items-center gap-4 flex-1">
+                        <a href="/produk/${fav.product.slug}" class="flex items-center gap-4 flex-1">
                             <img src="${fav.product.image_main}" alt="${fav.product.name}" class="w-16 h-16 object-contain rounded">
                             <div class="flex-1">
-                                <a href="/produk/${fav.product.slug}" class="font-semibold text-[#1A0C0C] hover:text-[#A41025] transition">
+                                <div class="font-semibold text-[#1A0C0C] hover:text-[#A41025] transition">
                                     ${fav.product.name}
-                                </a>
+                                </div>
                                 <p class="text-[#7c5b58] text-sm">Rp ${Number(fav.product.price).toLocaleString('id-ID')}</p>
                             </div>
-                        </div>
+                        </a>
                         <button type="button" class="unfavorite-btn ml-4 text-[#A41025] hover:text-[#820c1d] transition" data-wishlist-id="${fav.id}" title="Hapus dari favorit">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M4.318 6.318a4.5 4.5 0 000 6.364L10 16.364l5.682-5.682a4.5 4.5 0 00-6.364-6.364L10 7.636l-.318-.318a4.5 4.5 0 00-6.364 0z" />

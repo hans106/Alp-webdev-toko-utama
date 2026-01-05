@@ -134,4 +134,41 @@ class OrderController extends Controller
 
         return redirect()->back()->with('error', 'Pesanan tidak bisa direset.');
     }
+
+    // Generate Snap Token explicitly via AJAX (Midtrans Sandbox)
+    public function generateSnap(Request $request, $id)
+    {
+        $order = Order::where('user_id', Auth::id())->where('id', $id)->firstOrFail();
+
+        if($order->status != 'pending') {
+            return response()->json(['success' => false, 'message' => 'Order tidak dalam status pending'], 400);
+        }
+
+        // Konfigurasi Midtrans
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => $order->invoice_code . '-' . rand(),
+                'gross_amount' => (int) $order->total_price,
+            ],
+            'customer_details' => [
+                'first_name' => Auth::user()->name,
+                'email' => Auth::user()->email,
+            ],
+        ];
+
+        try {
+            $snapToken = Snap::getSnapToken($params);
+            $order->snap_token = $snapToken;
+            $order->save();
+
+            return response()->json(['success' => true, 'snap_token' => $snapToken]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal membuat token: ' . $e->getMessage()], 500);
+        }
+    }
 }

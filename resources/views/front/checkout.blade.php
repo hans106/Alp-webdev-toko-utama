@@ -36,14 +36,14 @@
 
                 <div class="mb-6">
                     <label class="block font-bold text-slate-700 mb-2 text-sm">Nomor WhatsApp / HP Aktif <span class="text-red-500">*</span></label>
-                    <input type="number" name="phone" value="{{ old('phone') }}" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition" placeholder="Contoh: 081234567890" required>
-                    <p class="text-xs text-slate-400 mt-1">*Wajib angka, minimal 10 digit.</p>
+                    <input id="phone" type="tel" name="phone" value="{{ old('phone') }}" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition" placeholder="Contoh: 081234567890" required>
+                    <p id="phone-feedback" class="text-xs text-slate-400 mt-1">*Wajib angka, minimal 10 digit.</p>
                 </div>
 
                 <div class="mb-6">
                     <label class="block font-bold text-slate-700 mb-2 text-sm">Alamat Lengkap Pengiriman <span class="text-red-500">*</span></label>
-                    <textarea name="address" rows="3" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition" placeholder="Jalan, Nomor Rumah, RT/RW, Kelurahan, Patokan..." required>{{ old('address') }}</textarea>
-                    <p class="text-xs text-slate-400 mt-1">*Tulis alamat lengkap minimal 10 huruf.</p>
+                    <textarea id="address" name="address" rows="3" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition" placeholder="Jalan, Nomor Rumah, RT/RW, Kelurahan, Patokan..." required>{{ old('address') }}</textarea>
+                    <p id="address-feedback" class="text-xs text-slate-400 mt-1">*Tulis alamat lengkap minimal 10 kata.</p>
                 </div>
 
                 <div class="mb-8">
@@ -51,10 +51,72 @@
                     <input type="text" name="notes" value="{{ old('notes') }}" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition" placeholder="Contoh: Pagar warna hitam">
                 </div>
 
-                <button type="submit" class="w-full bg-gradient-to-r from-primary to-indigo-600 text-white font-bold py-4 rounded-xl hover:shadow-lg transition transform hover:-translate-y-0.5 text-lg">
+                <button id="submit-order" type="submit" class="w-full bg-gradient-to-r from-primary to-indigo-600 text-white font-bold py-4 rounded-xl hover:shadow-lg transition transform hover:-translate-y-0.5 text-lg">
                     Buat Pesanan
                 </button>
             </form>
+
+            <script>
+                // Real-time validation for phone and address
+                const phoneInput = document.getElementById('phone');
+                const addressInput = document.getElementById('address');
+                const phoneFeedback = document.getElementById('phone-feedback');
+                const addressFeedback = document.getElementById('address-feedback');
+                const submitBtn = document.getElementById('submit-order');
+
+                function validatePhone() {
+                    const val = phoneInput.value.replace(/\D/g, ''); // keep digits only
+                    const len = val.length;
+                    const min = 10;
+                    if (len >= min) {
+                        phoneInput.classList.remove('border-slate-300');
+                        phoneInput.classList.add('border-green-500');
+                        phoneFeedback.textContent = 'Nomor cukup (' + len + ' digit)';
+                        phoneFeedback.classList.remove('text-slate-400'); phoneFeedback.classList.add('text-green-600');
+                        return true;
+                    } else {
+                        phoneInput.classList.remove('border-green-500');
+                        phoneInput.classList.add('border-red-500');
+                        const missing = min - len;
+                        phoneFeedback.textContent = 'Kurang ' + missing + ' digit lagi';
+                        phoneFeedback.classList.remove('text-green-600'); phoneFeedback.classList.add('text-red-600');
+                        return false;
+                    }
+                }
+
+                function validateAddress() {
+                    const text = addressInput.value.trim();
+                    const words = text ? text.split(/\s+/).length : 0;
+                    const minWords = 10;
+                    if (words >= minWords) {
+                        addressInput.classList.remove('border-slate-300');
+                        addressInput.classList.add('border-green-500');
+                        addressFeedback.textContent = 'Alamat cukup (' + words + ' kata)';
+                        addressFeedback.classList.remove('text-slate-400'); addressFeedback.classList.add('text-green-600');
+                        return true;
+                    } else {
+                        addressInput.classList.remove('border-green-500');
+                        addressInput.classList.add('border-red-500');
+                        const missing = minWords - words;
+                        addressFeedback.textContent = 'Kurang ' + missing + ' kata lagi';
+                        addressFeedback.classList.remove('text-green-600'); addressFeedback.classList.add('text-red-600');
+                        return false;
+                    }
+                }
+
+                phoneInput.addEventListener('input', validatePhone);
+                addressInput.addEventListener('input', validateAddress);
+
+                // Prevent submit if validations fail
+                document.querySelector('form[action="{{ route('checkout.process') }}"]').addEventListener('submit', function(e) {
+                    const okPhone = validatePhone();
+                    const okAddress = validateAddress();
+                    if (!okPhone || !okAddress) {
+                        e.preventDefault();
+                        alert('Perbaiki data pengiriman sebelum membuat pesanan.');
+                    }
+                });
+            </script>
         </div>
 
         <div class="w-full lg:w-1/3">
@@ -65,7 +127,7 @@
                     @foreach($carts as $cart)
                     <div class="flex gap-3 items-start border-b border-slate-50 pb-3 last:border-0">
                         <div class="w-12 h-12 bg-slate-50 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200">
-                            <img src="{{ asset($cart->product->image_main) }}" class="w-full h-full object-contain">
+                            <img src="{{ $cart->product->image_main ? Storage::url($cart->product->image_main) : asset('logo/logo_utama.jpeg') }}" class="w-full h-full object-contain">
                         </div>
                         <div class="flex-grow text-sm">
                             <p class="font-bold text-slate-700 line-clamp-1">{{ $cart->product->name }}</p>
