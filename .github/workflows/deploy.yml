@@ -1,0 +1,44 @@
+name: Deploy Toko Utama
+
+on:
+  push:
+    branches: [ main ] # Pipeline jalan setiap ada push ke branch main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            cd /var/www/Alp-webdev-toko-utama
+            
+            # 1. Tarik kode terbaru
+            git pull origin main
+            
+            # 2. Build Docker (supaya perubahan Dockerfile/kontainer terupdate)
+            docker compose up -d --build
+            
+            # 3. Jalankan perintah Laravel di dalam kontainer
+            # Pakai --force agar tidak minta konfirmasi di production
+            docker exec toko_utama_app php artisan migrate --force
+            docker exec toko_utama_app php artisan cache:clear
+            docker exec toko_utama_app php artisan config:cache
+            docker exec toko_utama_app php artisan route:cache
+            
+            # 4. Frontend Build
+            docker exec toko_utama_app npm install
+            docker exec toko_utama_app npm run build
+            
+            # 5. Fix Permissions (penting agar tidak error 500)
+            docker exec toko_utama_app chown -R www-data:www-data /var/www/html/storage /var/www/html/public
+            docker exec toko_utama_app chmod -R 775 /var/www/html/storage /var/www/html/public
