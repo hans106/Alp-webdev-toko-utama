@@ -5,7 +5,7 @@
     <section class="relative h-[600px] flex items-center justify-center overflow-hidden mb-16">
 
         <div class="absolute inset-0">
-            <img src="{{ asset('lokasi/Utama_bagian_depan.jpg') }}" alt="Background Toko"
+            <img src="/Lokasi/Utama_bagian_depan.jpg" alt="Background Toko"
                 class="w-full h-full object-cover scale-105 animate-[pulse_8s_ease-in-out_infinite] opacity-90">
             <div class="absolute inset-0 bg-gradient-to-b from-[#2B0A0A]/40 via-[#2B0A0A]/50 to-[#2B0A0A]"></div>
         </div>
