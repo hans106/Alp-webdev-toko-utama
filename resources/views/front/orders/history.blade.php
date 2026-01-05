@@ -8,92 +8,124 @@
             <div class="space-y-6">
                 @foreach ($orders as $order)
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        
+                        {{-- Container Utama --}}
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
 
-                            <div>
-                                <div class="flex items-center gap-3 mb-2">
-                                    <span class="font-bold text-slate-800 text-lg">#{{ $order->invoice_code }}</span>
-                                    <span
-                                        class="text-xs text-slate-500">{{ $order->created_at->format('d M Y, H:i') }}</span>
+                            {{-- BAGIAN KIRI: Gambar & Info Order --}}
+                            <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                                
+                                {{-- 1. FOTO PRODUK (Thumbnail Anti-Error) --}}
+                                <div class="w-24 h-24 flex-shrink-0 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 relative">
+                                    @if($order->orderItems->count() > 0 && $order->orderItems->first()->product)
+                                        <img src="{{ asset('storage/' . str_replace('public/', '', $order->orderItems->first()->product->thumbnail)) }}" 
+                                             alt="Produk" 
+                                             class="w-full h-full object-cover"
+                                             onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=No+Image';">
+                                    @else
+                                        {{-- Placeholder kalau tidak ada gambar --}}
+                                        <div class="w-full h-full flex items-center justify-center text-slate-400">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                    @endif
                                 </div>
 
-                                <div class="flex items-center gap-2">
+                                {{-- 2. INFO ORDER --}}
+                                <div>
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <span class="font-bold text-slate-800 text-lg">#{{ $order->invoice_code }}</span>
+                                        <span class="text-xs text-slate-500">{{ $order->created_at->format('d M Y, H:i') }}</span>
+                                    </div>
 
-                                    {{-- 1. MENUNGGU PEMBAYARAN --}}
-                                    @if ($order->status == 'pending')
-                                        <span
-                                            class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold border border-yellow-200">
-                                            Menunggu Pembayaran
-                                        </span>
-
-                                        {{-- 2. SUDAH LUNAS (Paid, Settlement, Capture itu sama artinya Lunas) --}}
-                                    @elseif($order->status == 'paid' || $order->status == 'settlement' || $order->status == 'capture')
-                                        <span
-                                            class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200">
-                                            Success
-                                        </span>
-
-                                        {{-- 3. KADALUARSA --}}
-                                    @elseif($order->status == 'expire')
-                                        <span
-                                            class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold border border-red-200">
-                                            Expired
-                                        </span>
-
-                                        {{-- 4. DIBATALKAN / DITOLAK (Ganti manual disini) --}}
-                                    @elseif($order->status == 'cancel' || $order->status == 'deny' || $order->status == 'failure')
-                                        <span
-                                            class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-bold border border-slate-200">
-                                            Canceled
-                                        </span>
-
-                                        {{-- 5. LAIN-LAIN (Jaga-jaga kalau ada status aneh) --}}
-                                    @else
-                                        <span
-                                            class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-bold border border-gray-200">
-                                            {{-- Tampilkan apa adanya sesuai database --}}
-                                            {{ $order->status }}
-                                        </span>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        {{-- LOGIKA BADGE STATUS --}}
+                                        @if ($order->status == 'pending')
+                                            <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold border border-yellow-200">
+                                                ⏳ Menunggu Pembayaran
+                                            </span>
+                                        @elseif($order->status == 'paid' || $order->status == 'settlement' || $order->status == 'capture')
+                                            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200">
+                                                ✅ Lunas
+                                            </span>
+                                        @elseif($order->status == 'expire')
+                                            <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold border border-red-200">
+                                                ⛔ Kadaluarsa
+                                            </span>
+                                        @elseif($order->status == 'cancel' || $order->status == 'deny')
+                                            <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-bold border border-slate-200">
+                                                ❌ Dibatalkan
+                                            </span>
+                                        @else
+                                            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-bold border border-gray-200">
+                                                {{ $order->status }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                    
+                                    {{-- Nama Produk Utama --}}
+                                    @if($order->orderItems->count() > 0)
+                                        <p class="text-sm text-slate-600 mt-2 line-clamp-1 font-medium">
+                                            {{ $order->orderItems->first()->product->name }} 
+                                            @if($order->orderItems->count() > 1)
+                                                <span class="text-slate-400 text-xs ml-1">+{{ $order->orderItems->count() - 1 }} lainnya</span>
+                                            @endif
+                                        </p>
                                     @endif
-
                                 </div>
                             </div>
 
-                            <div class="flex flex-col items-end gap-2">
-                                <span class="text-sm text-slate-500">Total Tagihan</span>
-                                <span class="text-xl font-extrabold text-primary">Rp
-                                    {{ number_format($order->total_price, 0, ',', '.') }}</span>
+                            {{-- BAGIAN KANAN: Harga & Tombol --}}
+                            <div class="flex flex-col items-end gap-3 w-full md:w-auto mt-4 md:mt-0">
+                                <div class="text-right">
+                                    <span class="text-sm text-slate-500 block">Total Tagihan</span>
+                                    <span class="text-xl font-extrabold text-primary">Rp {{ number_format($order->total_price, 0, ',', '.') }}</span>
+                                </div>
 
+                                {{-- TOMBOL AKSI PINTAR --}}
                                 <a href="{{ route('orders.show', $order->id) }}"
-                                    class="inline-flex items-center gap-2 bg-indigo-50 text-primary px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-primary hover:text-white transition">
-                                    Lihat Detail & Bayar
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 5l7 7-7 7" />
+                                    class="inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition w-full md:w-auto
+                                    {{ $order->status == 'pending' 
+                                        ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200' 
+                                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
+                                    
+                                    @if ($order->status == 'pending')
+                                        Bayar Sekarang
+                                    @else
+                                        Lihat Detail
+                                    @endif
+                                    
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                     </svg>
                                 </a>
                             </div>
+
                         </div>
                     </div>
                 @endforeach
             </div>
         @else
+            {{-- Tampilan Kosong --}}
             <div class="text-center py-20 bg-slate-50 rounded-3xl border border-dashed border-slate-300">
                 <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-400" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
                 </div>
                 <h3 class="text-xl font-bold text-slate-800 mb-2">Belum Ada Pesanan</h3>
-                <p class="text-slate-500 mb-6">Kamu belum pernah belanja di Toko Utama nih.</p>
-                <a href="{{ route('catalog') }}"
-                    class="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg transition">
+                <p class="text-slate-500 mb-6">Kamu belum pernah belanja disini nih.</p>
+                <a href="{{ route('front.index') }}" class="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg transition">
                     Mulai Belanja Sekarang
                 </a>
             </div>
         @endif
     </div>
+
+    {{-- CSS Fix Footer Melayang --}}
+    <style>
+        body { display: flex; flex-direction: column; min-height: 100vh; }
+        main, .content-wrapper { flex: 1; }
+    </style>
 @endsection
