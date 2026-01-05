@@ -4,7 +4,7 @@
 
             {{-- 1. LOGO --}}
             <a href="{{ route('home') }}" class="flex items-center gap-3 group z-50 relative">
-                <img src="{{ asset('logo/Logo_Utama.jpeg') }}" alt="Logo"
+                <img src="/logo/Logo_Utama.jpeg" alt="Logo"
                     class="h-10 w-auto object-contain rounded-lg group-hover:scale-105 transition duration-300 shadow-sm">
                 <span class="text-xl md:text-2xl font-extrabold text-amber-400 leading-none">
                     Toko<span class="text-white">Utama</span>
