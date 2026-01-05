@@ -1,4 +1,17 @@
 services:
+  # Database MySQL
+  db:
+    image: mysql:8.0
+    container_name: hans_db 
+    restart: always
+    environment:
+      MYSQL_DATABASE: hans_db
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-password123}
+    volumes:
+      - hans_db_data:/var/lib/mysql
+    networks:
+      - global_proxy
+
   # Container PHP (App)
   toko-utama-app:
     build:
@@ -9,6 +22,8 @@ services:
     working_dir: /var/www/html
     volumes:
       - .:/var/www/html
+    depends_on:
+      - db
     networks:
       - global_proxy
 
@@ -28,3 +43,6 @@ services:
 networks:
   global_proxy:
     external: true
+
+volumes:
+  hans_db_data:
