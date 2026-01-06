@@ -28,15 +28,15 @@ class AdminOrderController extends Controller
             return redirect()->back()->with('error', 'Pesanan tidak bisa diterima. Status harus "pending"!');
         }
 
-        // Update status jadi 'accepted' (diterima oleh admin)
+        // Update status jadi 'paid' (diterima & pembayaran valid oleh admin)
         $oldStatus = $order->status;
-        $order->update(['status' => 'accepted']);
+        $order->update(['status' => 'paid']);
 
         // --- 📹 REKAM CCTV (ORDER DITERIMA) ---
         ActivityLog::create([
             'user_id' => Auth::id(),
             'action' => 'APPROVE ORDER',
-            'description' => "Menerima Pesanan #{$order->id}. Status: '{$oldStatus}' -> 'accepted'."
+            'description' => "Menerima Pesanan #{$order->id}. Status: '{$oldStatus}' -> 'paid'."
         ]);
         // ------------------------------------
 
