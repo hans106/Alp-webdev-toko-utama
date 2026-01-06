@@ -5,7 +5,7 @@ services:
     container_name: hans_db 
     restart: always
     environment:
-      MYSQL_DATABASE: hans_db
+      MYSQL_DATABASE: alpprimaproject
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-password123}
     volumes:
       - hans_db_data:/var/lib/mysql
