@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Log;
 use Midtrans\Config;
 use Midtrans\Snap;
 
@@ -65,7 +66,7 @@ class Order extends Model
             
             return $snapToken;
         } catch (\Exception $e) {
-            \Log::error('Midtrans Snap Token Error: ' . $e->getMessage(), ['order_id' => $this->id]);
+            Log::error('Midtrans Snap Token Error: ' . $e->getMessage(), ['order_id' => $this->id]);
             return null;
         }
     }

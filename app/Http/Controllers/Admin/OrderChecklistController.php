@@ -9,6 +9,7 @@ use App\Models\OrderChecklistItem;
 use App\Models\Order;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderChecklistController extends Controller
 {
@@ -80,8 +81,8 @@ class OrderChecklistController extends Controller
         $cl = OrderChecklist::with(['order.orderItems.product', 'admin'])->where('id', $id)->firstOrFail();
 
         // If Dompdf is installed, stream a PDF. Otherwise fall back to the HTML print view.
-        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
-            $pdf = \PDF::loadView('admin.checklists.print_pdf', compact('cl'));
+        if (class_exists(Pdf::class)) {
+            $pdf = Pdf::loadView('admin.checklists.print_pdf', compact('cl'));
             return $pdf->stream(sprintf('checklist-%s.pdf', $cl->id));
         }
 
@@ -115,7 +116,7 @@ class OrderChecklistController extends Controller
         ]);
 
         // If Dompdf is installed, return a small confirmation page that opens the PDF in a new tab
-        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
+        if (class_exists(Pdf::class)) {
             return view('admin.checklists.sent', compact('cl'));
         }
 
