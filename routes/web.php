@@ -84,8 +84,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/my-orders', [FrontOrderController::class, 'index'])->name('orders.index');
     Route::get('/my-orders/{id}', [FrontOrderController::class, 'show'])->name('orders.show');
     Route::get('/my-orders/check-status/{id}', [FrontOrderController::class, 'checkPaymentStatus'])->name('orders.check_status'); 
-
-    Route::get('/my-orders/reset-token/{id}', [FrontOrderController::class, 'resetToken'])->name('orders.reset');
+    Route::get('/my-orders/print/{id}', [FrontOrderController::class, 'printNota'])->name('orders.print');
+    Route::post('/my-orders/reset-token/{id}', [FrontOrderController::class, 'resetToken'])->name('orders.reset');
     Route::get('/my-orders/generate-snap/{id}', [FrontOrderController::class, 'generateSnap'])->name('orders.generate_snap');
 });
 
@@ -158,12 +158,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         ->name('orders.index')
         ->middleware('role:master,admin_penjualan');
     
-    
-    // Approve (accept) order
-    Route::post('/orders/{id}/approve', [AdminOrderController::class, 'approve'])
-        ->name('orders.approve')
+    // Send order to checklist
+    Route::post('/orders/{id}/send-checklist', [AdminOrderController::class, 'sendToChecklist'])
+        ->name('orders.send_checklist')
         ->middleware('role:master,admin_penjualan');
-
+    
     // Order Checklists (Admin Penjualan & Master)
     Route::prefix('checklists')->name('checklists.')->middleware('role:master,admin_penjualan')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\OrderChecklistController::class, 'index'])->name('index');
@@ -173,14 +172,4 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::post('/{checklist}/send', [\App\Http\Controllers\Admin\OrderChecklistController::class, 'send'])->name('send');
         Route::get('/{checklist}/print', [\App\Http\Controllers\Admin\OrderChecklistController::class, 'print'])->name('print');
     });
-
-    
-    // Reject order
-    Route::post('/orders/{id}/reject', [AdminOrderController::class, 'reject'])
-        ->name('orders.reject')
-        ->middleware('role:master,admin_penjualan');
-        
-    Route::post('/orders/{id}/ship', [AdminOrderController::class, 'ship'])
-        ->name('orders.ship')
-        ->middleware('role:master,admin_penjualan');
 });
