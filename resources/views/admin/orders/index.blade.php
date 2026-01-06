@@ -5,7 +5,6 @@
 @endsection
 
 @section('content')
-
     <div class="flex items-center justify-between mb-6">
         <div>
             <h2 class="text-2xl font-bold">Pesanan Masuk</h2>
@@ -13,15 +12,15 @@
         </div>
     </div>
 
-    @if(session('success'))
+    @if (session('success'))
         <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded mb-4">{{ session('success') }}</div>
     @endif
 
-    @if(session('error'))
+    @if (session('error'))
         <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded mb-4">{{ session('error') }}</div>
     @endif
 
-    @if(session('info'))
+    @if (session('info'))
         <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded mb-4">{{ session('info') }}</div>
     @endif
 
@@ -40,57 +39,62 @@
             </thead>
             <tbody>
                 @forelse($orders as $order)
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="p-3 font-mono text-sm">{{ $order->invoice_code }}</td>
-                    <td class="p-3 text-sm">{{ $order->created_at->format('d/m/Y H:i') }}</td>
-                    <td class="p-3">
-                        <div class="font-medium">{{ $order->user->name }}</div>
-                        <div class="text-xs text-gray-500">{{ $order->user->email }}</div>
-                    </td>
-                    <td class="p-3 text-center">
-                        <span class="bg-gray-100 px-2 py-1 rounded text-sm">{{ $order->orderItems->count() }} item</span>
-                    </td>
-                    <td class="p-3 font-bold text-primary">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
-                    <td class="p-3">
-                        @if(in_array($order->status, ['paid', 'settlement']))
-                            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">LUNAS</span>
-                        @else
-                            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-bold">{{ strtoupper($order->status) }}</span>
-                        @endif
-                    </td>
-                    <td class="p-3 text-right">
-                        @if($order->checklist)
-                            <a href="{{ route('admin.checklists.show', $order->checklist->id) }}" 
-                               class="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-200">
-                                Lihat Checklist
-                            </a>
-                        @else
-                            <form action="{{ route('admin.orders.send_checklist', $order->id) }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" 
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-3 font-mono text-sm">{{ $order->invoice_code }}</td>
+                        <td class="p-3 text-sm">{{ $order->created_at->format('d/m/Y H:i') }}</td>
+                        <td class="p-3">
+                            <div class="font-medium">{{ $order->user->name }}</div>
+                            <div class="text-xs text-gray-500">{{ $order->user->email }}</div>
+                        </td>
+                        <td class="p-3 text-center">
+                            <span class="bg-gray-100 px-2 py-1 rounded text-sm">{{ $order->orderItems->count() }}
+                                item</span>
+                        </td>
+                        <td class="p-3 font-bold text-primary">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
+                        <td class="p-3">
+                            @if (in_array($order->status, ['paid', 'settlement']))
+                                <span
+                                    class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">LUNAS</span>
+                            @else
+                                <span
+                                    class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-bold">{{ strtoupper($order->status) }}</span>
+                            @endif
+                        </td>
+                        <td class="p-3 text-right">
+                            @if ($order->checklist)
+                                <a href="{{ route('admin.checklists.show', $order->checklist->id) }}"
+                                    class="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-200">
+                                    Lihat Checklist
+                                </a>
+                            @else
+                                <form action="{{ route('admin.orders.send_checklist', $order->id) }}" method="POST"
+                                    class="inline">
+                                    @csrf
+                                    <button type="submit"
                                         class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark">
-                                    Kirim ke Checklist
-                                </button>
-                            </form>
-                        @endif
-                    </td>
-                </tr>
+                                        Kirim ke Checklist
+                                    </button>
+                                </form>
+                            @endif
+                        </td>
+                    </tr>
                 @empty
-                <tr>
-                    <td colspan="7" class="p-8 text-center text-gray-500">
-                        <div class="py-8">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                            </svg>
-                            <p class="text-lg font-medium">Belum ada pesanan yang dibayar</p>
-                        </div>
-                    </td>
-                </tr>
+                    <tr>
+                        <td colspan="7" class="p-8 text-center text-gray-500">
+                            <div class="py-8">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 mx-auto mb-4"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                </svg>
+                                <p class="text-lg font-medium">Belum ada pesanan yang dibayar</p>
+                            </div>
+                        </td>
+                    </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 
     <div class="mt-4">{{ $orders->links() }}</div>
-
 @endsection

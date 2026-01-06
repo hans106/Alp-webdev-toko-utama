@@ -7,15 +7,15 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderChecklist;
 use App\Models\OrderChecklistItem;
+use Illuminate\Support\Facades\Auth;
 
 
 class AdminOrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::with('user') // <--- GANTI (...) JADI 'user'
-            ->whereIn('status', ['paid', 'settlement']) // Hanya status LUNAS
-            ->whereNotNull('paid_at')                   // Pastikan tanggal bayar ada
+        $orders = Order::with('user')
+            ->whereIn('status', ['paid', 'settlement']) // Hanya status LUNAS                   // Pastikan tanggal bayar ada                 // Pastikan tanggal bayar ada
             ->orderBy('paid_at', 'desc')
             ->paginate(20);
 
@@ -29,25 +29,23 @@ class AdminOrderController extends Controller
     {
         $order = Order::with('orderItems.product')->findOrFail($id);
 
-        // Cek apakah order sudah dibayar
         if (!in_array($order->status, ['paid', 'settlement'])) {
             return redirect()->back()->with('error', 'Hanya pesanan yang sudah dibayar yang bisa dikirim ke checklist.');
         }
 
-        // Cek apakah sudah ada checklist untuk order ini
         if ($order->checklist()->exists()) {
             return redirect()->back()->with('info', 'Checklist untuk pesanan ini sudah dibuat sebelumnya.');
         }
 
-        // Buat Checklist baru
+        // 2. PERBAIKI BAGIAN INI
         $checklist = OrderChecklist::create([
             'order_id' => $order->id,
+            'admin_id' => Auth::id(), // <--- TAMBAHKAN INI (Ambil ID Admin yg login)
             'recipient_name' => $order->user->name,
             'items_count' => $order->orderItems->count(),
             'status' => 'belum_selesai',
         ]);
 
-        // Buat checklist items
         foreach ($order->orderItems as $item) {
             OrderChecklistItem::create([
                 'order_checklist_id' => $checklist->id,
