@@ -8,15 +8,14 @@ use App\Models\Order;
 use App\Models\OrderChecklist;
 use App\Models\OrderChecklistItem;
 
+
 class AdminOrderController extends Controller
 {
     public function index()
     {
-        // Ambil pesanan yang BENAR-BENAR sudah dibayar
-        // Filter ketat: status paid/settlement DAN paid_at tidak null
-        $orders = Order::with(['user', 'orderItems.product', 'checklist'])
-            ->whereIn('status', ['paid', 'settlement'])
-            ->whereNotNull('paid_at')  // ← Validasi tambahan: harus ada paid_at
+        $orders = Order::with('user') // <--- GANTI (...) JADI 'user'
+            ->whereIn('status', ['paid', 'settlement']) // Hanya status LUNAS
+            ->whereNotNull('paid_at')                   // Pastikan tanggal bayar ada
             ->orderBy('paid_at', 'desc')
             ->paginate(20);
 

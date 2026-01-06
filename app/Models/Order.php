@@ -74,7 +74,7 @@ class Order extends Model
         // Parameter transaksi
         $params = [
             'transaction_details' => [
-                'order_id' => $this->invoice_code,
+                'order_id' => $this->invoice_code . '-' . time(), 
                 'gross_amount' => (int) $this->total_price,
             ],
             'customer_details' => [
