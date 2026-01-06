@@ -13,9 +13,9 @@ class OrderChecklist extends Model
         'order_id',
         'admin_id',
         'recipient_name',
+        'recipient_name',
         'items_count',
-        'notes',
-        'sent_at'
+        'status',
     ];
 
     protected $casts = [

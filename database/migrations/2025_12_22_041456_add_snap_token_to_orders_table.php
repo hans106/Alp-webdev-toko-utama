@@ -6,24 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
-        Schema::table('orders', function (Blueprint $table) {
-            // $table->string('snap_token')->nullable()->after('invoice_code');
-            $table->string('payment_method')->nullable()->change();
-        });
-    }
+public function up()
+{
+    Schema::table('orders', function (Blueprint $table) {
+        $table->string('snap_token')->nullable()->after('invoice_code');
+    });
+}
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('snap_token');
-        });
-    }
+public function down()
+{
+    Schema::table('orders', function (Blueprint $table) {
+        $table->dropColumn('snap_token');
+    });
+}
 };

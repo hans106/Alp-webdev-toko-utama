@@ -1,9 +1,17 @@
-<aside id="adminSidebar" class="w-64 bg-[#1a1c23] text-white shrink-0 fixed inset-y-0 left-0 z-40 transform -translate-x-full md:translate-x-0 md:static md:flex md:flex-col border-r md:border-gray-800 transition-transform duration-200 ease-in-out">
+<aside id="adminSidebar"
+    class="w-64 bg-[#1a1c23] text-white shrink-0 fixed inset-y-0 left-0 z-40 transform -translate-x-full md:translate-x-0 md:static md:flex md:flex-col border-r md:border-gray-800 transition-transform duration-200 ease-in-out">
 
     {{-- 1. LOGO --}}
     <div class="p-4 flex items-center gap-3 border-b border-gray-800 h-16">
+<<<<<<< HEAD
         <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center font-bold text-white text-lg shadow-lg">
             <img src="/logo/Logo_Utama.jpeg" alt="Logo" class="w-full h-full object-cover">
+=======
+        <div
+            class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center font-bold text-white text-lg shadow-lg">
+            {{-- Gunakan asset() dan sesuaikan nama file (Logo_Utama.jpeg) --}}
+            <img src="{{ asset('logo/Logo_Utama.jpeg') }}" alt="Logo" class="w-full h-full object-cover">
+>>>>>>> 96a892684eb34fc15fe7c4b17463272341c52a86
         </div>
         <div class="flex-1">
             <h1 class="font-bold text-base tracking-wide">Toko Utama</h1>
@@ -12,7 +20,8 @@
 
         {{-- Close button for mobile --}}
         <button id="closeSidebarBtn" class="md:hidden text-gray-400 hover:text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
@@ -24,30 +33,36 @@
         {{-- Dashboard --}}
         <a href="{{ route('admin.dashboard') }}"
             class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors group {{ request()->routeIs('admin.dashboard') ? 'bg-orange-500 text-white shadow-md' : '' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
             </svg>
             <span class="font-medium">Dashboard</span>
         </a>
 
-                {{-- Group: ADMIN --}}
+        {{-- Group: ADMIN --}}
         <div class="pt-3 pb-1 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Master</div>
 
         <a href="{{ route('admin.users.index') }}"
             class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('admin.users.*') ? 'bg-orange-500 text-white shadow-md' : '' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
             User
         </a>
-        
+
         {{-- MENU PEGAWAI (SUDAH DIPERBAIKI) --}}
         <a href="{{ route('admin.employees.index') }}"
             class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors group {{ request()->routeIs('admin.employees.*') ? 'bg-orange-500 text-white shadow-md' : '' }}">
-            
+
             {{-- Icon Dasi / ID Card --}}
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0c0 .884-.956 2.99-3 3.5M13 14h.01M10 14h.01M7 14h.01" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0c0 .884-.956 2.99-3 3.5M13 14h.01M10 14h.01M7 14h.01" />
             </svg>
             <span class="font-medium">Pegawai</span>
         </a>
@@ -55,8 +70,10 @@
         <a href="{{ route('admin.events.index') }}"
             class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors group {{ request()->routeIs('admin.events.*') ? 'bg-orange-500 text-white shadow-md' : '' }}">
             {{-- Icon Kalender --}}
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             <span class="font-medium">Events</span>
         </a>
@@ -66,24 +83,30 @@
 
         <a href="{{ route('admin.products.index') }}"
             class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('admin.products.*') ? 'bg-gray-800 text-white' : '' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
             Kelola Produk
         </a>
 
         <a href="{{ route('admin.suppliers.index') }}"
             class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('admin.suppliers.*') ? 'bg-gray-800 text-white' : '' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5" />
             </svg>
             Data Supplier
         </a>
 
         <a href="{{ route('admin.restocks.index') }}"
             class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('admin.restocks.*') ? 'bg-orange-500 text-white shadow-md' : '' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7 7h10M7 17h10" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4M7 7h10M7 17h10" />
             </svg>
             Restock Barang
         </a>
@@ -97,21 +120,25 @@
 
         <a href="{{ route('admin.orders.index') }}"
             class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('admin.orders.*') ? 'bg-orange-500 text-white shadow-md' : '' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
             Pesanan Masuk
         </a>
 
         {{-- Checklist Nota (Admin Penjualan) --}}
-        @if(in_array(Auth::user()->role, ['master', 'admin_penjualan']))
-        <a href="{{ route('admin.checklists.index') }}"
-            class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('admin.checklists.*') ? 'bg-orange-500 text-white shadow-md' : '' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7 7h10M7 17h10" />
-            </svg>
-            Checklist Nota
-        </a>
+        @if (in_array(Auth::user()->role, ['master', 'admin_penjualan']))
+            <a href="{{ route('admin.checklists.index') }}"
+                class="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('admin.checklists.*') ? 'bg-orange-500 text-white shadow-md' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4M7 7h10M7 17h10" />
+                </svg>
+                Checklist Nota
+            </a>
         @endif
 
 
@@ -133,8 +160,10 @@
             @csrf
             <button type="submit"
                 class="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-[10px] font-bold text-red-400 bg-red-400/10 hover:bg-red-400/20 rounded-lg transition-colors uppercase tracking-wider">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
                 Logout
             </button>

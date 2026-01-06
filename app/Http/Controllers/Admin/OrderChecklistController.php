@@ -9,7 +9,6 @@ use App\Models\OrderChecklistItem;
 use App\Models\Order;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderChecklistController extends Controller
 {
@@ -25,34 +24,64 @@ class OrderChecklistController extends Controller
         return view('admin.checklists.show', compact('checklist'));
     }
 
+    /**
+     * FUNGSI TOGGLE ITEM (Centang / Hapus Centang)
+     */
+    public function toggleItem($itemId)
+    {
+        $item = OrderChecklistItem::findOrFail($itemId);
+
+        // Logika Toggle: Reset jika penuh, Penuhkan jika belum
+        if ($item->qty_checked >= $item->qty_required) {
+            $item->qty_checked = 0;
+            $item->status = 'pending';
+        } else {
+            $item->qty_checked = $item->qty_required;
+            $item->status = 'checked';
+        }
+        $item->save();
+
+        // Cek Status Header Checklist (Otomatis)
+        $checklist = $item->checklist;
+        $incompleteItems = $checklist->items()
+            ->whereColumn('qty_checked', '<', 'qty_required')
+            ->count();
+
+        if ($incompleteItems == 0) {
+            $checklist->status = 'sudah_fix';
+        } else {
+            $checklist->status = 'belum_selesai';
+        }
+        $checklist->save();
+
+        return redirect()->back()->with('success', 'Item diperbarui.');
+    }
+
+    // Fungsi updateItem lama (dibiarkan untuk backup)
     public function updateItem(Request $request, $item)
     {
         $it = OrderChecklistItem::findOrFail($item);
-
         $qty = (int) $request->input('qty_checked', 0);
         if ($qty < 0) $qty = 0;
         if ($qty > $it->qty_required) $qty = $it->qty_required;
 
         $it->qty_checked = $qty;
         $it->status = ($it->qty_checked >= $it->qty_required) ? 'checked' : 'pending';
-        $it->notes = $request->input('notes');
         $it->save();
 
-        // Log
         ActivityLog::create([
             'user_id' => Auth::id(),
             'action' => 'CHECKLIST ITEM UPDATED',
-            'description' => "Update checklist item #{$it->id} (order #{$it->checklist->order->id}): qty_checked={$it->qty_checked}"
+            'description' => "Update checklist item #{$it->id}: qty={$it->qty_checked}"
         ]);
 
-        // If all items checked, we can optionally change checklist status to 'sudah_fix'
         $allDone = $it->checklist->items()->whereColumn('qty_checked', '<', 'qty_required')->count() == 0;
         if ($allDone) {
             $it->checklist->status = 'sudah_fix';
             $it->checklist->save();
         }
 
-        return redirect()->back()->with('success', 'Checklist item diperbarui.');
+        return redirect()->back()->with('success', 'Item diperbarui.');
     }
 
     public function updateStatus(Request $request, $checklist)
@@ -63,63 +92,51 @@ class OrderChecklistController extends Controller
             return redirect()->back()->with('error', 'Status tidak valid');
         }
 
-        $old = $cl->status;
         $cl->status = $status;
         $cl->save();
-
-        ActivityLog::create([
-            'user_id' => Auth::id(),
-            'action' => 'CHECKLIST STATUS UPDATED',
-            'description' => "Checklist #{$cl->id} status changed: {$old} -> {$status}"
-        ]);
 
         return redirect()->back()->with('success', 'Status Checklist diperbarui.');
     }
 
+    /**
+     * FUNGSI PRINT: Langsung Tampil HTML
+     */
     public function print($id)
     {
         $cl = OrderChecklist::with(['order.orderItems.product', 'admin'])->where('id', $id)->firstOrFail();
-
-        // If Dompdf is installed, stream a PDF. Otherwise fall back to the HTML print view.
-        if (class_exists(Pdf::class)) {
-            $pdf = Pdf::loadView('admin.checklists.print_pdf', compact('cl'));
-            return $pdf->stream(sprintf('checklist-%s.pdf', $cl->id));
-        }
-
         return view('admin.checklists.print', compact('cl'));
     }
 
-    // Kirim checklist ke pengirim (finalize dan ubah status order jadi 'sent')
+    /**
+     * FUNGSI SEND (KIRIM KURIR): Hanya Notifikasi
+     */
     public function send(Request $request, $id)
     {
         $cl = OrderChecklist::with(['items', 'order'])->findOrFail($id);
 
-        // Pastikan semua item sudah dicek penuh
+        // Validasi: Pastikan semua item sudah dicek
         $incomplete = $cl->items()->whereColumn('qty_checked', '<', 'qty_required')->exists();
         if ($incomplete) {
-            return redirect()->back()->with('error', 'Tidak bisa kirim: masih ada item yang belum dicek penuh.');
+            return redirect()->back()->with('error', 'Gagal: Masih ada barang yang belum dicek!');
         }
 
-        // Update checklist dan order
-        $oldChecklist = $cl->status;
+        // 1. Update status checklist
         $cl->status = 'sudah_fix';
         $cl->save();
 
+        // 2. Update status order jadi 'sent'
         $order = $cl->order;
-        $oldOrderStatus = $order->status;
         $order->update(['status' => 'sent']);
 
+        // 3. Log Aktivitas
         ActivityLog::create([
             'user_id' => Auth::id(),
             'action' => 'SEND TO DELIVERY',
-            'description' => "Checklist #{$cl->id} for Order #{$order->id} sent to delivery. Checklist status: {$oldChecklist} -> sudah_fix. Order status: {$oldOrderStatus} -> sent"
+            'description' => "Checklist #{$cl->id} (Order #{$order->invoice_code}) sent to delivery."
         ]);
 
-        // If Dompdf is installed, return a small confirmation page that opens the PDF in a new tab
-        if (class_exists(Pdf::class)) {
-            return view('admin.checklists.sent', compact('cl'));
-        }
-
-        return redirect()->route('admin.checklists.index')->with('success', 'Checklist berhasil dikirim ke pengirim.');
+        // 4. Redirect ke Index + Notifikasi (Sesuai Request)
+        return redirect()->route('admin.checklists.index')
+            ->with('success', 'Pesanan berhasil dikirim ke kurir (Status: SENT).');
     }
 }

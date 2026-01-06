@@ -34,12 +34,28 @@ class OrderController extends Controller
                         ->where('id', $id)
                         ->firstOrFail();
 
-        // 2. LOGIC MIDTRANS - Generate token jika order accepted dan belum ada token
-        if ($order->status == 'accepted' && empty($order->snap_token)) {
+        // 2. Auto-generate token jika pending dan belum ada token (silent, no error message)
+        if ($order->status == 'pending' && empty($order->snap_token)) {
             $order->generateSnapToken();
+            $order->refresh(); // Reload data dari DB
         }
 
         return view('front.orders.detail', compact('order'));
+    }
+
+    public function printNota($id)
+    {
+        $order = Order::with(['orderItems.product', 'user'])
+                        ->where('user_id', Auth::id())
+                        ->where('id', $id)
+                        ->firstOrFail();
+
+        // Hanya bisa print jika sudah dibayar
+        if (!in_array($order->status, ['paid', 'settlement'])) {
+            return redirect()->back()->with('error', 'Nota hanya bisa dicetak untuk pesanan yang sudah dibayar.');
+        }
+
+        return view('front.orders.print_nota', compact('order'));
     }
 
     public function store(Request $request)
@@ -95,22 +111,25 @@ class OrderController extends Controller
     {
         $order = Order::where('user_id', Auth::id())->where('id', $id)->firstOrFail();
 
-        if($order->status == 'accepted') {
-            $order->snap_token = null;
-            $order->save();
+        if($order->status == 'pending') {
+            // Hapus token lama dan generate baru
+            $order->update(['snap_token' => null]);
+            $order->generateSnapToken();
+            $order->refresh();
             
-            return redirect()->back()->with('success', 'Link pembayaran berhasil diperbarui!');
+            // Redirect langsung tanpa flash message
+            return redirect()->route('orders.show', $order->id);
         }
 
-        return redirect()->back()->with('error', 'Pesanan tidak bisa direset.');
+        return redirect()->back();
     }
 
     public function generateSnap(Request $request, $id)
     {
         $order = Order::where('user_id', Auth::id())->where('id', $id)->firstOrFail();
 
-        if($order->status != 'accepted') {
-            return response()->json(['success' => false, 'message' => 'Order tidak dapat menerima pembayaran saat ini. Tunggu konfirmasi penjualan.' ], 400);
+        if($order->status != 'pending') {
+            return response()->json(['success' => false, 'message' => 'Order tidak dapat menerima pembayaran saat ini.' ], 400);
         }
 
         // Generate atau regenerate snap token
@@ -131,9 +150,9 @@ class OrderController extends Controller
     {
         $order = Order::where('user_id', Auth::id())->where('id', $id)->firstOrFail();
 
-        // Hanya cek jika status masih 'accepted' atau 'pending' (bisa dicek untuk menunggu pembayaran)
-        if (!in_array($order->status, ['accepted', 'pending'])) {
-            return redirect()->back()->with('info', 'Status pembayaran sudah: ' . $order->status);
+        // Hanya cek jika status masih 'pending'
+        if ($order->status != 'pending') {
+            return redirect()->back()->with('info', 'Status pembayaran sudah: ' . strtoupper($order->status));
         }
 
         // Konfigurasi Midtrans
@@ -161,6 +180,7 @@ class OrderController extends Controller
                 $order->update([
                     'status' => $newStatus,
                     'paid_at' => ($newStatus == 'paid') ? now() : null,
+                    'snap_token' => null,
                 ]);
                 
                 return redirect()->back()->with('success', 'Status pembayaran diperbarui: ' . strtoupper($newStatus));
@@ -169,8 +189,6 @@ class OrderController extends Controller
             return redirect()->back()->with('info', 'Status pembayaran masih: PENDING. Silakan selesaikan pembayaran.');
 
         } catch (\Exception $e) {
-            // Jika order_id tidak ditemukan di Midtrans, coba dengan pattern lain
-            // Karena kita menambahkan timestamp/random di order_id
             return redirect()->back()->with('error', 'Tidak dapat mengecek status: ' . $e->getMessage());
         }
     }
