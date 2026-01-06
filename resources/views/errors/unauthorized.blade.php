@@ -56,14 +56,14 @@
                 <button 
                     type="button" 
                     onclick="goBack()" 
-                    class="flex-1 px-4 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold rounded-lg transition-all">
+                    class="flex-1 px-4 py-3 bg-gray-400 hover:bg-gray-500 text-white font-bold rounded-lg transition-all">
                     ✕ Tutup
                 </button>
 
                 {{-- Login Button --}}
                 <a 
                     href="{{ route('login') }}" 
-                    class="flex-1 px-4 py-3 bg-primary hover:bg-primary-700 text-white font-bold rounded-lg transition-all text-center">
+                    class="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-all text-center shadow-md">
                     🔓 Gunakan Akun Lain
                 </a>
             </div>

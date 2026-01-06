@@ -9,7 +9,7 @@
     </div>
 
     <div class="flex items-center gap-4">
-        <span class="text-sm text-gray-500">Halo, <b>{{ Auth::user()->name ?? 'Admin' }}</b> 👋</span>
+        <span class="text-sm text-gray-500">Halo, <b>{{ Auth::user()->name ?? 'Admin' }}</b></span>
     </div>
 </header>
 
