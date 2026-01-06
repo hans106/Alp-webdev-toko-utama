@@ -3,7 +3,7 @@
     {{-- 1. LOGO --}}
     <div class="p-4 flex items-center gap-3 border-b border-gray-800 h-16">
         <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center font-bold text-white text-lg shadow-lg">
-            <img src="logo/logo_utama.jpeg" alt="Logo" class="w-full h-full object-cover">
+            <img src="/logo/Logo_Utama.jpeg" alt="Logo" class="w-full h-full object-cover">
         </div>
         <div class="flex-1">
             <h1 class="font-bold text-base tracking-wide">Toko Utama</h1>
