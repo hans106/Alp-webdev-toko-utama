@@ -15,8 +15,8 @@ class AdminOrderController extends Controller
     public function index()
     {
         $orders = Order::with('user')
-            ->whereIn('status', ['paid', 'settlement']) // Hanya status LUNAS                   // Pastikan tanggal bayar ada                 // Pastikan tanggal bayar ada
-            ->orderBy('paid_at', 'desc')
+            ->whereIn('status', ['paid', 'settlement','pending']) // Hanya status LUNAS                   // Pastikan tanggal bayar ada                 // Pastikan tanggal bayar ada
+            ->orderBy('created_at', 'desc')
             ->paginate(20);
 
         return view('admin.orders.index', compact('orders'));
@@ -29,18 +29,20 @@ class AdminOrderController extends Controller
     {
         $order = Order::with('orderItems.product')->findOrFail($id);
 
-        if (!in_array($order->status, ['paid', 'settlement'])) {
+        // --- BAGIAN INI DIUBAH ---
+        // Tambahkan 'pending' di sini supaya order pending bisa lolos masuk checklist
+        if (!in_array($order->status, ['paid', 'settlement', 'pending'])) { 
             return redirect()->back()->with('error', 'Hanya pesanan yang sudah dibayar yang bisa dikirim ke checklist.');
         }
+        // -------------------------
 
         if ($order->checklist()->exists()) {
             return redirect()->back()->with('info', 'Checklist untuk pesanan ini sudah dibuat sebelumnya.');
         }
 
-        // 2. PERBAIKI BAGIAN INI
         $checklist = OrderChecklist::create([
             'order_id' => $order->id,
-            'admin_id' => Auth::id(), // <--- TAMBAHKAN INI (Ambil ID Admin yg login)
+            'admin_id' => Auth::id(), 
             'recipient_name' => $order->user->name,
             'items_count' => $order->orderItems->count(),
             'status' => 'belum_selesai',
