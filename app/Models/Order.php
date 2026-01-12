@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 class Order extends Model
 {
     use HasFactory;
-    
+
     protected $guarded = ['id'];
 
     // Cast timestamp fields to Carbon instances so ->format() works in views
@@ -24,7 +24,7 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
@@ -32,9 +32,9 @@ class Order extends Model
 
     public function checklist()
     {
-        return $this->hasOne(OrderChecklist::class);
+        // Ini PENTING biar tombolnya tahu pesanan ini sudah dikirim atau belum
+        return $this->hasOne(OrderChecklist::class, 'order_id');
     }
-
     /**
      * Generate Midtrans Snap Token untuk pembayaran
      * Otomatis dipanggil ketika order pending atau user request pembayaran
@@ -50,7 +50,7 @@ class Order extends Model
         // Validasi config Midtrans
         $serverKey = config('midtrans.server_key');
         $clientKey = config('midtrans.client_key');
-        
+
         if (empty($serverKey) || empty($clientKey)) {
             Log::error('Midtrans config not set!', [
                 'server_key' => $serverKey ? 'exists' : 'MISSING',
@@ -74,7 +74,7 @@ class Order extends Model
         // Parameter transaksi
         $params = [
             'transaction_details' => [
-                'order_id' => $this->invoice_code . '-' . time(), 
+                'order_id' => $this->invoice_code . '-' . time(),
                 'gross_amount' => (int) $this->total_price,
             ],
             'customer_details' => [
@@ -82,7 +82,7 @@ class Order extends Model
                 'email' => $this->user->email ?? 'customer@example.com',
                 'phone' => $this->user->phone ?? '08123456789',
             ],
-            'item_details' => $this->orderItems->map(function($item) {
+            'item_details' => $this->orderItems->map(function ($item) {
                 return [
                     'id' => $item->product_id,
                     'price' => (int) $item->price,
@@ -102,17 +102,16 @@ class Order extends Model
         try {
             // Generate snap token dari Midtrans
             $snapToken = \Midtrans\Snap::getSnapToken($params);
-            
+
             Log::info('Snap Token Generated Successfully', [
                 'order_id' => $this->id,
                 'token_preview' => substr($snapToken, 0, 20) . '...'
             ]);
-            
+
             // Simpan snap token ke database
             $this->update(['snap_token' => $snapToken]);
-            
+
             return $snapToken;
-            
         } catch (\Exception $e) {
             // Catch semua exception (termasuk Midtrans errors)
             Log::error('Snap Token Generation Error', [
@@ -122,7 +121,7 @@ class Order extends Model
                 'error_code' => $e->getCode(),
                 'error_class' => get_class($e),
             ]);
-            
+
             return null;
         }
     }

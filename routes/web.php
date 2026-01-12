@@ -101,7 +101,7 @@ Route::middleware(['auth'])->group(function () {
 
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
 
-    // Dashboard accessible by all 3 admin roles (master, inventory, admin_penjualan)
+    // Dashboard (Bisa diakses semua admin)
     Route::get('/', [ProductController::class, 'dashboard'])
         ->name('dashboard')
         ->middleware(CheckRole::class . ':master,inventory,admin_penjualan');
@@ -110,89 +110,61 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     // GROUP 1: KHUSUS MASTER (Full Access)
     // --------------------------------------------------------
     Route::middleware([CheckRole::class . ':master'])->group(function () {
-        
-        // 2. Manajemen User
         Route::resource('users', UserController::class);
-        // 3. Manajemen Pegawai (Employee - Profil Web)
         Route::resource('employees', EmployeeController::class)->except(['create', 'edit', 'show']);
-        // 4. Manajemen Event
         Route::resource('events', EventController::class)->except(['create', 'edit', 'show']);
     });
 
     // --------------------------------------------------------
     // GROUP 2: DIVISI GUDANG (Inventory + Master)
     // --------------------------------------------------------
-    Route::prefix('products')->name('products.')
-        ->middleware(CheckRole::class . ':master,inventory')
-        ->group(function () {
-            Route::get('/', [ProductController::class, 'index'])->name('index');
-            Route::get('/create', [ProductController::class, 'create'])->name('create');
-            Route::post('/', [ProductController::class, 'store'])->name('store');
-            Route::get('/{id}/edit', [ProductController::class, 'edit'])->name('edit');
-            Route::put('/{id}', [ProductController::class, 'update'])->name('update');
-            Route::delete('/{id}', [ProductController::class, 'destroy'])->name('destroy');
-    });
-
-    // Supplier
-    Route::prefix('suppliers')->name('suppliers.')
-        ->middleware(CheckRole::class . ':master,inventory')
-        ->group(function () {
-            Route::get('/', [SupplierController::class, 'index'])->name('index');
-            Route::get('/create', [SupplierController::class, 'create'])->name('create');
-            Route::post('/', [SupplierController::class, 'store'])->name('store');
-            Route::get('/{supplier}', [SupplierController::class, 'show'])->name('show');
-            Route::get('/{supplier}/edit', [SupplierController::class, 'edit'])->name('edit');
-            Route::put('/{supplier}', [SupplierController::class, 'update'])->name('update');
-            Route::delete('/{supplier}', [SupplierController::class, 'destroy'])->name('destroy');
-    });
-
-    // Restock
-    Route::prefix('restocks')->name('restocks.')
-        ->middleware(CheckRole::class . ':master,inventory')
-        ->group(function () {
+    // Produk & Supplier & Restock
+    Route::middleware(CheckRole::class . ':master,inventory')->group(function () {
+        Route::resource('products', ProductController::class);
+        Route::resource('suppliers', SupplierController::class);
+        
+        // Restock
+        Route::prefix('restocks')->name('restocks.')->group(function () {
             Route::get('/', [RestockController::class, 'index'])->name('index');
             Route::get('/create', [RestockController::class, 'create'])->name('create');
             Route::post('/', [RestockController::class, 'store'])->name('store');
             Route::get('/{restock}', [RestockController::class, 'show'])->name('show');
             Route::get('/{restock}/edit', [RestockController::class, 'edit'])->name('edit');
             Route::put('/{restock}', [RestockController::class, 'update'])->name('update');
-            
-            // Checklist Restock (Akses juga untuk Admin Penjualan)
-            Route::get('/{restock}/checklist', [RestockController::class, 'checklist'])
-                ->name('checklist')
-                ->middleware(CheckRole::class . ':master,inventory,admin_penjualan');
-            
-            Route::post('/{restock}/checklist', [RestockController::class, 'updateChecklist'])
-                ->name('checklist.update')
-                ->middleware(CheckRole::class . ':master,inventory,admin_penjualan');
-            
             Route::delete('/{restock}', [RestockController::class, 'destroy'])->name('destroy');
+            
+            // Checklist Restock (Barang Masuk)
+            Route::get('/{restock}/checklist', [RestockController::class, 'checklist'])->name('checklist');
+            Route::post('/{restock}/checklist', [RestockController::class, 'updateChecklist'])->name('checklist.update');
+        });
     });
-
 
     // --------------------------------------------------------
     // GROUP 3: DIVISI PENJUALAN (Admin Penjualan + Master)
     // --------------------------------------------------------
-    Route::get('/orders', [AdminOrderController::class, 'index'])
-        ->name('orders.index')
-        ->middleware(CheckRole::class . ':master,admin_penjualan');
     
-    // Send order to checklist
-    Route::post('/orders/{id}/send-checklist', [AdminOrderController::class, 'sendToChecklist'])
-        ->name('orders.send_checklist')
-        ->middleware(CheckRole::class . ':master,admin_penjualan');
-    
-   Route::prefix('checklists')->name('checklists.')
-    ->middleware(CheckRole::class . ':master,admin_penjualan')
-    ->group(function () {
-        Route::get('/', [OrderChecklistController::class, 'index'])->name('index');
-        Route::get('/{checklist}', [OrderChecklistController::class, 'show'])->name('show');
-        
+    // A. ORDER / PESANAN MASUK (INI YANG TADI HILANG BANG!)
+    Route::prefix('orders')->name('orders.')
+        ->middleware(CheckRole::class . ':master,admin_penjualan')
+        ->group(function() {
+            // Halaman Tabel Pesanan Masuk
+            Route::get('/', [AdminOrderController::class, 'index'])->name('index');
+            
+            // Action Tombol "Kirim ke Checklist"
+            Route::post('/{id}/send-checklist', [AdminOrderController::class, 'sendToChecklist'])
+                ->name('send_checklist');
+        });
 
-        Route::post('/item/{item}/toggle', [OrderChecklistController::class, 'toggleItem'])->name('item.toggle');
+    // B. CHECKLIST NOTA / BARANG KELUAR
+    Route::prefix('checklists')->name('checklists.')
+        ->middleware(CheckRole::class . ':master,admin_penjualan') 
+        ->group(function () {
+            Route::get('/', [OrderChecklistController::class, 'index'])->name('index');
+            Route::get('/{checklist}', [OrderChecklistController::class, 'show'])->name('show');
+            Route::post('/item/{item}/toggle', [OrderChecklistController::class, 'toggleItem'])->name('item.toggle');
+            Route::post('/{checklist}/status', [OrderChecklistController::class, 'updateStatus'])->name('status.update');
+            Route::post('/{checklist}/send', [OrderChecklistController::class, 'send'])->name('send');
+            Route::get('/{checklist}/print', [OrderChecklistController::class, 'print'])->name('print');
+    });
 
-        Route::post('/{checklist}/status', [OrderChecklistController::class, 'updateStatus'])->name('status.update');
-        Route::post('/{checklist}/send', [OrderChecklistController::class, 'send'])->name('send');
-        Route::get('/{checklist}/print', [OrderChecklistController::class, 'print'])->name('print');
-});
 });

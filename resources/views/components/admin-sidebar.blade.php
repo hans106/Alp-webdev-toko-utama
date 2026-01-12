@@ -3,15 +3,10 @@
 
     {{-- 1. LOGO --}}
     <div class="p-4 flex items-center gap-3 border-b border-gray-800 h-16">
-<<<<<<< HEAD
-        <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center font-bold text-white text-lg shadow-lg">
-            <img src="/logo/Logo_Utama.jpeg" alt="Logo" class="w-full h-full object-cover">
-=======
         <div
             class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center font-bold text-white text-lg shadow-lg">
             {{-- Gunakan asset() dan sesuaikan nama file (Logo_Utama.jpeg) --}}
             <img src="{{ asset('logo/Logo_Utama.jpeg') }}" alt="Logo" class="w-full h-full object-cover">
->>>>>>> 96a892684eb34fc15fe7c4b17463272341c52a86
         </div>
         <div class="flex-1">
             <h1 class="font-bold text-base tracking-wide">Toko Utama</h1>

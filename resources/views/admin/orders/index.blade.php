@@ -12,16 +12,23 @@
         </div>
     </div>
 
+    {{-- Alert Messages --}}
     @if (session('success'))
-        <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded mb-4">{{ session('success') }}</div>
+        <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded mb-4">
+            {{ session('success') }}
+        </div>
     @endif
 
     @if (session('error'))
-        <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded mb-4">{{ session('error') }}</div>
+        <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded mb-4">
+            {{ session('error') }}
+        </div>
     @endif
 
     @if (session('info'))
-        <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded mb-4">{{ session('info') }}</div>
+        <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded mb-4">
+            {{ session('info') }}
+        </div>
     @endif
 
     <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
@@ -40,38 +47,61 @@
             <tbody>
                 @forelse($orders as $order)
                     <tr class="border-b hover:bg-gray-50">
-                        <td class="p-3 font-mono text-sm">{{ $order->invoice_code }}</td>
+                        {{-- 1. Invoice --}}
+                        <td class="p-3 font-mono text-sm">#{{ $order->invoice_code }}</td>
+
+                        {{-- 2. Tanggal --}}
                         <td class="p-3 text-sm">{{ $order->created_at->format('d/m/Y H:i') }}</td>
+
+                        {{-- 3. Pelanggan --}}
                         <td class="p-3">
-                            <div class="font-medium">{{ $order->user->name }}</div>
-                            <div class="text-xs text-gray-500">{{ $order->user->email }}</div>
+                            <div class="font-medium">{{ $order->user->name ?? 'Guest' }}</div>
+                            <div class="text-xs text-gray-500">{{ $order->user->email ?? '-' }}</div>
                         </td>
+
+                        {{-- 4. Items Count --}}
                         <td class="p-3 text-center">
-                            <span class="bg-gray-100 px-2 py-1 rounded text-sm">{{ $order->orderItems->count() }}
-                                item</span>
+                            <span class="bg-gray-100 px-2 py-1 rounded text-sm">
+                                {{ $order->orderItems->count() }} item
+                            </span>
                         </td>
-                        <td class="p-3 font-bold text-primary">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
+
+                        {{-- 5. Total Harga (Cek grand_total atau total_price) --}}
+                        <td class="p-3 font-bold text-primary">
+                            Rp {{ number_format($order->grand_total ?? $order->total_price, 0, ',', '.') }}
+                        </td>
+
+                        {{-- 6. Status --}}
                         <td class="p-3">
                             @if (in_array($order->status, ['paid', 'settlement']))
-                                <span
-                                    class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">LUNAS</span>
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
+                                    LUNAS
+                                </span>
+                            @elseif($order->status == 'processing')
+                                <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">
+                                    DIPROSES GUDANG
+                                </span>
                             @else
-                                <span
-                                    class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-bold">{{ strtoupper($order->status) }}</span>
+                                <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-bold">
+                                    {{ strtoupper($order->status) }}
+                                </span>
                             @endif
                         </td>
+
+                        {{-- 7. Aksi (Button Logic) --}}
                         <td class="p-3 text-right">
                             @if ($order->checklist)
+                                {{-- Jika SUDAH ada checklist --}}
                                 <a href="{{ route('admin.checklists.show', $order->checklist->id) }}"
-                                    class="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-200">
+                                   class="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-200 transition">
                                     Lihat Checklist
                                 </a>
                             @else
-                                <form action="{{ route('admin.orders.send_checklist', $order->id) }}" method="POST"
-                                    class="inline">
+                                {{-- Jika BELUM ada checklist --}}
+                                <form action="{{ route('admin.orders.send_checklist', $order->id) }}" method="POST" class="inline" onsubmit="return confirm('Kirim pesanan ini ke Gudang?');">
                                     @csrf
                                     <button type="submit"
-                                        class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark">
+                                            class="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-600 transition shadow-sm">
                                         Kirim ke Checklist
                                     </button>
                                 </form>
@@ -96,5 +126,7 @@
         </table>
     </div>
 
-    <div class="mt-4">{{ $orders->links() }}</div>
+    <div class="mt-4">
+        {{ $orders->links() }}
+    </div>
 @endsection

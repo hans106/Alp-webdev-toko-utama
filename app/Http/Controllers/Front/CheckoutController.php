@@ -49,17 +49,17 @@ class CheckoutController extends Controller
 
         // VALIDASI INPUT (address must have at least 4 words; phone allow spaces/+, but require at least 10 digits)
         $request->validate([
-            'address' => ['required','string', function($attribute, $value, $fail) {
+            'address' => ['required', 'string', function ($attribute, $value, $fail) {
                 // Count words more robustly (ignore punctuation)
                 $words = preg_split('/\s+/', trim(strip_tags($value)));
-                $words = array_filter($words, function($w) {
+                $words = array_filter($words, function ($w) {
                     return preg_match('/\p{L}|\p{N}/u', $w);
                 });
                 if (count($words) < 4) {
                     $fail('Alamat harus terdiri dari minimal 4 kata.');
                 }
             }],
-            'phone' => ['required','string', function($attribute, $value, $fail) {
+            'phone' => ['required', 'string', function ($attribute, $value, $fail) {
                 $digits = preg_replace('/\D+/', '', $value);
                 if (strlen($digits) < 10) {
                     $fail('Nomor WA harus berisi minimal 10 digit angka.');
@@ -117,35 +117,9 @@ class CheckoutController extends Controller
                     'description' => "Checkout Order #" . $newOrder->invoice_code . " (Rp " . number_format($newOrder->total_price) . ")"
                 ]);
 
-                // ==========================================
-                // E. PROSES MIDTRANS (THE MAGIC)
-                // ==========================================
-
-                // 1. Set Konfigurasi
-                Config::$serverKey = config('midtrans.server_key');
-                Config::$isProduction = config('midtrans.is_production', false);
-                Config::$isSanitized = true;
-                Config::$is3ds = true;
-
-                // 2. Siapkan Parameter Midtrans
-                $params = [
-                    'transaction_details' => [
-                        'order_id' => $newOrder->invoice_code, // Pakai Invoice Code biar unik
-                        'gross_amount' => (int) $newOrder->total_price, // Harus Integer
-                    ],
-                    'customer_details' => [
-                        'first_name' => $user->name,
-                        'email' => $user->email,
-                        'phone' => $request->phone,
-                    ],
-                ];
-
-                // 3. Minta Token ke Midtrans
-                $snapToken = Snap::getSnapToken($params);
-
-                // 4. Simpan Token ke Database Order
-                $newOrder->snap_token = $snapToken;
-                $newOrder->save();
+                
+                // E. GENERATE SNAP TOKEN
+                $snapToken = $newOrder->generateSnapToken();
 
                 return $newOrder;
             });
